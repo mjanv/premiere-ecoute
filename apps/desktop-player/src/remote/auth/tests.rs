@@ -317,3 +317,28 @@ fn a_browser_that_cannot_open_is_a_transient_error() {
         Err(AuthError::Transient(_))
     ));
 }
+
+/// A browser that opens and never comes back.
+struct SilentBrowser;
+
+impl Browser for SilentBrowser {
+    fn open(&self, _url: &str) -> Result<(), String> {
+        Ok(())
+    }
+}
+
+#[test]
+fn cancelling_the_sign_in_signs_nobody_in_and_asks_the_server_for_nothing() {
+    let (mut a, http, store) = auth(vec![], None);
+    assert_eq!(
+        a.sign_in_until(
+            &SilentBrowser,
+            Duration::from_secs(30),
+            Instant::now(),
+            &|| true
+        ),
+        Err(AuthError::Cancelled)
+    );
+    assert_eq!(stored(&store), None);
+    assert_eq!(http.posted.borrow().len(), 0);
+}

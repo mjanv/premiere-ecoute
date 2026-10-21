@@ -58,3 +58,29 @@ fn the_built_in_server_matches_the_build_flavour() {
         assert_eq!(DEFAULT_SERVER, "https://premiere-ecoute.fr");
     }
 }
+
+#[test]
+fn a_saved_address_can_be_forgotten_and_nothing_is_loaded_after() {
+    let dir = std::env::temp_dir().join(format!("pep-config-forget-{}", std::process::id()));
+    save_to(&dir, "https://one.example").unwrap();
+    assert_eq!(load_from(&dir).as_deref(), Some("https://one.example"));
+    forget_from(&dir).unwrap();
+    assert_eq!(load_from(&dir), None);
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn forgetting_when_nothing_was_saved_is_not_an_error() {
+    let dir = std::env::temp_dir().join(format!("pep-config-nothing-{}", std::process::id()));
+    assert!(forget_from(&dir).is_ok());
+}
+
+#[test]
+fn a_forgotten_address_can_be_saved_again() {
+    let dir = std::env::temp_dir().join(format!("pep-config-again-{}", std::process::id()));
+    save_to(&dir, "https://one.example").unwrap();
+    forget_from(&dir).unwrap();
+    save_to(&dir, "https://two.example").unwrap();
+    assert_eq!(load_from(&dir).as_deref(), Some("https://two.example"));
+    let _ = std::fs::remove_dir_all(&dir);
+}

@@ -155,6 +155,21 @@ impl NowPlaying {
         }
     }
 
+    /// Stops the link to the current server and offers the address field again, so another server
+    /// can be chosen. The credential of the old server is kept.
+    fn change_server(&mut self, cx: &mut Context<Self>) {
+        if let Some(handle) = self.remote_handle.take() {
+            handle.stop();
+        }
+        if let Err(message) = remote::config::forget() {
+            crate::log::warn(message);
+        }
+        *lock(&self.remote) = RemoteStatus::default();
+        self.server_error = None;
+        self.editing_server = true;
+        cx.notify();
+    }
+
     /// Validates the address in the field, saves it and starts the backend link.
     fn connect_server(&mut self, cx: &mut Context<Self>) {
         let text = self.server_input.read(cx).value();
@@ -768,6 +783,7 @@ impl Render for NowPlaying {
 
         // Footer: only the actions the link needs, and the server field while it is being edited.
         let needs_sign_in = matches!(remote.link, Link::Unauthorized);
+        let signing_in = matches!(remote.link, Link::SigningIn);
         let local_only = matches!(remote.link, Link::Disabled) && self.remote_handle.is_none();
         let editing = local_only && self.editing_server;
         let enrolled = matches!(
@@ -785,6 +801,12 @@ impl Render for NowPlaying {
         let sign_in = cx.listener(|this, _, _, _| {
             if let Some(handle) = &this.remote_handle {
                 handle.sign_in();
+            }
+        });
+        let change_server = cx.listener(|this, _, _, cx| this.change_server(cx));
+        let cancel_sign_in = cx.listener(|this, _, _, _| {
+            if let Some(handle) = &this.remote_handle {
+                handle.cancel_sign_in();
             }
         });
         let sign_out = cx.listener(|this, _, _, _| {
@@ -832,6 +854,19 @@ impl Render for NowPlaying {
                             .child("Connect"),
                     )
             })
+            .when(!editing && self.remote_handle.is_some(), |d| {
+                d.child(
+                    div()
+                        .id("change-server")
+                        .px(px(4.))
+                        .py(px(2.))
+                        .rounded(px(4.))
+                        .cursor_pointer()
+                        .hover(|s| s.text_color(col(p.ink)).bg(col(p.surface)))
+                        .on_click(change_server)
+                        .child("Change server"),
+                )
+            })
             .when(!editing && enrolled, |d| {
                 d.child(
                     div()
@@ -844,6 +879,9 @@ impl Render for NowPlaying {
                         .on_click(sign_out)
                         .child("Sign out"),
                 )
+            })
+            .when(signing_in, |d| {
+                d.child(action("cancel-sign-in", "Cancel", p).on_click(cancel_sign_in))
             })
             .when(!editing && needs_sign_in, |d| {
                 d.child(action("sign-in", "Sign in", p).on_click(sign_in))

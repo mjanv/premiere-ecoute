@@ -26,6 +26,8 @@ pub enum AuthError {
     Denied,
     /// The user never came back from the browser.
     TimedOut,
+    /// The user gave up waiting for the browser.
+    Cancelled,
     /// Network or server trouble: try again later.
     Transient(String),
 }
@@ -37,6 +39,7 @@ impl std::fmt::Display for AuthError {
             AuthError::Unauthorized(why) => write!(f, "sign in again ({why})"),
             AuthError::Denied => write!(f, "sign in was cancelled"),
             AuthError::TimedOut => write!(f, "sign in timed out"),
+            AuthError::Cancelled => write!(f, "sign-in cancelled"),
             AuthError::Transient(why) => write!(f, "{why}"),
         }
     }
@@ -173,10 +176,21 @@ fn respond(stream: &mut std::net::TcpStream, status: &str, body: &str) {
 
 /// Waits for the browser to come back to `127.0.0.1:<port>/cb`. Accepts the first valid request,
 /// ignores everything else, and gives up at `timeout`.
+#[cfg(test)]
 pub fn wait_for_callback(
     listener: &TcpListener,
     state: &str,
     timeout: Duration,
+) -> Result<String, AuthError> {
+    wait_for_callback_until(listener, state, timeout, &|| false)
+}
+
+/// `wait_for_callback`, giving up with `Cancelled` as soon as `cancelled` says so.
+pub fn wait_for_callback_until(
+    listener: &TcpListener,
+    state: &str,
+    timeout: Duration,
+    cancelled: &dyn Fn() -> bool,
 ) -> Result<String, AuthError> {
     listener
         .set_nonblocking(true)
@@ -213,6 +227,9 @@ pub fn wait_for_callback(
                 }
             }
             Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                if cancelled() {
+                    return Err(AuthError::Cancelled);
+                }
                 if Instant::now() >= deadline {
                     return Err(AuthError::TimedOut);
                 }

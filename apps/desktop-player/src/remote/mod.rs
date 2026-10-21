@@ -304,10 +304,17 @@ impl Worker {
         match control {
             Control::SignIn => {
                 self.set_link(Link::SigningIn);
-                match self
-                    .auth
-                    .sign_in(self.browser.as_ref(), SIGN_IN_TIMEOUT, self.clock.now())
-                {
+                // The window's Cancel button sets the same flag a sign-out does.
+                self.cancel.store(false, Ordering::Relaxed);
+                let cancel = self.cancel.clone();
+                let result = self.auth.sign_in_until(
+                    self.browser.as_ref(),
+                    SIGN_IN_TIMEOUT,
+                    self.clock.now(),
+                    &move || cancel.load(Ordering::Relaxed),
+                );
+                self.cancel.store(false, Ordering::Relaxed);
+                match result {
                     Ok(()) => {
                         self.backoff.reset();
                         self.set_link(Link::Connecting);
@@ -394,6 +401,17 @@ pub struct Handle {
 impl Handle {
     pub fn sign_in(&self) {
         let _ = self.control.send(Control::SignIn);
+    }
+
+    /// Stops the link: the session ends, the worker stops, nothing is signed out (the credential of
+    /// a server stays, so coming back to it needs no new sign-in).
+    pub fn stop(self) {
+        self.cancel.store(true, Ordering::Relaxed);
+    }
+
+    /// Gives up waiting for the browser (the window's Cancel while signing in).
+    pub fn cancel_sign_in(&self) {
+        self.cancel.store(true, Ordering::Relaxed);
     }
 
     pub fn sign_out(&self) {

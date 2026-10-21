@@ -10,12 +10,12 @@ Already decided: tests live in dedicated files (`foo/tests.rs`, see `AGENTS.md`)
 |---|---|---|---|
 | A1 | ~~Second instance steals the connection~~ | Done: `src/instance.rs` takes the named mutex `Local\premiere-ecoute-player` at startup; a second launch exits at once. Previews (`PLAYER_UI_PREVIEW`) skip the check. Open idea: focus the first window instead of exiting silently |
 | A2 | ~~No logging at all~~ | Done: `src/log.rs` writes `%LOCALAPPDATA%\premiere-ecoute-player\player.log` (rotated at 1 MB to `player.log.old`): start, panics, worker crashes, link changes, failed token refreshes and connections, session ends, command outcomes, audio capture failures, and one line per track with every SMTC field Spotify reported. Never tokens. Still open: volume errors (A8) are not logged |
-| A3 | **Sign-in cannot be cancelled** | `Auth::sign_in` blocks the worker up to 5 minutes (`SIGN_IN_TIMEOUT`); the footer says "Waiting for the browser" with nothing to click | Cancel button, and a cancel flag checked in `oauth::wait_for_callback`'s loop |
-| A4 | **Server address cannot be changed from the window** | Once saved, only deleting `%APPDATA%\premiere-ecoute-player\server.txt` changes it | "Change server" action that clears the saved address and returns to "Local only" |
+| A3 | ~~Sign-in cannot be cancelled~~ | Done: the footer shows Cancel while waiting for the browser (`Handle::cancel_sign_in`, `oauth::wait_for_callback_until`) |
+| A4 | ~~Server address cannot be changed from the window~~ | Done: "Change server" stops the link, forgets the saved address (`config::forget`) and opens the address field; the old server keeps its credential |
 | A5 | ~~Track `uri` is an assumption~~ | Handled on the backend: `Discography.TrackMatch` finds the stored track from title, artist, length, album and track number, and the `Local` player mode swaps the made-up `spotify:local:…` uri for `spotify:track:<id>` (once per track). A song that is not stored keeps the made-up uri. Spotify reports `track_number` and `album_artist` but leaves `album_track_count` at 0 and genres empty (one track sampled, 2026-10-21) |
 | A6 | **Two backend checks never run** | Killing the player should return the backend to Web API polling; two instances should give "replaced" | Run step 8 of the backend guide's end-to-end test |
 | A7 | **Backend: first login loses the authorize request** (other repo) | `auth_controller.ex:75` sets the return page to `/` after the Twitch callback, so a first login needs a second click on Sign in | Do not overwrite `user_return_to` when it points at `/oauth/authorize` |
-| A8 | **Volume errors are swallowed** | `volume::get().unwrap_or(None)` shows "Volume unavailable" for any Core Audio failure | Carry the error (or log it, once A2 exists) |
+| A8 | ~~Volume errors are swallowed~~ | Done: logged once when they appear or change (`new_volume_error`); the window still shows "Volume unavailable" |
 
 ## B. Structure
 

@@ -99,11 +99,23 @@ impl Auth {
     }
 
     /// Browser sign-in: PKCE, loopback redirect, consent, code exchange.
+    #[cfg(test)]
     pub fn sign_in(
         &mut self,
         browser: &dyn Browser,
         timeout: Duration,
         now: Instant,
+    ) -> Result<(), AuthError> {
+        self.sign_in_until(browser, timeout, now, &|| false)
+    }
+
+    /// `sign_in`, giving up with `Cancelled` while it waits for the browser if `cancelled` says so.
+    pub fn sign_in_until(
+        &mut self,
+        browser: &dyn Browser,
+        timeout: Duration,
+        now: Instant,
+        cancelled: &dyn Fn() -> bool,
     ) -> Result<(), AuthError> {
         let (listener, port) = oauth::bind_loopback()?;
         let (verifier, state) = (oauth::code_verifier(), oauth::random_state());
@@ -112,7 +124,7 @@ impl Auth {
         browser
             .open(&url)
             .map_err(|e| AuthError::Transient(format!("cannot open the browser: {e}")))?;
-        let code = oauth::wait_for_callback(&listener, &state, timeout)?;
+        let code = oauth::wait_for_callback_until(&listener, &state, timeout, cancelled)?;
         let tokens = oauth::exchange_code(self.http.as_ref(), &self.base, port, &code, &verifier)?;
         self.adopt_tokens(tokens, now);
         Ok(())

@@ -30,6 +30,20 @@ pub fn save_to(dir: &Path, address: &str) -> std::io::Result<()> {
     std::fs::rename(tmp, dir.join(FILE))
 }
 
+/// Forgets the saved address, so the next start (or the window's address field) begins again from
+/// the build's default. Nothing saved is not an error.
+pub fn forget_from(dir: &Path) -> std::io::Result<()> {
+    match std::fs::remove_file(dir.join(FILE)) {
+        Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e),
+        _ => Ok(()),
+    }
+}
+
+pub fn forget() -> Result<(), String> {
+    let dir = dir().ok_or("cannot find where the server address is saved")?;
+    forget_from(&dir).map_err(|e| format!("cannot forget the server address: {e}"))
+}
+
 pub fn load() -> Option<String> {
     load_from(&dir()?)
 }

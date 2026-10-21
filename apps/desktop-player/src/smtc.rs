@@ -32,6 +32,8 @@ const COVER_MAX_BYTES: u32 = 8 * 1024 * 1024;
 pub struct Smtc {
     /// The last track written to the log, so each track is logged once.
     logged: (String, String, String),
+    /// The last volume error written to the log, so it is said once, not at every look.
+    volume_error: Option<String>,
     cover: Cover,
     uris: UriTracker,
 }
@@ -72,6 +74,16 @@ impl Smtc {
         }
         self.cover.artwork.clone()
     }
+}
+
+/// Returns the volume error to log, if it is a new one: it appears, or it changes. `None` for no
+/// error clears it, so the same error later is logged again.
+fn new_volume_error(last: &mut Option<String>, error: Option<String>) -> Option<String> {
+    if *last == error {
+        return None;
+    }
+    last.clone_from(&error);
+    error
 }
 
 /// What Spotify told SMTC about a track, for the log: shows which fields it leaves empty.
@@ -205,6 +217,15 @@ impl Backend for Smtc {
             },
             Instant::now(),
         );
+        // Spotify has no audio session until it has played something: "unknown", and worth a line
+        // in the log once, not an error on screen.
+        let (volume, volume_error) = match volume::get() {
+            Ok(volume) => (volume, None),
+            Err(error) => (None, Some(error)),
+        };
+        if let Some(error) = new_volume_error(&mut self.volume_error, volume_error) {
+            crate::log::warn(format!("cannot read Spotify's volume: {error}"));
+        }
         let snapshot = Snapshot {
             running: true,
             position,
@@ -221,7 +242,7 @@ impl Backend for Smtc {
             shuffle,
             repeat,
             playback,
-            volume: volume::get().unwrap_or(None),
+            volume,
             ..Snapshot::default()
         };
         let track = (

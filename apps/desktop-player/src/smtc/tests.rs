@@ -107,3 +107,32 @@ fn a_track_line_shows_what_spotify_reported_and_what_it_left_out() {
         r#"track "Song" by "", album "" by "", number ?/?, genres [], shuffle ?, repeat ?, 0 s"#
     );
 }
+
+#[test]
+fn a_volume_error_is_logged_when_it_appears_or_changes_not_at_every_look() {
+    let mut last = None;
+    assert_eq!(
+        new_volume_error(&mut last, Some("no audio session".into())),
+        Some("no audio session".to_string())
+    );
+    // The same error at the next look: nothing more to say.
+    assert_eq!(
+        new_volume_error(&mut last, Some("no audio session".into())),
+        None
+    );
+    assert_eq!(
+        new_volume_error(&mut last, Some("device lost".into())),
+        Some("device lost".to_string())
+    );
+}
+
+#[test]
+fn a_volume_that_works_again_clears_the_error_so_a_later_one_is_logged() {
+    let mut last = None;
+    new_volume_error(&mut last, Some("x".into()));
+    assert_eq!(new_volume_error(&mut last, None), None);
+    assert_eq!(
+        new_volume_error(&mut last, Some("x".into())),
+        Some("x".to_string())
+    );
+}

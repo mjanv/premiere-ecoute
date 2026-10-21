@@ -167,3 +167,41 @@ fn token_responses_map_to_tokens_or_precise_errors() {
         Err(AuthError::Transient(_))
     ));
 }
+
+#[test]
+fn waiting_for_the_browser_can_be_cancelled_and_returns_at_once() {
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    let (quiet, _) = bind_loopback().unwrap();
+    let flag = Arc::new(AtomicBool::new(false));
+    let setter = {
+        let flag = flag.clone();
+        std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(150));
+            flag.store(true, Ordering::Relaxed);
+        })
+    };
+    let started = Instant::now();
+    let result = wait_for_callback_until(&quiet, "s1", Duration::from_secs(30), &|| {
+        flag.load(Ordering::Relaxed)
+    });
+    setter.join().unwrap();
+    assert_eq!(result, Err(AuthError::Cancelled));
+    assert!(started.elapsed() < Duration::from_secs(3));
+}
+
+#[test]
+fn not_cancelling_changes_nothing() {
+    let (listener, port) = bind_loopback().unwrap();
+    let browser = browser_hits(port, vec!["/cb?code=the-code&state=s1".into()]);
+    assert_eq!(
+        wait_for_callback_until(&listener, "s1", Duration::from_secs(5), &|| false),
+        Ok("the-code".into())
+    );
+    browser.join().unwrap();
+}
+
+#[test]
+fn a_cancelled_sign_in_is_not_a_failure_to_report() {
+    assert_eq!(AuthError::Cancelled.to_string(), "sign-in cancelled");
+}

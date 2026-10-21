@@ -20,7 +20,7 @@ A compact card of a fixed size (400 by 730, not resizable): every block has a fi
 4. **Now playing**: the cover, the title in the poster face (up to two lines), the artist, and the album in full (up to two lines, so a long album name is readable).
 5. **The minute ruler** with the elapsed and total time, and **the live waveform**.
 6. **Transport and volume** on one row.
-7. **The footer**, one fixed row: the actions the link needs (Sign in, Sign out, Connect to server). While the server address is edited, the field, Connect and a close button take the row's place, and an invalid address is shown in the verdict's hint line, so the window never changes height.
+7. **The footer**, one fixed row: the actions the link needs (Cancel while waiting for the browser, Sign in, Sign out, Connect to server, and Change server, which stops the link, forgets the saved address and opens the address field again; the credential of the old server is kept). While the server address is edited, the field, Connect and a close button take the row's place, and an invalid address is shown in the verdict's hint line, so the window never changes height.
 
 ## The checklist
 
@@ -119,4 +119,3 @@ tools/shot.sh target/x86_64-pc-windows-msvc/release/premiere-ecoute-player.exe /
 - Re-adding the tray icon after Windows Explorer restarts (`TaskbarCreated`), and removing it if the process is killed (Windows drops the ghost on the next hover).
 - Light theme. The palette is always dark by design.
 - Keyboard shortcuts and visible focus rings for the custom transport controls.
-- Cancel while waiting for the browser, and changing the saved server from the window (see `docs/refactoring.md`, A3 and A4).
