@@ -17,7 +17,7 @@ For development, copy `target/x86_64-pc-windows-msvc/release/premiere-ecoute-pla
 | [AGENTS.md](AGENTS.md) | Build and test commands, conventions, how the code is laid out |
 | [docs/architecture.md](docs/architecture.md) | How it works: threads, Windows APIs, the backend link, the waveform, the build |
 | [docs/distribution.md](docs/distribution.md) | Installer, portable zip, icon, versioning, what is not done (signing, auto-update) |
-| [docs/ui.md](docs/ui.md) | The design: palette from the cover, type, ruler, waveform, footer |
+| [docs/ui.md](docs/ui.md) | The design: verdict and checklist, status colours, palette from the cover, ruler, waveform |
 | [docs/adr/0001-remote-control-via-phoenix-channels.md](docs/adr/0001-remote-control-via-phoenix-channels.md) | Why and how the player links to the backend |
 | [docs/refactoring.md](docs/refactoring.md) | What to tidy next, with priorities |
 
