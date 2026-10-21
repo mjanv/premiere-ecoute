@@ -40,3 +40,23 @@ fn the_tooltip_names_the_app_and_the_state_and_fits_the_shell_limit() {
         assert!(tip.encode_utf16().count() < 128, "{tip}");
     }
 }
+
+#[test]
+fn every_light_survives_the_round_trip_through_its_code() {
+    for light in [Light::Green, Light::Amber, Light::Red, Light::Grey] {
+        assert_eq!(light_from_code(light_code(light)), light);
+    }
+}
+
+#[test]
+fn an_unknown_code_is_the_neutral_light() {
+    assert_eq!(light_from_code(200), Light::Grey);
+}
+
+#[test]
+fn only_the_registered_taskbar_message_means_the_taskbar_came_back() {
+    assert!(is_taskbar_created(0xC123, 0xC123));
+    assert!(!is_taskbar_created(0xC124, 0xC123));
+    // Registration failed: no message is ever taken for it, not even 0.
+    assert!(!is_taskbar_created(0, 0));
+}

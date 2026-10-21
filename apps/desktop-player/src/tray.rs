@@ -10,6 +10,7 @@ use crate::light::Light;
 use crate::taskbar;
 use std::ffi::c_void;
 use std::sync::OnceLock;
+use std::sync::atomic::{AtomicU8, AtomicU32, Ordering};
 use std::sync::mpsc::{Receiver, Sender, channel};
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
@@ -20,9 +21,10 @@ use windows::Win32::UI::Shell::{
 use windows::Win32::UI::WindowsAndMessaging::{
     AppendMenuW, CreatePopupMenu, CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyMenu,
     DispatchMessageW, GetCursorPos, GetMessageW, IsIconic, MF_STRING, MSG, PostMessageW,
-    PostQuitMessage, RegisterClassW, SW_HIDE, SW_RESTORE, SetForegroundWindow, ShowWindow,
-    TPM_RETURNCMD, TPM_RIGHTBUTTON, TrackPopupMenu, TranslateMessage, WM_CLOSE, WM_DESTROY,
-    WM_LBUTTONDBLCLK, WM_LBUTTONUP, WM_RBUTTONUP, WNDCLASSW, WS_EX_TOOLWINDOW, WS_POPUP,
+    PostQuitMessage, RegisterClassW, RegisterWindowMessageW, SW_HIDE, SW_RESTORE,
+    SetForegroundWindow, ShowWindow, TPM_RETURNCMD, TPM_RIGHTBUTTON, TrackPopupMenu,
+    TranslateMessage, WM_CLOSE, WM_DESTROY, WM_LBUTTONDBLCLK, WM_LBUTTONUP, WM_RBUTTONUP,
+    WNDCLASSW, WS_EX_TOOLWINDOW, WS_POPUP,
 };
 use windows::core::{PCWSTR, w};
 
@@ -65,6 +67,50 @@ fn menu_event(command: usize) -> Option<Event> {
 
 fn tooltip(light: Light) -> String {
     format!("Premiere Ecoute: {}", light.description())
+}
+
+/// The light the icon shows now, kept for the procedure: when Explorer restarts the icon is added
+/// again with it.
+static CURRENT_LIGHT: AtomicU8 = AtomicU8::new(0);
+/// The id Windows gave the "TaskbarCreated" message, 0 until registered.
+static TASKBAR_CREATED: AtomicU32 = AtomicU32::new(0);
+
+fn light_code(light: Light) -> u8 {
+    match light {
+        Light::Grey => 0,
+        Light::Green => 1,
+        Light::Amber => 2,
+        Light::Red => 3,
+    }
+}
+
+fn light_from_code(code: u8) -> Light {
+    match code {
+        1 => Light::Green,
+        2 => Light::Amber,
+        3 => Light::Red,
+        _ => Light::Grey,
+    }
+}
+
+/// Windows sends a registered message to every top-level window when the taskbar is created again
+/// (Explorer restarted): the icons it had are gone and have to be added again.
+fn is_taskbar_created(message: u32, registered: u32) -> bool {
+    registered != 0 && message == registered
+}
+
+/// Adds the icon, with its callback message and the light `light`. Returns whether the shell took it.
+fn add_icon(hwnd: HWND, light: Light) -> bool {
+    let mut nid = data(hwnd);
+    nid.uFlags = NIF_MESSAGE;
+    nid.uCallbackMessage = CALLBACK;
+    let icon = fill(&mut nid, light);
+    let added = notify(NIM_ADD, &nid);
+    if let Some(icon) = icon {
+        // SAFETY: the shell copied the icon.
+        let _ = unsafe { DestroyIcon(icon) };
+    }
+    added
 }
 
 /// Where the hidden window's procedure sends what the user chose.
@@ -146,6 +192,11 @@ extern "system" fn procedure(hwnd: HWND, message: u32, wparam: WPARAM, lparam: L
             }
             LRESULT(0)
         }
+        m if is_taskbar_created(m, TASKBAR_CREATED.load(Ordering::Relaxed)) => {
+            // Explorer restarted: the icon is gone. Adding one that exists fails, which is harmless.
+            add_icon(hwnd, light_from_code(CURRENT_LIGHT.load(Ordering::Relaxed)));
+            LRESULT(0)
+        }
         WM_DESTROY => {
             notify(NIM_DELETE, &data(hwnd));
             // SAFETY: ends this thread's message loop.
@@ -189,15 +240,10 @@ fn run(ready: Sender<Option<isize>>) {
         let _ = ready.send(None);
         return;
     };
-    let mut nid = data(hwnd);
-    nid.uFlags = NIF_MESSAGE;
-    nid.uCallbackMessage = CALLBACK;
-    let icon = fill(&mut nid, Light::Grey);
-    let added = notify(NIM_ADD, &nid);
-    if let Some(icon) = icon {
-        // SAFETY: the shell copied the icon.
-        let _ = unsafe { DestroyIcon(icon) };
-    }
+    // SAFETY: registers a message name with Windows; the returned id is valid for the session.
+    let created = unsafe { RegisterWindowMessageW(w!("TaskbarCreated")) };
+    TASKBAR_CREATED.store(created, Ordering::Relaxed);
+    let added = add_icon(hwnd, Light::Grey);
     let _ = ready.send(added.then_some(hwnd.0 as isize));
     if !added {
         return;
@@ -254,6 +300,7 @@ impl Tray {
         };
         if notify(NIM_MODIFY, &nid) {
             self.shown = Some(light);
+            CURRENT_LIGHT.store(light_code(light), Ordering::Relaxed);
         }
         // SAFETY: the shell copied the icon.
         let _ = unsafe { DestroyIcon(icon) };

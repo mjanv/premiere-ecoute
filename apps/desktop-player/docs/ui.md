@@ -116,6 +116,6 @@ tools/shot.sh target/x86_64-pc-windows-msvc/release/premiere-ecoute-player.exe /
 ## Not done
 
 - Seeking (clicking the ruler). The backend call (`TryChangePlaybackPositionAsync`) exists in SMTC; the ruler is display-only.
-- Re-adding the tray icon after Windows Explorer restarts (`TaskbarCreated`), and removing it if the process is killed (Windows drops the ghost on the next hover).
+- Removing the tray icon if the process is killed (Windows drops the ghost on the next hover). The icon is added again when Explorer restarts (`TaskbarCreated`); that path is tested for its decisions and smoke-tested, not against a real Explorer restart.
 - Light theme. The palette is always dark by design.
 - Keyboard shortcuts and visible focus rings for the custom transport controls.
