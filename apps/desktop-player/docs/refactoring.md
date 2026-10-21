@@ -13,8 +13,8 @@ Already decided: tests live in dedicated files (`foo/tests.rs`, see `AGENTS.md`)
 | A3 | ~~Sign-in cannot be cancelled~~ | Done: the footer shows Cancel while waiting for the browser (`Handle::cancel_sign_in`, `oauth::wait_for_callback_until`) |
 | A4 | ~~Server address cannot be changed from the window~~ | Done: "Change server" stops the link, forgets the saved address (`config::forget`) and opens the address field; the old server keeps its credential |
 | A5 | ~~Track `uri` is an assumption~~ | Handled on the backend: `Discography.TrackMatch` finds the stored track from title, artist, length, album and track number, and the `Local` player mode swaps the made-up `spotify:local:…` uri for `spotify:track:<id>` (once per track). A song that is not stored keeps the made-up uri. Spotify reports `track_number` and `album_artist` but leaves `album_track_count` at 0 and genres empty (one track sampled, 2026-10-21) |
-| A6 | **Two backend checks never run** | Killing the player should return the backend to Web API polling; two instances should give "replaced" | Run step 8 of the backend guide's end-to-end test |
-| A7 | **Backend: first login loses the authorize request** (other repo) | `auth_controller.ex:75` sets the return page to `/` after the Twitch callback, so a first login needs a second click on Sign in | Do not overwrite `user_return_to` when it points at `/oauth/authorize` |
+| A6 | Two backend checks never run | Partly done by use: stopping and restarting the player brought the backend back to polling and back (seen in a real session), and a second instance gets `replaced`. Token refresh after expiry was not exercised on its own |
+| A7 | ~~Backend: first login loses the authorize request~~ | Done: `UserAuth.put_default_return_to/2` keeps a stored `/oauth/authorize` page after the Twitch callback |
 | A8 | ~~Volume errors are swallowed~~ | Done: logged once when they appear or change (`new_volume_error`); the window still shows "Volume unavailable" |
 
 ## B. Structure

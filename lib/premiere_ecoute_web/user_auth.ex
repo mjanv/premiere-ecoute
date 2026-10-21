@@ -52,6 +52,29 @@ defmodule PremiereEcouteWeb.UserAuth do
   end
 
   @doc """
+  Sets the page to go to after logging in, unless the visitor was on the way to authorize an OAuth client.
+
+  A desktop player is sent to log in when it asks for authorization: the page it asked for was stored, and replacing it would drop the request and make the user start again.
+  """
+  @spec put_default_return_to(Plug.Conn.t(), String.t()) :: Plug.Conn.t()
+  def put_default_return_to(conn, path) do
+    case get_session(conn, :user_return_to) do
+      stored when is_binary(stored) ->
+        if authorize_path?(stored), do: conn, else: put_session(conn, :user_return_to, path)
+
+      _ ->
+        put_session(conn, :user_return_to, path)
+    end
+  end
+
+  defp authorize_path?(path) do
+    case URI.parse(path) do
+      %URI{path: "/oauth/authorize"} -> true
+      _ -> false
+    end
+  end
+
+  @doc """
   Logs the user out.
 
   It clears all session data for safety. See renew_session.

@@ -72,7 +72,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
          {user, auth_data} when not is_nil(user) <- {User.get_user_by_email(auth_data.email), auth_data},
          {:ok, user} <- AccountRegistration.register_twitch_user(auth_data) do
       conn
-      |> put_session(:user_return_to, ~p"/")
+      |> UserAuth.put_default_return_to(~p"/")
       |> UserAuth.log_in_user(user, %{})
     else
       {nil, auth_data} ->
