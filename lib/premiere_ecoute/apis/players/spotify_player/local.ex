@@ -10,15 +10,17 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   require Logger
 
   alias PremiereEcoute.Apis.Players.PlaybackState
+  alias PremiereEcoute.Apis.Players.Protocol
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
   alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Discography.TrackMatch
 
   @stale_after_ms 5_000
   @stale_check_ms 1_000
   @command_ttl_ms 10_000
   @command_grace_ms 2_000
-  @keys [:device, :last_seq, :last_seen_ms, :stale_timer, :pending]
+  @keys [:device, :last_seq, :last_seen_ms, :stale_timer, :pending, :resolved]
 
   @doc """
   Enters the local mode for the device connected through `pid`.
@@ -61,7 +63,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
 
   @impl true
   def handle_info({:device_snapshot, seq, snapshot}, %{last_seq: last_seq} = data) when seq > last_seq do
-    state = to_playback_state(snapshot)
+    {resolved, data} = resolve(snapshot, data)
+    state = Protocol.playback_state(resolved)
     log_snapshot(data, seq, snapshot, state)
     {:observe, state, %{data | last_seq: seq, last_seen_ms: now()}}
   end
@@ -108,6 +111,52 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   end
 
   def handle_info(_message, data), do: {:noreply, data}
+
+  # Windows does not tell which Spotify track plays, so the player sends a made-up `spotify:local:` uri (see `docs/guides/desktop-player.md`). Whatever needs a real `spotify:track:` uri (wantlist save, radio, single track sessions) gets it from the stored discography. The answer is kept for as long as the made-up uri does not change, so a track costs one lookup. An unknown song keeps its made-up uri: track changes are still seen.
+  defp resolve(%{uri: "spotify:local:" <> _ = uri} = snapshot, data) do
+    case data[:resolved] do
+      {^uri, real} ->
+        {use_resolved(snapshot, real), data}
+
+      _ ->
+        real = lookup(snapshot, data)
+        {use_resolved(snapshot, real), Map.put(data, :resolved, {uri, real})}
+    end
+  end
+
+  defp resolve(snapshot, data), do: {snapshot, data}
+
+  defp use_resolved(snapshot, nil), do: snapshot
+  defp use_resolved(snapshot, uri), do: %{snapshot | uri: uri}
+
+  # A failing lookup must never stop the player from following the desktop app.
+  defp lookup(snapshot, data) do
+    wanted = %{
+      title: snapshot.title,
+      artist: snapshot.artist,
+      album: snapshot.album,
+      track_number: Map.get(snapshot, :track_number),
+      length_ms: snapshot.length_ms
+    }
+
+    case TrackMatch.find(wanted) do
+      {:ok, id} ->
+        uri = "spotify:track:" <> id
+        Logger.info("Desktop player track resolved user=#{user(data)} title=#{inspect(snapshot.title)} uri=#{uri}")
+        uri
+
+      :error ->
+        Logger.info(
+          "Desktop player track unknown user=#{user(data)} title=#{inspect(snapshot.title)} artist=#{inspect(snapshot.artist)}"
+        )
+
+        nil
+    end
+  rescue
+    error ->
+      Logger.warning("Desktop player track lookup failed user=#{user(data)} reason=#{Exception.message(error)}")
+      nil
+  end
 
   # `:rejected`, `:expired` and `:error` guarantee that the command was not executed: the Web API takes over.
   defp reply(:ok, result), do: result
@@ -198,28 +247,4 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   defp schedule_stale_check(data), do: Map.put(data, :stale_timer, Process.send_after(self(), :stale_check, @stale_check_ms))
 
   defp now, do: System.monotonic_time(:millisecond)
-
-  defp to_playback_state(snapshot) do
-    %PlaybackState{
-      is_playing: snapshot.playback == :playing,
-      progress_ms: snapshot.position_ms,
-      device: if(snapshot.running, do: %{name: "Desktop", is_active: true}),
-      item: item(snapshot),
-      status: :normal
-    }
-  end
-
-  defp item(%{uri: nil}), do: PlaybackState.default().item
-
-  defp item(snapshot) do
-    %{
-      uri: snapshot.uri,
-      name: snapshot.title,
-      duration_ms: max(snapshot.length_ms, 1),
-      artists: [%{name: snapshot.artist}],
-      type: :album,
-      track_number: nil,
-      album: %{name: snapshot.album, total_tracks: 0, images: []}
-    }
-  end
 end

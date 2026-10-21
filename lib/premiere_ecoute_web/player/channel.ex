@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Player.Channel do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Devices
-  alias PremiereEcouteWeb.Player.Protocol
+  alias PremiereEcoute.Apis.Players.Protocol
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
 

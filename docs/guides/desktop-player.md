@@ -113,6 +113,8 @@ On join the backend starts the user's player process and switches it to local mo
    "playback": "playing",
    "uri": "spotify:track:6rqhFgbbKwnb9MLmUQDhG6",
    "title": "...", "artist": "...", "album": "...",
+   "album_artist": "...", "track_number": 3, "album_track_count": 12,
+   "genres": ["..."], "shuffle": false, "repeat": "none",
    "position_ms": 12345, "length_ms": 215000,
    "volume": 0.5 }}
 ```
@@ -120,8 +122,9 @@ On join the backend starts the user's player process and switches it to local mo
 - `seq` is an integer increasing by 1 per snapshot per connection (start at 1). The backend ignores any `seq` not greater than the last one.
 - `running`: boolean. `playback`: `"playing" | "paused" | "stopped"`. `volume`: number in `0.0..1.0` or `null`. `position_ms`, `length_ms`: non-negative integers. `uri`: `null` when unknown or not a track. Strings are cut to 512 characters.
 - All of `running`, `playback`, `position_ms`, `length_ms` are required; `volume` may be `null`; unknown keys are ignored.
+- Optional keys, read from the Windows media session when Spotify reports them: `album_artist` (string), `track_number` and `album_track_count` (positive integers), `genres` (at most 10 strings), `shuffle` (boolean), `repeat` (`"none" | "track" | "list"`). Send `null` (or `[]` for `genres`) when unknown. The backend drops a value of the wrong type instead of refusing the snapshot, and a player that sends none of them keeps working. `track_number` and `album_track_count` end up in the playback state.
 - Send `running: false` (and `uri: null`) when Spotify desktop is not running: the backend then reports "no device".
-- The backend uses `uri` to detect track changes, so it must change when the track changes.
+- The backend uses `uri` to detect track changes, so it must change when the track changes. Windows does not expose the track's Spotify URI, so the player sends a made-up `spotify:local:…` string unless it started the track itself. The backend then looks the song up in its discography (title, artist, length, album, `track_number`) and uses the real `spotify:track:<id>` when it finds one, otherwise it keeps the made-up string.
 
 `ack`, exactly one per received `command`:
 
