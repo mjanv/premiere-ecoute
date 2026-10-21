@@ -5,6 +5,7 @@ pub mod palette;
 pub mod ruler;
 
 use crate::artwork::{self, Artwork};
+use crate::light::Light;
 use crate::player::{self, Command, Request, Snapshot, format_time, lock};
 use crate::remote;
 use crate::remote_status::{Link, RemoteStatus, Tone};
@@ -48,6 +49,10 @@ pub struct NowPlaying {
     volume_touched: Option<Instant>,
     cover: Option<(u64, Arc<Image>)>,
     palette: Option<Palette>,
+    #[cfg(windows)]
+    badge: Option<crate::taskbar::Badge>,
+    #[cfg(windows)]
+    tray: Option<crate::tray::Tray>,
     _volume_sub: Subscription,
 }
 
@@ -68,6 +73,7 @@ impl NowPlaying {
     ) -> Self {
         // Repaint calmly, and smoothly (about 30 times a second) while sound is scrolling by.
         let (watched_snapshot, watched_scope) = (shared.clone(), scope.clone());
+        let (light_snapshot, light_remote) = (shared.clone(), remote.clone());
         cx.spawn(async move |this, cx| {
             loop {
                 let busy = lock(&watched_snapshot).playback == player::Playback::Playing
@@ -75,7 +81,26 @@ impl NowPlaying {
                 cx.background_executor()
                     .timer(if busy { SMOOTH } else { POLL / 3 })
                     .await;
-                if this.update(cx, |_, cx| cx.notify()).is_err() {
+                // The light is set here, not in `render`: a minimized window may not repaint.
+                let light = Light::of(&lock(&light_snapshot), &lock(&light_remote));
+                let updated = this.update(cx, |this, cx| {
+                    #[cfg(windows)]
+                    {
+                        if let Some(badge) = this.badge.as_mut() {
+                            badge.show(light);
+                        }
+                        if let Some(tray) = this.tray.as_mut() {
+                            tray.set_light(light);
+                            if tray.poll().is_some() {
+                                cx.quit();
+                            }
+                        }
+                    }
+                    #[cfg(not(windows))]
+                    let _ = (this, light);
+                    cx.notify()
+                });
+                if updated.is_err() {
                     break;
                 }
             }
@@ -121,6 +146,10 @@ impl NowPlaying {
             volume_touched: None,
             cover: None,
             palette: None,
+            #[cfg(windows)]
+            badge: crate::taskbar::Badge::for_window(window),
+            #[cfg(windows)]
+            tray: crate::taskbar::hwnd_of(window).and_then(crate::tray::Tray::start),
             _volume_sub,
         }
     }

@@ -20,12 +20,28 @@ pub enum Playback {
     Stopped,
 }
 
+/// Spotify's repeat mode, as SMTC reports it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Repeat {
+    None,
+    Track,
+    List,
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Snapshot {
     pub running: bool,
     pub title: String,
     pub artist: String,
     pub album: String,
+    pub album_artist: String,
+    /// Position of the track in its album; `None` when Spotify does not say.
+    pub track_number: Option<u32>,
+    pub album_track_count: Option<u32>,
+    pub genres: Vec<String>,
+    /// `None` when SMTC does not report the mode.
+    pub shuffle: Option<bool>,
+    pub repeat: Option<Repeat>,
     pub playback: Playback,
     pub position: Duration,
     pub length: Duration,

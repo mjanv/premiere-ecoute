@@ -46,6 +46,19 @@ Under the ruler, a small box with a line that stays in place and moves with the 
 
 One short row. On the left, a dot and the link: `Local only` (the server address could not be used, with a "Connect to server" button that opens an address field, prefilled with the build default: `https://premiere-ecoute.fr`, or `http://localhost:4000` in a `dev-server` build; Enter or Connect saves it and starts the link), `Connecting to server`, `Server linked`, `Server offline, retry in 12 s`, `Server: sign in again`, `Server error: …`. When linked, the row also shows `sent 7s` (age of the last snapshot sent) and, right-aligned, the last command received with its outcome (`next, ok 18s`), which appears only once a command has been received. "Sign out" sits at the right end of the row once the player is enrolled (not in the title bar: Windows treats the whole title bar as the window caption, so clicks inside it never reach a button). Problems use the warning colour. The source of truth is `RemoteStatus` in `src/remote_status.rs`; only the remote subsystem (ADR 0001) writes it.
 
+## Status light and tray
+
+The streamer starts the player and leaves it behind other software, so one light says whether the session will work, without opening the window. It shows as a dot on the taskbar button and as the notification-area icon, with the same colour and a tooltip:
+
+| Light | Meaning |
+|---|---|
+| Green | Linked to the server and Spotify is running |
+| Amber | Signing in, connecting, retrying, or Spotify is not running |
+| Red | Login rejected, server error, or the player cannot read Spotify |
+| Grey | Local only |
+
+Playing or paused does not change it. Minimizing the window hides it to the tray (no taskbar button); a left click on the icon restores it, a right click offers Open and Quit. Nothing flashes. The rules are `Light::of` in `src/light.rs`.
+
 ## Copy
 
 Sentence case, plain verbs, no apologies, no separator characters between pieces of a phrase (use separate lines, elements or commas). Empty states say what to do ("Open Spotify on this PC. It shows up here as soon as it plays."). Command failures say what failed ("Last action failed: …").
@@ -68,6 +81,7 @@ tools/shot.sh target/x86_64-pc-windows-msvc/release/premiere-ecoute-player.exe /
 ## Not done
 
 - Seeking (clicking the ruler). The backend call (`TryChangePlaybackPositionAsync`) exists in SMTC; the ruler is display-only.
+- Re-adding the tray icon after Windows Explorer restarts (`TaskbarCreated`), and removing it if the process is killed (Windows drops the ghost on the next hover).
 - Light theme. The palette is always dark by design.
 - Keyboard shortcuts and visible focus rings for the custom transport controls.
 - Cancel while waiting for the browser, and changing the saved server from the window (see `docs/refactoring.md`, A3 and A4).

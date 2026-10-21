@@ -61,3 +61,49 @@ fn an_update_in_the_future_or_unset_never_underflows() {
     // Unset (0) or negative reads as the year 1601: a huge elapsed time, which `current_position` caps.
     assert!(since_update(DateTime { UniversalTime: -1 }, now) > Duration::from_secs(1 << 33));
 }
+
+#[test]
+fn smtc_counts_of_zero_or_less_mean_unknown() {
+    assert_eq!(count(0), None);
+    assert_eq!(count(-1), None);
+    assert_eq!(count(7), Some(7));
+}
+
+#[test]
+fn smtc_repeat_modes_map_to_ours() {
+    assert_eq!(repeat_from(MediaPlaybackAutoRepeatMode::None), Repeat::None);
+    assert_eq!(
+        repeat_from(MediaPlaybackAutoRepeatMode::Track),
+        Repeat::Track
+    );
+    assert_eq!(repeat_from(MediaPlaybackAutoRepeatMode::List), Repeat::List);
+}
+
+#[test]
+fn a_track_line_shows_what_spotify_reported_and_what_it_left_out() {
+    let full = Snapshot {
+        title: "Song".into(),
+        artist: "Artist".into(),
+        album: "Album".into(),
+        album_artist: "Album Artist".into(),
+        track_number: Some(3),
+        album_track_count: Some(12),
+        genres: vec!["Rock".into(), "Pop".into()],
+        shuffle: Some(false),
+        repeat: Some(Repeat::List),
+        length: Duration::from_secs(215),
+        ..Snapshot::default()
+    };
+    assert_eq!(
+        track_line(&full),
+        r#"track "Song" by "Artist", album "Album" by "Album Artist", number 3/12, genres [Rock, Pop], shuffle false, repeat list, 215 s"#
+    );
+    let bare = Snapshot {
+        title: "Song".into(),
+        ..Snapshot::default()
+    };
+    assert_eq!(
+        track_line(&bare),
+        r#"track "Song" by "", album "" by "", number ?/?, genres [], shuffle ?, repeat ?, 0 s"#
+    );
+}

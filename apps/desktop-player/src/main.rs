@@ -5,12 +5,20 @@ mod artwork;
 #[cfg(windows)]
 mod capture;
 mod identity;
+#[cfg(windows)]
+mod instance;
+mod light;
+mod log;
 mod player;
 mod remote;
 mod remote_status;
 #[cfg(windows)]
 mod smtc;
 mod supervise;
+#[cfg(windows)]
+mod taskbar;
+#[cfg(windows)]
+mod tray;
 mod ui;
 #[cfg(windows)]
 mod volume;
@@ -26,6 +34,12 @@ use ui::NowPlaying;
 use waveform::Scope;
 
 fn main() {
+    // Previews never link to the backend, so they cannot steal its one connection.
+    #[cfg(windows)]
+    if std::env::var_os("PLAYER_UI_PREVIEW").is_none() && !instance::first() {
+        return;
+    }
+    log::init();
     application().with_assets(ui::assets::AppAssets).run(|cx| {
         init(cx);
         cx.text_system()
@@ -73,14 +87,18 @@ fn main() {
             supervise::supervise(
                 "audio-capture",
                 supervise::Policy::default(),
-                |_, _| {},
+                |decision, message| {
+                    log::warn(format!("audio-capture crashed: {message} ({decision:?})"))
+                },
                 move || capture::run(scope.clone()),
             );
             let shared = shared.clone();
             supervise::supervise(
                 "player-worker",
                 supervise::Policy::default(),
-                |_, _| {},
+                |decision, message| {
+                    log::warn(format!("player-worker crashed: {message} ({decision:?})"))
+                },
                 move || player::run(smtc::Smtc::default(), &rx, shared.clone(), ui::POLL),
             );
         }

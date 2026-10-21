@@ -289,6 +289,7 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
 }
 
 fn record(status: &Mutex<RemoteStatus>, name: String, outcome: Outcome, at: Instant) {
+    crate::log::info(format!("command {name}: {}", outcome.label()));
     lock(status).exchange.last_command = Some(CommandLog { name, outcome, at });
 }
 

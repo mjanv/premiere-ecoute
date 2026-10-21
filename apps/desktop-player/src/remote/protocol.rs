@@ -4,7 +4,7 @@
 //!
 //! The backend guide is the authority. This file is pure: no I/O, no clock.
 
-use crate::player::{Command, Playback, Snapshot};
+use crate::player::{Command, Playback, Repeat, Snapshot};
 use crate::remote_status::Outcome;
 use serde_json::{Value, json};
 use std::time::Duration;
@@ -13,6 +13,7 @@ pub const TOPIC: &str = "desktop:me";
 pub const PROTO: u32 = 1;
 const HEARTBEAT_TOPIC: &str = "phoenix";
 const MAX_TEXT: usize = 512;
+const MAX_GENRES: usize = 10;
 const DEFAULT_TTL: Duration = Duration::from_millis(10_000);
 const MAX_TTL: Duration = Duration::from_secs(60);
 
@@ -117,11 +118,27 @@ pub fn snapshot(join_ref: &str, msg_ref: u64, seq: u64, s: &Snapshot) -> String 
             "title": cut(&s.title),
             "artist": cut(&s.artist),
             "album": cut(&s.album),
+            "album_artist": cut(&s.album_artist),
+            "track_number": s.track_number,
+            "album_track_count": s.album_track_count,
+            "genres": s.genres.iter().take(MAX_GENRES).map(|g| cut(g)).collect::<Vec<_>>(),
+            "shuffle": s.shuffle,
+            "repeat": s.repeat.map(Repeat::wire),
             "position_ms": s.position.as_millis() as u64,
             "length_ms": s.length.as_millis() as u64,
             "volume": s.volume,
         }}),
     )
+}
+
+impl Repeat {
+    pub fn wire(self) -> &'static str {
+        match self {
+            Repeat::None => "none",
+            Repeat::Track => "track",
+            Repeat::List => "list",
+        }
+    }
 }
 
 impl Outcome {

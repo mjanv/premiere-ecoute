@@ -223,10 +223,19 @@ pub fn run(scope: Arc<Mutex<Scope>>) {
     unsafe {
         let _ = CoInitializeEx(None, COINIT_MULTITHREADED);
     }
+    // Retries every few seconds: log a failure when it changes, not on every try.
+    let mut last_error: Option<String> = None;
     loop {
         match volume::spotify_pid() {
             Ok(Some(pid)) => {
-                let _ = capture_once(pid, &scope);
+                let result = capture_once(pid, &scope);
+                let error = result.err();
+                if error != last_error {
+                    if let Some(e) = &error {
+                        crate::log::warn(format!("audio capture stopped: {e}"));
+                    }
+                    last_error = error;
+                }
                 std::thread::sleep(RETRY);
             }
             _ => std::thread::sleep(Duration::from_secs(1)),

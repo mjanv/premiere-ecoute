@@ -202,7 +202,12 @@ impl Worker {
     }
 
     fn set_link(&self, link: Link) {
-        lock(&self.status).link = link;
+        let mut status = lock(&self.status);
+        // Offline counts down every second: only the move into a state is worth a line.
+        if std::mem::discriminant(&status.link) != std::mem::discriminant(&link) {
+            crate::log::info(format!("link: {}", link.label()));
+        }
+        status.link = link;
     }
 
     fn offline(&mut self) -> Next {
@@ -223,7 +228,10 @@ impl Worker {
             Err(AuthError::NotEnrolled | AuthError::Unauthorized(_)) => {
                 return self.sign_in_needed();
             }
-            Err(_) => return self.offline(),
+            Err(e) => {
+                crate::log::warn(format!("access token unavailable: {e:?}"));
+                return self.offline();
+            }
         };
         self.set_link(Link::Connecting);
         let mut transport = match self.dialer.dial(&token) {
@@ -238,7 +246,10 @@ impl Worker {
                 self.refused_once = false;
                 return self.sign_in_needed();
             }
-            Err(ConnectError::Failed(_)) => return self.offline(),
+            Err(ConnectError::Failed(e)) => {
+                crate::log::warn(format!("connection failed: {e}"));
+                return self.offline();
+            }
         };
         self.refused_once = false;
 
@@ -260,6 +271,11 @@ impl Worker {
         if ended.joined_for >= STABLE {
             self.backoff.reset();
         }
+        crate::log::info(format!(
+            "session ended after {} s: {:?}",
+            ended.joined_for.as_secs(),
+            ended.reason
+        ));
         match ended.reason {
             End::Lost(_) => self.offline(),
             End::Replaced => {
@@ -294,7 +310,10 @@ impl Worker {
                         self.set_link(Link::Connecting);
                     }
                     // Declined, timed out, no browser: back to the button.
-                    Err(_) => self.set_link(Link::Unauthorized),
+                    Err(e) => {
+                        crate::log::warn(format!("sign-in did not complete: {e:?}"));
+                        self.set_link(Link::Unauthorized);
+                    }
                 }
             }
             Control::SignOut => {
@@ -405,6 +424,7 @@ pub fn start(
             Decision::Restart { after } => format!("restarting in {} s", after.as_secs().max(1)),
             Decision::CoolOff { after } => format!("paused for {} min", after.as_secs() / 60),
         };
+        crate::log::warn(format!("remote-worker crashed: {message}, {restart}"));
         lock(&crash_status).link = Link::Failed(format!("{message}, {restart}"));
     };
 

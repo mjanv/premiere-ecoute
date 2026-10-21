@@ -113,6 +113,61 @@ fn snapshot_says_not_running_with_no_uri_and_a_null_volume() {
 }
 
 #[test]
+fn snapshot_carries_the_album_position_and_modes() {
+    let s = Snapshot {
+        running: true,
+        album_artist: "AA".into(),
+        track_number: Some(3),
+        album_track_count: Some(12),
+        genres: vec!["Rock".into(), "Pop".into()],
+        shuffle: Some(true),
+        repeat: Some(Repeat::List),
+        ..Snapshot::default()
+    };
+    let p = decode_frame(&snapshot("1", 2, 1, &s)).unwrap().payload["snapshot"].clone();
+    assert_eq!(p["album_artist"], "AA");
+    assert_eq!(p["track_number"], 3);
+    assert_eq!(p["album_track_count"], 12);
+    assert_eq!(p["genres"], json!(["Rock", "Pop"]));
+    assert_eq!(p["shuffle"], true);
+    assert_eq!(p["repeat"], "list");
+}
+
+#[test]
+fn unknown_album_position_and_modes_are_null() {
+    let s = Snapshot {
+        running: true,
+        ..Snapshot::default()
+    };
+    let p = decode_frame(&snapshot("1", 2, 1, &s)).unwrap().payload["snapshot"].clone();
+    assert_eq!(p["track_number"], Value::Null);
+    assert_eq!(p["album_track_count"], Value::Null);
+    assert_eq!(p["shuffle"], Value::Null);
+    assert_eq!(p["repeat"], Value::Null);
+    assert_eq!(p["genres"], json!([]));
+}
+
+#[test]
+fn repeat_modes_have_wire_names() {
+    assert_eq!(Repeat::None.wire(), "none");
+    assert_eq!(Repeat::Track.wire(), "track");
+    assert_eq!(Repeat::List.wire(), "list");
+}
+
+#[test]
+fn snapshot_sends_at_most_ten_genres_cut_to_512_characters() {
+    let s = Snapshot {
+        running: true,
+        genres: vec!["é".repeat(600); 12],
+        ..Snapshot::default()
+    };
+    let p = decode_frame(&snapshot("1", 2, 1, &s)).unwrap().payload["snapshot"].clone();
+    let genres = p["genres"].as_array().unwrap();
+    assert_eq!(genres.len(), 10);
+    assert_eq!(genres[0].as_str().unwrap().chars().count(), 512);
+}
+
+#[test]
 fn snapshot_text_is_cut_to_512_characters() {
     let s = Snapshot {
         running: true,

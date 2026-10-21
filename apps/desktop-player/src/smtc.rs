@@ -3,7 +3,7 @@
 
 use crate::artwork::Artwork;
 use crate::identity::{Identity, UriTracker};
-use crate::player::{Backend, Playback, Snapshot, autoplay_uri, current_position};
+use crate::player::{Backend, Playback, Repeat, Snapshot, autoplay_uri, current_position};
 use crate::volume;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use windows::Foundation::{DateTime, TimeSpan};
@@ -13,6 +13,7 @@ use windows::Media::Control::{
     GlobalSystemMediaTransportControlsSessionMediaProperties,
     GlobalSystemMediaTransportControlsSessionPlaybackStatus as Status,
 };
+use windows::Media::MediaPlaybackAutoRepeatMode;
 use windows::Storage::Streams::DataReader;
 
 /// Cover of the current track. SMTC hands out the thumbnail slightly after a track change, so a
@@ -29,6 +30,8 @@ const COVER_MAX_BYTES: u32 = 8 * 1024 * 1024;
 
 #[derive(Default)]
 pub struct Smtc {
+    /// The last track written to the log, so each track is logged once.
+    logged: (String, String, String),
     cover: Cover,
     uris: UriTracker,
 }
@@ -71,6 +74,24 @@ impl Smtc {
     }
 }
 
+/// What Spotify told SMTC about a track, for the log: shows which fields it leaves empty.
+fn track_line(s: &Snapshot) -> String {
+    let n = |v: Option<u32>| v.map_or("?".to_string(), |v| v.to_string());
+    let shuffle = s.shuffle.map_or("?".to_string(), |v| v.to_string());
+    let repeat = s.repeat.map_or("?", Repeat::wire);
+    format!(
+        "track {:?} by {:?}, album {:?} by {:?}, number {}/{}, genres [{}], shuffle {shuffle}, repeat {repeat}, {} s",
+        s.title,
+        s.artist,
+        s.album,
+        s.album_artist,
+        n(s.track_number),
+        n(s.album_track_count),
+        s.genres.join(", "),
+        s.length.as_secs()
+    )
+}
+
 fn err(e: windows::core::Error) -> String {
     e.message()
 }
@@ -95,6 +116,19 @@ fn playback_from(status: Status) -> Playback {
         Status::Playing => Playback::Playing,
         Status::Paused => Playback::Paused,
         _ => Playback::Stopped,
+    }
+}
+
+/// SMTC reports 0 (or less) for a count it does not know.
+fn count(n: i32) -> Option<u32> {
+    u32::try_from(n).ok().filter(|n| *n > 0)
+}
+
+fn repeat_from(mode: MediaPlaybackAutoRepeatMode) -> Repeat {
+    match mode {
+        MediaPlaybackAutoRepeatMode::Track => Repeat::Track,
+        MediaPlaybackAutoRepeatMode::List => Repeat::List,
+        _ => Repeat::None,
     }
 }
 
@@ -135,11 +169,15 @@ impl Backend for Smtc {
             .map_err(err)?
             .join()
             .map_err(err)?;
-        let status = session
-            .GetPlaybackInfo()
-            .map_err(err)?
-            .PlaybackStatus()
-            .map_err(err)?;
+        let info = session.GetPlaybackInfo().map_err(err)?;
+        let status = info.PlaybackStatus().map_err(err)?;
+        // Not every app reports the modes: a missing value is "unknown", not an error.
+        let shuffle = info.IsShuffleActive().and_then(|v| v.Value()).ok();
+        let repeat = info
+            .AutoRepeatMode()
+            .and_then(|v| v.Value())
+            .ok()
+            .map(repeat_from);
         let playback = playback_from(status);
         let timeline = session.GetTimelineProperties().map_err(err)?;
         let length = ticks(timeline.EndTime().map_err(err)?)
@@ -150,6 +188,13 @@ impl Backend for Smtc {
         let title = props.Title().map_err(err)?.to_string();
         let artist = props.Artist().map_err(err)?.to_string();
         let album = props.AlbumTitle().map_err(err)?.to_string();
+        let album_artist = props.AlbumArtist().map_err(err)?.to_string();
+        let track_number = count(props.TrackNumber().map_err(err)?);
+        let album_track_count = count(props.AlbumTrackCount().map_err(err)?);
+        let genres = props
+            .Genres()
+            .map(|g| g.into_iter().map(|g| g.to_string()).collect())
+            .unwrap_or_default();
         let artwork = self.cover_for(&props, (title.clone(), artist.clone(), album.clone()));
         let uri = self.uris.observe(
             Identity {
@@ -160,7 +205,7 @@ impl Backend for Smtc {
             },
             Instant::now(),
         );
-        Ok(Snapshot {
+        let snapshot = Snapshot {
             running: true,
             position,
             length,
@@ -169,10 +214,26 @@ impl Backend for Smtc {
             title,
             artist,
             album,
+            album_artist,
+            track_number,
+            album_track_count,
+            genres,
+            shuffle,
+            repeat,
             playback,
             volume: volume::get().unwrap_or(None),
             ..Snapshot::default()
-        })
+        };
+        let track = (
+            snapshot.title.clone(),
+            snapshot.artist.clone(),
+            snapshot.album.clone(),
+        );
+        if !track.0.is_empty() && track != self.logged {
+            crate::log::info(track_line(&snapshot));
+            self.logged = track;
+        }
+        Ok(snapshot)
     }
 
     fn toggle_play_pause(&mut self) -> Result<(), String> {
