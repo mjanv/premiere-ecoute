@@ -117,6 +117,28 @@ defmodule PremiereEcoute.Apis.Players.Protocol do
     %{"id" => id, "type" => Atom.to_string(type), "args" => Map.new(args, fn {k, v} -> {to_string(k), v} end), "ttl_ms" => ttl_ms}
   end
 
+  @doc """
+  Encodes the `session` event: whether the streamer has a listening session and where it is.
+
+  `state` is `none`, `preparing` or `active`. `source`, `name`, `track_number` and `track_count` are `null` when they do not apply.
+  """
+  @spec session(%{
+          state: :none | :preparing | :active,
+          source: atom() | nil,
+          title: String.t() | nil,
+          track_number: pos_integer() | nil,
+          track_count: pos_integer() | nil
+        }) :: map()
+  def session(%{state: state, source: source, title: title, track_number: track_number, track_count: track_count}) do
+    %{
+      "state" => Atom.to_string(state),
+      "source" => source && Atom.to_string(source),
+      "name" => title && String.slice(title, 0, @max_string),
+      "track_number" => track_number,
+      "track_count" => track_count
+    }
+  end
+
   @doc "Encodes a `disconnect` reason."
   @spec disconnect(atom()) :: map()
   def disconnect(reason), do: %{"reason" => Atom.to_string(reason)}

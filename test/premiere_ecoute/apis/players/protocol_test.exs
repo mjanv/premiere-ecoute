@@ -137,4 +137,43 @@ defmodule PremiereEcoute.Apis.Players.ProtocolTest do
       assert %{item: %{track_number: nil, album: %{total_tracks: 0}}} = Protocol.playback_state(legacy)
     end
   end
+
+  describe "session/1" do
+    test "encodes a running album session with its position" do
+      summary = %{state: :active, source: :album, title: "Plantation Lullabies", track_number: 4, track_count: 10}
+
+      assert Protocol.session(summary) == %{
+               "state" => "active",
+               "source" => "album",
+               "name" => "Plantation Lullabies",
+               "track_number" => 4,
+               "track_count" => 10
+             }
+    end
+
+    test "encodes a prepared session" do
+      summary = %{state: :preparing, source: :playlist, title: "Mix", track_number: nil, track_count: nil}
+
+      assert %{"state" => "preparing", "source" => "playlist", "track_number" => nil, "track_count" => nil} =
+               Protocol.session(summary)
+    end
+
+    test "encodes no session with only a state" do
+      summary = %{state: :none, source: nil, title: nil, track_number: nil, track_count: nil}
+
+      assert Protocol.session(summary) == %{
+               "state" => "none",
+               "source" => nil,
+               "name" => nil,
+               "track_number" => nil,
+               "track_count" => nil
+             }
+    end
+
+    test "cuts a long name to 512 characters" do
+      summary = %{state: :active, source: :free, title: String.duplicate("é", 600), track_number: nil, track_count: nil}
+
+      assert String.length(Protocol.session(summary)["name"]) == 512
+    end
+  end
 end

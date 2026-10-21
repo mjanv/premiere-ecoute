@@ -144,16 +144,30 @@ On join the backend starts the user's player process and switches it to local mo
 
 | `type` | `args` | Sent today by the backend |
 |---|---|---|
-| `play_uri` | `{"uri": "spotify:track:..."}` | Yes (session track start, next, previous, resume) |
+| `play_uri` | `{"uri": "spotify:track:...", "track_number": 4}`: `track_number` is the position of an album track in its album, sent when known (not for singles and playlist tracks) | Yes (session track start, next, previous, resume) |
 | `toggle_play_pause` | `{}` | Yes, only to pause a session that is playing |
 | `next`, `previous` | `{}` | Only on demand through `SpotifyPlayer.command/3`; no session flow sends them |
 | `set_volume` | `{"volume": 0.0..1.0}` | Only on demand through `SpotifyPlayer.command/3` |
+
+The desktop app does not always start the track it is asked for: asked for the first track of an album, it may go to where that album was last left, at another track and position. The player is the only one to deal with it, and the `ok` ack of a `play_uri` means *the track plays from its beginning*. When `track_number` is given, the player checks the track that plays against it (the track number Spotify reports) and navigates to the right one if they differ; without it, it can only detect a track that plays from the middle. An invalid `track_number` is ignored, not rejected.
 
 Rules the player must apply (the backend relies on them):
 - `ttl_ms` is relative. Start a timer on receipt; if it elapsed before execution, do not run it and ack `expired`.
 - Keep the last 256 command ids with their result. A repeated id is not executed again: ack `duplicate`.
 - Re-validate every command (type allow-list, URI format `spotify:track:` plus 22 alphanumeric characters, volume range) and ack `rejected` on failure.
 - Execute at most once. Never re-run a command after a reconnect.
+
+`session`, pushed right after the join and again whenever the streamer's session changes (prepared, started, stopped) or its track does, never twice with the same content. It tells whether the streamer has a listening session and where it is. No votes:
+
+```json
+{"state": "active", "source": "album", "name": "Plantation Lullabies",
+ "track_number": 4, "track_count": 10}
+```
+
+- `state`: `"none"` (no session), `"preparing"` (prepared in the last two hours, not started) or `"active"` (running). A player must ignore a state it does not know.
+- `source`: `"album" | "playlist" | "track" | "free" | "clip"`, or `null` when `state` is `none`. `name`: the album, playlist or track title, or the free session's name; `null` when `state` is `none`.
+- `track_number` and `track_count`: the position of the current track, for an album or a playlist once a track has started; `null` otherwise.
+- The player shows it, decides nothing from it, and forgets it as soon as the link is not live.
 
 `disconnect` (the channel then closes, the socket may stay open):
 

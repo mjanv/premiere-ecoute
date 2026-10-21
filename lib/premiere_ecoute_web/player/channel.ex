@@ -4,7 +4,7 @@ defmodule PremiereEcouteWeb.Player.Channel do
 
   Topic `desktop:<user_id>`, or `desktop:me` for a player that does not know its user id.
 
-  Thin transport between the player and the user's `SpotifyPlayer`: validates incoming messages, forwards them and pushes commands. Takes no decision.
+  Thin transport between the player and the user's `SpotifyPlayer`: validates incoming messages, forwards them and pushes commands. Also tells the player whether the streamer has a listening session (the `session` event, with no votes). Takes no decision.
   """
 
   use Phoenix.Channel
@@ -12,9 +12,10 @@ defmodule PremiereEcouteWeb.Player.Channel do
   require Logger
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Apis.Players.Protocol
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Devices
-  alias PremiereEcoute.Apis.Players.Protocol
+  alias PremiereEcoute.Sessions.ListeningSession
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
 
@@ -37,6 +38,8 @@ defmodule PremiereEcouteWeb.Player.Channel do
 
       true ->
         PremiereEcoute.PubSub.subscribe("player:revoked:#{user_id}")
+        PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
+        send(self(), :push_session)
         Process.send_after(self(), :recheck, @recheck_ms)
         socket = assign(socket, :invalid, [])
         PlayerSupervisor.start({user_id, device: true})
@@ -90,12 +93,43 @@ defmodule PremiereEcouteWeb.Player.Channel do
     end
   end
 
+  # The streamer's session changed, or its track did: tell the player, once per change.
+  def handle_info(:push_session, %{assigns: %{user_id: user_id}} = socket) do
+    session = ListeningSession.current(%User{id: user_id})
+    socket = follow_session(socket, session)
+    payload = session |> ListeningSession.summary() |> Protocol.session()
+
+    if socket.assigns[:session] == payload do
+      {:noreply, socket}
+    else
+      push(socket, "session", payload)
+      {:noreply, assign(socket, :session, payload)}
+    end
+  end
+
+  # What the session itself says: a track started, forwards or back, or it stopped.
+  def handle_info({event, _track}, socket) when event in [:next_track, :previous_track, :track_captured],
+    do: handle_info(:push_session, socket)
+
+  def handle_info(:stop, socket), do: handle_info(:push_session, socket)
+
+  def handle_info({event, _session_id}, socket) when event in [:session_prepared, :session_started, :session_stopped],
+    do: handle_info(:push_session, socket)
+
+  # A track starts from a pause at the end of the previous one (that is how a session plays), so
+  # it is a `:start`, not a `:new_track`: both mean the position may have changed.
+  def handle_info({:player, event, _state}, socket) when event in [:new_track, :start],
+    do: handle_info(:push_session, socket)
+
   def handle_info(:player_revoked, socket), do: handle_info({:disconnect, :revoked}, socket)
 
   def handle_info({:disconnect, reason}, socket) do
     push(socket, "disconnect", Protocol.disconnect(reason))
     {:stop, {:shutdown, reason}, socket}
   end
+
+  # The playback topic carries much more than sessions.
+  def handle_info(_message, socket), do: {:noreply, socket}
 
   @impl true
   def terminate(reason, %{assigns: %{user_id: user_id}}) do
@@ -105,6 +139,20 @@ defmodule PremiereEcouteWeb.Player.Channel do
   defp refuse(user_id, reason) do
     Logger.warning("Desktop player join refused user=#{user_id} reason=#{reason}")
     {:error, %{reason: reason}}
+  end
+
+  # Listens to the topic of the streamer's current session, and to no other: its track changes are
+  # told there, before the player has even started the track.
+  defp follow_session(%{assigns: assigns} = socket, session) do
+    wanted = session && session.id
+
+    if Map.get(assigns, :session_id) == wanted do
+      socket
+    else
+      if old = Map.get(assigns, :session_id), do: PremiereEcoute.PubSub.unsubscribe("session:#{old}")
+      if wanted, do: PremiereEcoute.PubSub.subscribe("session:#{wanted}")
+      assign(socket, :session_id, wanted)
+    end
   end
 
   # Values sent by the player are logged on one line, without control characters.

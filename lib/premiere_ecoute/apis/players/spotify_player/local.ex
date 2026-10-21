@@ -171,7 +171,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
         {:reply, :api, data}
 
       uri ->
-        push(data, from, :play_uri, %{uri: uri}, {:ok, uri})
+        push(data, from, :play_uri, play_args(uri, target), {:ok, uri})
     end
   end
 
@@ -211,6 +211,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
     timer = Process.send_after(self(), {:command_expired, id}, @command_ttl_ms + @command_grace_ms)
     {:noreply, %{data | pending: Map.put(data.pending, id, {from, timer, result, type})}}
   end
+
+  # The desktop app does not always start the track it is asked for (asked for the first track of an
+  # album, it may go back to where the album was left): the position of an album track in its album
+  # lets the player check what plays, and navigate to the right track.
+  defp play_args(uri, %Track{track_number: number}) when is_integer(number) and number > 0, do: %{uri: uri, track_number: number}
+  defp play_args(uri, _target), do: %{uri: uri}
 
   defp track_uri(%Track{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(%Single{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id
