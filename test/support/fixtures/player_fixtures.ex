@@ -3,6 +3,10 @@ defmodule PremiereEcoute.PlayerFixtures do
   Test helpers for the desktop player: issues real Boruta tokens through the player OAuth client.
   """
 
+  import Ecto.Query, only: [from: 2]
+
+  alias Boruta.Ecto.Token
+  alias Boruta.Ecto.TokenStore
   alias Boruta.Oauth.AuthorizeResponse
   alias Boruta.Oauth.ResourceOwner
   alias Boruta.Oauth.TokenResponse
@@ -71,5 +75,36 @@ defmodule PremiereEcoute.PlayerFixtures do
 
     %TokenResponse{access_token: access_token, refresh_token: refresh_token} = Boruta.Oauth.token(token_conn, Callbacks)
     %{access_token: access_token, refresh_token: refresh_token}
+  end
+
+  @doc """
+  Refreshes the player's tokens with a refresh token, as the player does (the refresh token is rotated).
+  """
+  @spec refresh_player_tokens(String.t()) ::
+          {:ok, %{access_token: String.t(), refresh_token: String.t()}} | {:error, Boruta.Oauth.Error.t()}
+  def refresh_player_tokens(refresh_token) do
+    conn = %Plug.Conn{
+      body_params: %{"grant_type" => "refresh_token", "refresh_token" => refresh_token, "client_id" => OauthClient.id()},
+      query_params: %{}
+    }
+
+    case Boruta.Oauth.token(conn, Callbacks) do
+      %TokenResponse{access_token: access, refresh_token: refresh} -> {:ok, %{access_token: access, refresh_token: refresh}}
+      %Boruta.Oauth.Error{} = error -> {:error, error}
+    end
+  end
+
+  @doc """
+  Makes an access token expire an hour ago, as if the player had been running for hours.
+
+  Boruta keeps a token in a cache for as long as it lives and then reads the database, where the expiry is recorded: the cached copy is dropped so that the aged row is what is read.
+  """
+  @spec expire_access_token(String.t()) :: :ok
+  def expire_access_token(access_token) do
+    past = System.os_time(:second) - 3_600
+    cached = Boruta.AccessTokensAdapter.get_by(value: access_token)
+    PremiereEcoute.Repo.update_all(from(t in Token, where: t.value == ^access_token), set: [expires_at: past])
+    if cached, do: TokenStore.invalidate(cached)
+    :ok
   end
 end

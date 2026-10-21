@@ -4,7 +4,7 @@ Backend contract for the Rust desktop player (`apps/desktop-player`). This docum
 
 ## Status
 
-Implemented and covered by backend tests: OAuth enrollment, the socket and channel, the playback state follow, command routing with Web API fallback, revocation. Verified live over a real WebSocket on a dev server with the Rust player: join, snapshots, `play_uri`, `toggle_play_pause`, `next`, and the fall back to Web API polling on disconnect. Not verified live: refresh rotation, revoke from the account page, `replaced`.
+Implemented and covered by backend tests: OAuth enrollment, the socket and channel, the playback state follow, command routing with Web API fallback, revocation. Verified live over a real WebSocket on a dev server with the Rust player: join, snapshots, `play_uri`, `toggle_play_pause`, `next`, and the fall back to Web API polling on disconnect. Sessions longer than the hour an access token lives are covered by tests with real token expiry (`test/premiere_ecoute_web/player/long_session_test.exs`, and the worker tests of the player): the socket only checks the access token when it connects, so a connection stays up after it expires; the periodic check looks at the refresh token, not the access token; a reconnect refreshes first and saves the rotated refresh token before using the new access token. Not verified live: a real run over an hour, revoke from the account page.
 
 ## What changed from the ADR
 

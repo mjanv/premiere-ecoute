@@ -446,3 +446,122 @@ fn the_socket_address_follows_the_scheme_and_adds_the_path_and_version() {
         "wss://premiere-ecoute.fr/player/websocket?vsn=2.0.0"
     );
 }
+
+/// Records the access token of every connection, then plays the script.
+struct RecordingDialer {
+    inner: ScriptedDialer,
+    seen: Rc<RefCell<Vec<String>>>,
+}
+
+impl Dialer for RecordingDialer {
+    fn dial(&self, token: &str) -> Result<Box<dyn Transport>, ConnectError> {
+        self.seen.borrow_mut().push(token.to_string());
+        self.inner.dial(token)
+    }
+}
+
+/// A fixture whose connections are recorded: the access token each one was made with.
+fn recorded(dials: Vec<Dial>, stored: Option<&str>) -> (Fixture, Rc<RefCell<Vec<String>>>) {
+    let mut f = fixture(vec![], stored);
+    let seen = Rc::new(RefCell::new(Vec::new()));
+    f.worker.dialer = Box::new(RecordingDialer {
+        inner: ScriptedDialer {
+            clock: f.clock.clone(),
+            dials: RefCell::new(dials.into()),
+            dialed: f.dialed.clone(),
+        },
+        seen: seen.clone(),
+    });
+    (f, seen)
+}
+
+const HOUR: u64 = 3600;
+
+#[test]
+fn a_connection_that_outlives_its_access_token_reconnects_with_a_fresh_one() {
+    // An album longer than the hour an access token lives: the connection stays up, then drops.
+    let (mut f, seen) = recorded(
+        vec![
+            joined_then(lost_after(secs(HOUR + 600))),
+            joined_then(lost_after(secs(60))),
+        ],
+        Some("R0"),
+    );
+    f.worker.step();
+    f.worker.step();
+    assert_eq!(
+        *seen.borrow(),
+        ["A1", "A2"],
+        "the second connection used a refreshed token"
+    );
+    assert_eq!(f.tokens.count.get(), 2);
+    assert_eq!(
+        f.store.value.lock().unwrap().as_deref(),
+        Some("R2"),
+        "the rotated refresh token is saved"
+    );
+}
+
+#[test]
+fn a_long_session_never_asks_for_a_new_sign_in() {
+    // Five hours of connections that each last a bit over an hour.
+    let dials = (0..5)
+        .map(|_| joined_then(lost_after(secs(HOUR + 300))))
+        .collect();
+    let (mut f, seen) = recorded(dials, Some("R0"));
+    for _ in 0..5 {
+        let next = f.worker.step();
+        assert!(matches!(next, Next::Retry(_)), "{next:?}");
+        assert_ne!(link(&f), Link::Unauthorized);
+    }
+    assert_eq!(*seen.borrow(), ["A1", "A2", "A3", "A4", "A5"]);
+    assert_eq!(f.store.value.lock().unwrap().as_deref(), Some("R5"));
+}
+
+#[test]
+fn a_reconnect_within_the_hour_keeps_the_access_token() {
+    let (mut f, seen) = recorded(
+        vec![
+            joined_then(lost_after(secs(600))),
+            joined_then(lost_after(secs(60))),
+        ],
+        Some("R0"),
+    );
+    f.worker.step();
+    f.worker.step();
+    assert_eq!(*seen.borrow(), ["A1", "A1"]);
+    assert_eq!(f.tokens.count.get(), 1, "no refresh needed");
+}
+
+#[test]
+fn a_token_service_that_is_down_when_the_connection_drops_does_not_lose_the_sign_in() {
+    let (mut f, seen) = recorded(
+        vec![
+            joined_then(lost_after(secs(HOUR + 600))),
+            joined_then(lost_after(secs(60))),
+        ],
+        Some("R0"),
+    );
+    f.worker.step();
+    // The server cannot refresh right now.
+    f.tokens.failures.borrow_mut().push_back(HttpResponse {
+        status: 503,
+        body: String::new(),
+    });
+    let next = f.worker.step();
+    assert!(matches!(next, Next::Retry(_)), "{next:?}");
+    assert!(
+        matches!(link(&f), Link::Offline { .. }),
+        "offline, not signed out: {:?}",
+        link(&f)
+    );
+    assert_eq!(
+        f.store.value.lock().unwrap().as_deref(),
+        Some("R1"),
+        "the credential is kept"
+    );
+    // It comes back: the next attempt refreshes and reconnects.
+    f.worker.step();
+    assert_eq!(seen.borrow().len(), 2);
+    assert_eq!(seen.borrow()[1], "A2");
+}
