@@ -1,5 +1,5 @@
 use super::*;
-use crate::player::{Backend, Playback};
+use crate::player::{Backend, Playback, Repeat};
 use std::sync::{Arc, Mutex};
 
 const LENGTH: u64 = 180;
@@ -31,6 +31,8 @@ struct Spotify {
     /// Where Spotify goes when the first track of the album is asked for, whatever plays: the
     /// album's last track and position.
     resume_to: Option<(usize, u64)>,
+    shuffle: Option<bool>,
+    repeat: Option<Repeat>,
     ticks: u64,
 }
 
@@ -51,6 +53,8 @@ impl Spotify {
                 drifts: false,
                 flaky: 0,
                 resume_to: None,
+                shuffle: None,
+                repeat: None,
                 ticks: 0,
             },
             log,
@@ -72,6 +76,8 @@ impl Spotify {
                 Playback::Paused
             },
             volume: self.volume,
+            shuffle: self.shuffle,
+            repeat: self.repeat,
             ..Snapshot::default()
         }
     }
@@ -102,6 +108,16 @@ impl Backend for Spotify {
     }
     fn verifies_start(&self) -> bool {
         true
+    }
+    fn set_shuffle(&mut self, on: bool) -> Result<(), String> {
+        self.note(format!("shuffle {}", if on { "on" } else { "off" }));
+        self.shuffle = Some(on);
+        Ok(())
+    }
+    fn set_repeat(&mut self, repeat: Repeat) -> Result<(), String> {
+        self.note(format!("repeat {repeat:?}"));
+        self.repeat = Some(repeat);
+        Ok(())
     }
     fn play(&mut self) -> Result<(), String> {
         self.note("play");
@@ -891,4 +907,73 @@ fn a_half_updated_snapshot_is_not_judged_the_settled_one_is() {
 #[test]
 fn a_snapshot_has_to_hold_for_about_a_second_before_it_counts() {
     assert!(STABLE_POLLS as u64 * STEP.as_millis() as u64 >= 800);
+}
+
+#[test]
+fn shuffle_is_turned_off_before_the_track_is_asked_for() {
+    // The Web API path does the same when a session starts: tracks are played in order.
+    let (mut s, log) = Spotify::on(2, 40, 6);
+    s.shuffle = Some(true);
+    run_start(&mut s).0.unwrap();
+    let log = log.lock().unwrap();
+    let off = log
+        .iter()
+        .position(|l| l == "shuffle off")
+        .expect("turned off");
+    let asked = log.iter().position(|l| l == "play_uri").unwrap();
+    assert!(off < asked, "{log:?}");
+    assert_eq!(s.shuffle, Some(false));
+}
+
+#[test]
+fn repeat_is_turned_off_before_the_track_is_asked_for() {
+    for repeat in [Repeat::Track, Repeat::List] {
+        let (mut s, log) = Spotify::on(2, 40, 6);
+        s.repeat = Some(repeat);
+        run_start(&mut s).0.unwrap();
+        let log = log.lock().unwrap();
+        assert!(
+            log.iter().position(|l| l == "repeat None") < log.iter().position(|l| l == "play_uri"),
+            "{log:?}"
+        );
+        assert_eq!(s.repeat, Some(Repeat::None));
+    }
+}
+
+#[test]
+fn nothing_is_changed_when_shuffle_and_repeat_are_off_or_unknown() {
+    for (shuffle, repeat) in [(None, None), (Some(false), Some(Repeat::None))] {
+        let (mut s, log) = Spotify::on(2, 40, 6);
+        s.shuffle = shuffle;
+        s.repeat = repeat;
+        run_start(&mut s).0.unwrap();
+        assert!(
+            !log.lock()
+                .unwrap()
+                .iter()
+                .any(|l| l.starts_with("shuffle") || l.starts_with("repeat"))
+        );
+    }
+}
+
+#[test]
+fn a_spotify_that_refuses_to_change_the_modes_does_not_stop_the_track_from_starting() {
+    // `Scripted` cannot change them (the default is an error): the command carries on.
+    let before = Snapshot {
+        shuffle: Some(true),
+        repeat: Some(Repeat::List),
+        ..snap("Old", 100, Playback::Paused)
+    };
+    let mut backend = Scripted {
+        script: vec![playing_as("New", 1, 180, 0)],
+        at: 0,
+    };
+    let result = start(
+        &mut backend,
+        "spotify:track:x",
+        &before,
+        &mut |_| {},
+        &|_| {},
+    );
+    assert_eq!(result, Ok(()));
 }

@@ -11,7 +11,7 @@
 //! The repair relies on what the exception means: if Spotify resumed the loaded track, the track
 //! asked for was the first of its album. It only runs when the track number is known.
 
-use crate::player::{Backend, Playback, Snapshot, same_track};
+use crate::player::{Backend, Playback, Repeat, Snapshot, same_track};
 use std::time::Duration;
 
 /// Between two looks at Spotify.
@@ -118,6 +118,7 @@ pub fn start_expecting(
     publish: &mut dyn FnMut(&Snapshot),
     sleep: &dyn Fn(Duration),
 ) -> Result<(), String> {
+    normalize_modes(backend, before);
     let mut before = before.clone();
     let mut why = String::new();
     let mut resumed = false;
@@ -145,6 +146,27 @@ pub fn start_expecting(
         }
     }
     Err(why)
+}
+
+/// A session plays one track after the other, in order, and stops each at its end: shuffle and
+/// repeat would break that (the repair walks the album in order, and a repeated track would loop
+/// instead of waiting). The Web API path turns both off when a session starts; this does the same
+/// before a track is asked for. A Spotify that will not change them is not a reason to fail.
+fn normalize_modes(backend: &mut impl Backend, before: &Snapshot) {
+    if before.shuffle == Some(true) {
+        match backend.set_shuffle(false) {
+            Ok(()) => crate::log::info("shuffle was on: turned off, a session plays in order"),
+            Err(message) => crate::log::warn(format!("could not turn shuffle off: {message}")),
+        }
+    }
+    if matches!(before.repeat, Some(Repeat::Track | Repeat::List)) {
+        match backend.set_repeat(Repeat::None) {
+            Ok(()) => {
+                crate::log::info("repeat was on: turned off, a session plays each track once")
+            }
+            Err(message) => crate::log::warn(format!("could not turn repeat off: {message}")),
+        }
+    }
 }
 
 fn attempt_start(

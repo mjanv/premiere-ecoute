@@ -261,6 +261,33 @@ impl Backend for Smtc {
         true
     }
 
+    fn set_shuffle(&mut self, on: bool) -> Result<(), String> {
+        let session = spotify_session()?.ok_or("Spotify is not running")?;
+        accepted(
+            session
+                .TryChangeShuffleActiveAsync(on)
+                .map_err(err)?
+                .join()
+                .map_err(err)?,
+        )
+    }
+
+    fn set_repeat(&mut self, repeat: Repeat) -> Result<(), String> {
+        let session = spotify_session()?.ok_or("Spotify is not running")?;
+        let mode = match repeat {
+            Repeat::None => MediaPlaybackAutoRepeatMode::None,
+            Repeat::Track => MediaPlaybackAutoRepeatMode::Track,
+            Repeat::List => MediaPlaybackAutoRepeatMode::List,
+        };
+        accepted(
+            session
+                .TryChangeAutoRepeatModeAsync(mode)
+                .map_err(err)?
+                .join()
+                .map_err(err)?,
+        )
+    }
+
     fn play(&mut self) -> Result<(), String> {
         let session = spotify_session()?.ok_or("Spotify is not running")?;
         accepted(session.TryPlayAsync().map_err(err)?.join().map_err(err)?)

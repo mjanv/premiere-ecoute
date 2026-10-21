@@ -366,6 +366,14 @@ pub trait Backend {
     fn verifies_start(&self) -> bool {
         false
     }
+    /// Turns shuffle on or off. Not every backend can.
+    fn set_shuffle(&mut self, _on: bool) -> Result<(), String> {
+        Err("shuffle is not supported".into())
+    }
+    /// Sets the repeat mode. Not every backend can.
+    fn set_repeat(&mut self, _repeat: Repeat) -> Result<(), String> {
+        Err("repeat is not supported".into())
+    }
     /// Starts or resumes playback. Not every backend can.
     fn play(&mut self) -> Result<(), String> {
         Err("play is not supported".into())
