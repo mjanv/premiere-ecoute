@@ -21,6 +21,20 @@ cargo install --locked cargo-deny cargo-audit cargo-machete
 | Vulnerabilities | `cargo audit` | No vulnerability. "Unmaintained" warnings are reviewed, not blocking |
 | Advisories, licenses, bans, sources | `cargo deny check` (`deny.toml` sets the Windows target) | Passes. Every ignored advisory in `deny.toml` has a reason; remove an entry once its crate is gone |
 
+## Live checks
+
+The unit tests drive a simulated Spotify. `tools/live.sh` (`tools/live.sh end` for one scenario) drives the **real** Spotify desktop app through the media session, to check what the simulation only assumes. It needs Spotify open and signed in on the Windows PC, takes over what plays, and uses a build with `--features dev-tools` that never joins a server, so it can run next to a real player.
+
+| Scenario | Checks |
+|---|---|
+| `end` | A commanded track is paused at its end and the next track never starts |
+| `first-track` | The first track of an album that was just left is started, not resumed |
+| `other-album` | Another album plays and the album was left on track 4: track 1 is what plays |
+| `shuffle` | Shuffle and repeat are turned off before the track is asked for |
+| `restart` | A song already playing when the player starts is guarded while a session runs |
+
+Run it after a Spotify update, and when the start or end logic changes: it relies on undocumented client behaviour (see `docs/architecture.md`). The player's log (`%LOCALAPPDATA%\premiere-ecoute-player\player.log`) shows what it decided.
+
 ## Rules
 
 - Format with one `cargo fmt` commit, never mixed with other changes.
