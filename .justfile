@@ -31,7 +31,7 @@ player:
     export PLAYER_HUB_URL="http://localhost:$port"
     echo "==> desktop player -> $PLAYER_HUB_URL (watching apps/desktop-player)"
     exec watchexec --restart --quiet -w src -w assets -w build.rs -w Cargo.toml -- \
-      cargo xwin run --target x86_64-pc-windows-msvc --release
+      cargo xwin run --target x86_64-pc-windows-msvc --release --features dev-tools
 
 # Format, lint, test (on Windows), unused dependencies and advisories for the desktop player
 player-check:

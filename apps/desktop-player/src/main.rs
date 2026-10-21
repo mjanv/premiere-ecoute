@@ -36,6 +36,31 @@ use std::sync::{Arc, Mutex};
 use ui::NowPlaying;
 use waveform::Scope;
 
+/// Development only, built with `--features dev-tools`: `PLAYER_DEV_PLAY=spotify:track:<id>` plays
+/// that track at start, as the backend would command it (`PLAYER_DEV_TRACK=<n>` adds its position
+/// in its album), and `PLAYER_DEV_SESSION=1` behaves as if the backend said a session is running.
+#[cfg(feature = "dev-tools")]
+fn dev_tools(commands: &std::sync::mpsc::Sender<player::Request>) {
+    if let Ok(uri) = std::env::var("PLAYER_DEV_PLAY") {
+        let number = std::env::var("PLAYER_DEV_TRACK")
+            .ok()
+            .and_then(|n| n.parse::<u32>().ok());
+        let command = match number {
+            Some(number) => player::Command::PlayTrack { uri, number },
+            None => player::Command::PlayUri(uri),
+        };
+        let _ = commands.send(player::Request::local(command));
+    }
+    if std::env::var_os("PLAYER_DEV_SESSION").is_some() {
+        std::thread::spawn(|| {
+            loop {
+                player::session_running().store(true, std::sync::atomic::Ordering::Relaxed);
+                std::thread::sleep(std::time::Duration::from_millis(300));
+            }
+        });
+    }
+}
+
 fn main() {
     // Previews never link to the backend, so they cannot steal its one connection.
     #[cfg(windows)]
@@ -57,27 +82,8 @@ fn main() {
         let remote = Arc::new(Mutex::new(RemoteStatus::default()));
         let scope = Arc::new(Mutex::new(Scope::default()));
         let (commands, rx) = player::channel();
-        // Development only: play this `spotify:track:<id>` at start, as the backend would command it.
-        // `PLAYER_DEV_TRACK=<n>` adds the track's position in its album, as the backend sends it.
-        if let Ok(uri) = std::env::var("PLAYER_DEV_PLAY") {
-            let number = std::env::var("PLAYER_DEV_TRACK")
-                .ok()
-                .and_then(|n| n.parse::<u32>().ok());
-            let command = match number {
-                Some(number) => player::Command::PlayTrack { uri, number },
-                None => player::Command::PlayUri(uri),
-            };
-            let _ = commands.send(player::Request::local(command));
-        }
-        // Development only: behave as if the backend said a session is running.
-        if std::env::var_os("PLAYER_DEV_SESSION").is_some() {
-            std::thread::spawn(|| {
-                loop {
-                    player::session_running().store(true, std::sync::atomic::Ordering::Relaxed);
-                    std::thread::sleep(std::time::Duration::from_millis(300));
-                }
-            });
-        }
+        #[cfg(feature = "dev-tools")]
+        dev_tools(&commands);
         let preview = ui::preview();
 
         if let Some(status) = preview.remote {

@@ -10,6 +10,7 @@ step() { printf '\n==> %s\n' "$1"; shift; "$@"; }
 
 step "format" cargo fmt --check
 step "lint" cargo xwin clippy --target $target --release --all-targets --no-deps -- -D warnings
+step "lint with the dev tools" cargo xwin clippy --target $target --release --no-deps --features dev-tools -- -D warnings
 step "tests" cargo xwin test --target $target --release
 step "unused dependencies" cargo machete
 step "advisories, licenses, bans, sources" cargo deny check

@@ -52,6 +52,8 @@ gpui-pre-windows = { path = "vendor/gpui-pre-windows" }
 [features]
 # Dev builds talk to a local backend (http://localhost:4000); without it the server is https://premiere-ecoute.fr.
 dev-server = []
+# Development switches read from the environment (`PLAYER_DEV_PLAY`, `PLAYER_DEV_TRACK`, `PLAYER_DEV_SESSION`): never in a build for users.
+dev-tools = []
 
 [profile.release]
 lto = "thin"
