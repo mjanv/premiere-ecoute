@@ -6,12 +6,25 @@
 
 use crate::player::Snapshot;
 use crate::remote_status::{Link, RemoteStatus};
+use std::time::{Duration, Instant};
+
+/// The backend falls back to polling Spotify when no snapshot arrives for this long, so a player
+/// that has sent nothing for longer is not really linked, whatever the connection says.
+pub const STALE_AFTER: Duration = Duration::from_secs(5);
+
+/// Whether a snapshot went out recently enough for the backend to still follow this player.
+pub fn sending(remote: &RemoteStatus, now: Instant) -> bool {
+    remote
+        .exchange
+        .last_snapshot_at
+        .is_some_and(|at| now.saturating_duration_since(at) <= STALE_AFTER)
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Light {
-    /// Linked to the backend and Spotify is running.
+    /// Linked to the backend, sending, and Spotify is running.
     Green,
-    /// On its way or recoverable: signing in, connecting, retrying, or Spotify is not running.
+    /// On its way or recoverable: signing in, connecting, retrying, nothing sent lately, or Spotify is not running.
     Amber,
     /// Needs the streamer: login rejected, backend error, or the player cannot read Spotify.
     Red,
@@ -20,7 +33,7 @@ pub enum Light {
 }
 
 impl Light {
-    pub fn of(snapshot: &Snapshot, remote: &RemoteStatus) -> Self {
+    pub fn of(snapshot: &Snapshot, remote: &RemoteStatus, now: Instant) -> Self {
         if snapshot.error.is_some() {
             return Light::Red;
         }
@@ -28,7 +41,7 @@ impl Light {
             Link::Disabled => Light::Grey,
             Link::Unauthorized | Link::Failed(_) => Light::Red,
             Link::SigningIn | Link::Connecting | Link::Offline { .. } => Light::Amber,
-            Link::Connected if snapshot.running => Light::Green,
+            Link::Connected if snapshot.running && sending(remote, now) => Light::Green,
             Link::Connected => Light::Amber,
         }
     }

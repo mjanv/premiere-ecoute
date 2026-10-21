@@ -1,10 +1,15 @@
 use super::*;
+use crate::remote_status::Exchange;
 use std::time::Duration;
 
-fn status(link: Link) -> RemoteStatus {
+fn status(link: Link, sent_ago: Option<u64>, now: Instant) -> RemoteStatus {
     RemoteStatus {
         link,
-        ..RemoteStatus::default()
+        session: None,
+        exchange: Exchange {
+            last_snapshot_at: sent_ago.and_then(|s| now.checked_sub(Duration::from_secs(s))),
+            ..Exchange::default()
+        },
     }
 }
 
@@ -15,24 +20,54 @@ fn spotify(running: bool) -> Snapshot {
     }
 }
 
+fn now() -> Instant {
+    Instant::now() + Duration::from_secs(3600)
+}
+
 #[test]
-fn linked_with_spotify_running_is_green() {
+fn linked_and_sending_with_spotify_running_is_green() {
+    let now = now();
     assert_eq!(
-        Light::of(&spotify(true), &status(Link::Connected)),
+        Light::of(&spotify(true), &status(Link::Connected, Some(1), now), now),
         Light::Green
     );
 }
 
 #[test]
 fn linked_without_spotify_is_amber() {
+    let now = now();
     assert_eq!(
-        Light::of(&spotify(false), &status(Link::Connected)),
+        Light::of(&spotify(false), &status(Link::Connected, Some(1), now), now),
+        Light::Amber
+    );
+}
+
+#[test]
+fn linked_but_nothing_sent_for_a_while_is_amber() {
+    // The backend gives up on a silent player after 5 s and falls back to polling Spotify.
+    let now = now();
+    assert_eq!(
+        Light::of(&spotify(true), &status(Link::Connected, Some(6), now), now),
+        Light::Amber
+    );
+    assert_eq!(
+        Light::of(&spotify(true), &status(Link::Connected, Some(5), now), now),
+        Light::Green
+    );
+}
+
+#[test]
+fn linked_but_nothing_sent_yet_is_amber() {
+    let now = now();
+    assert_eq!(
+        Light::of(&spotify(true), &status(Link::Connected, None, now), now),
         Light::Amber
     );
 }
 
 #[test]
 fn a_link_on_its_way_or_retrying_is_amber() {
+    let now = now();
     for link in [
         Link::SigningIn,
         Link::Connecting,
@@ -41,7 +76,7 @@ fn a_link_on_its_way_or_retrying_is_amber() {
         },
     ] {
         assert_eq!(
-            Light::of(&spotify(true), &status(link.clone())),
+            Light::of(&spotify(true), &status(link.clone(), None, now), now),
             Light::Amber,
             "{link:?}"
         );
@@ -50,9 +85,10 @@ fn a_link_on_its_way_or_retrying_is_amber() {
 
 #[test]
 fn a_rejected_login_or_a_failure_is_red() {
+    let now = now();
     for link in [Link::Unauthorized, Link::Failed("protocol".into())] {
         assert_eq!(
-            Light::of(&spotify(true), &status(link.clone())),
+            Light::of(&spotify(true), &status(link.clone(), None, now), now),
             Light::Red,
             "{link:?}"
         );
@@ -61,10 +97,11 @@ fn a_rejected_login_or_a_failure_is_red() {
 
 #[test]
 fn an_unusable_player_is_red_whatever_the_link() {
+    let now = now();
     let broken = Snapshot::failed("no media session");
     for link in [Link::Connected, Link::Disabled] {
         assert_eq!(
-            Light::of(&broken, &status(link.clone())),
+            Light::of(&broken, &status(link.clone(), Some(1), now), now),
             Light::Red,
             "{link:?}"
         );
@@ -73,14 +110,16 @@ fn an_unusable_player_is_red_whatever_the_link() {
 
 #[test]
 fn local_only_is_grey() {
+    let now = now();
     assert_eq!(
-        Light::of(&spotify(true), &status(Link::Disabled)),
+        Light::of(&spotify(true), &status(Link::Disabled, None, now), now),
         Light::Grey
     );
 }
 
 #[test]
 fn playing_or_paused_does_not_change_the_light() {
+    let now = now();
     let paused = Snapshot {
         running: true,
         playback: crate::player::Playback::Paused,
@@ -90,8 +129,11 @@ fn playing_or_paused_does_not_change_the_light() {
         playback: crate::player::Playback::Playing,
         ..paused.clone()
     };
-    let linked = status(Link::Connected);
-    assert_eq!(Light::of(&paused, &linked), Light::of(&playing, &linked));
+    let linked = status(Link::Connected, Some(1), now);
+    assert_eq!(
+        Light::of(&paused, &linked, now),
+        Light::of(&playing, &linked, now)
+    );
 }
 
 #[test]

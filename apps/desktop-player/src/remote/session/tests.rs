@@ -418,3 +418,48 @@ fn the_status_shows_connected_after_the_join() {
     let (_, _, status, _) = drive(script, &ex, config());
     assert_eq!(lock(&status).link, Link::Connected);
 }
+
+fn session_frame(state: &str, name: &str) -> Step {
+    frame(
+        &json!(["1", null, "desktop:me", "session", {"state": state, "source": "album",
+            "name": name, "track_number": 4, "track_count": 10}])
+        .to_string(),
+    )
+}
+
+#[test]
+fn a_session_event_after_the_join_is_kept_in_the_status() {
+    let ex = FakeExecutor::answering(vec![]);
+    let script = vec![
+        frame(JOIN_OK),
+        session_frame("active", "Plantation Lullabies"),
+        revoked(),
+    ];
+    let (_, _, status, _) = drive(script, &ex, config());
+    let info = lock(&status).session.clone().expect("a session");
+    assert_eq!(info.state, crate::remote_status::SessionState::Active);
+    assert_eq!(info.name.as_deref(), Some("Plantation Lullabies"));
+    assert_eq!((info.track_number, info.track_count), (Some(4), Some(10)));
+}
+
+#[test]
+fn the_latest_session_event_wins() {
+    let ex = FakeExecutor::answering(vec![]);
+    let script = vec![
+        frame(JOIN_OK),
+        session_frame("active", "A"),
+        session_frame("none", "B"),
+        revoked(),
+    ];
+    let (_, _, status, _) = drive(script, &ex, config());
+    let info = lock(&status).session.clone().expect("a session");
+    assert_eq!(info.state, crate::remote_status::SessionState::None);
+}
+
+#[test]
+fn a_session_event_before_the_join_is_confirmed_is_ignored() {
+    let ex = FakeExecutor::answering(vec![]);
+    let script = vec![session_frame("active", "Early"), frame(JOIN_OK), revoked()];
+    let (_, _, status, _) = drive(script, &ex, config());
+    assert_eq!(lock(&status).session, None);
+}

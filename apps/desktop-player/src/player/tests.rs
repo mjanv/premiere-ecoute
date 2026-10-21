@@ -490,3 +490,256 @@ fn run_pauses_a_commanded_track_in_its_last_second() {
         1
     );
 }
+
+#[test]
+fn a_commanded_track_whose_end_was_missed_is_reported_so_it_can_be_paused_late() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+    assert!(!guard.observe(&track("New", 177, 180), t0));
+    // The next album track is playing already: the last second went by unseen.
+    assert!(!guard.observe(&track("Next", 1, 200), t0));
+    assert!(guard.take_missed());
+    assert!(!guard.take_missed(), "it is reported once");
+}
+
+#[test]
+fn a_skip_in_the_middle_of_the_track_is_not_a_missed_end() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 10, 180), t0));
+    assert!(!guard.observe(&track("Other", 1, 200), t0));
+    assert!(!guard.take_missed());
+}
+
+#[test]
+fn the_guard_says_which_snapshots_are_of_the_followed_track() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.guarded(&track("Old", 100, 200)), "not yet following");
+    guard.observe(&track("New", 1, 180), t0);
+    assert!(guard.guarded(&track("New", 90, 180)));
+    assert!(!guard.guarded(&track("Other", 1, 200)));
+}
+
+#[test]
+fn pause_defaults_to_the_toggle_and_is_not_safe_to_repeat() {
+    let mut backend = Fake {
+        playing: true,
+        ..Fake::default()
+    };
+    backend.pause().unwrap();
+    assert!(!backend.playing, "the default pause is the toggle");
+    assert!(!backend.pause_is_idempotent());
+}
+
+#[test]
+fn a_paused_track_that_plays_after_the_command_is_followed_at_once() {
+    // Spotify resumed the track that was loaded instead of switching: nothing changed but the state.
+    let t0 = Instant::now();
+    let paused = Snapshot {
+        playback: Playback::Paused,
+        ..track("Song", 100, 200)
+    };
+    let mut guard = armed(&paused, t0);
+    assert!(!guard.observe(&track("Song", 101, 200), t0));
+    assert!(guard.wake_in().is_some(), "it follows the track");
+    assert!(guard.observe(&track("Song", 199, 200), t0));
+}
+
+#[test]
+fn a_track_that_just_keeps_playing_is_followed_once_nothing_else_came() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Song", 50, 200), t0);
+    // The new track may be slow to start: for a few seconds the current one is not taken for it.
+    assert!(!guard.observe(&track("Song", 51, 200), t0 + Duration::from_secs(1)));
+    assert_eq!(guard.wake_in(), None);
+    let later = t0 + Duration::from_secs(5);
+    assert!(!guard.observe(&track("Song", 55, 200), later));
+    assert!(guard.wake_in().is_some(), "now it follows it");
+    assert!(guard.observe(&track("Song", 199, 200), later));
+}
+
+#[test]
+fn a_slow_new_track_is_still_the_one_followed() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 50, 200), t0);
+    assert!(!guard.observe(&track("Old", 51, 200), t0 + Duration::from_secs(1)));
+    assert!(!guard.observe(&track("New", 1, 180), t0 + Duration::from_secs(2)));
+    assert!(guard.guarded(&track("New", 100, 180)));
+    assert!(!guard.guarded(&track("Old", 100, 200)));
+}
+
+fn lagging(title: &str, position: u64, length: u64) -> Snapshot {
+    track(title, position, length)
+}
+
+#[test]
+fn a_title_that_lags_behind_the_new_track_does_not_lose_the_guard() {
+    // Spotify updates the title and the length one after the other: for a moment the old title
+    // comes with the new track's length.
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 193, 194), t0);
+    assert!(!guard.observe(&lagging("Old", 0, 243), t0));
+    assert!(
+        guard.guarded(&lagging("Old", 1, 243)),
+        "it locked on the mixed-up identity"
+    );
+    let soon = t0 + Duration::from_secs(1);
+    assert!(!guard.observe(&track("New", 1, 243), soon));
+    assert!(
+        guard.guarded(&track("New", 2, 243)),
+        "it moved to the real one"
+    );
+    assert!(guard.observe(&track("New", 242, 243), soon));
+}
+
+#[test]
+fn a_skip_to_another_track_later_is_still_left_alone() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+    let later = t0 + Duration::from_secs(30);
+    assert!(!guard.observe(&track("Other", 1, 200), later));
+    assert!(!guard.guarded(&track("Other", 2, 200)));
+}
+
+#[test]
+fn a_new_identity_in_the_middle_of_a_track_is_not_a_relock() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+    assert!(!guard.observe(&track("Other", 100, 200), t0 + Duration::from_secs(1)));
+    assert!(!guard.guarded(&track("Other", 101, 200)));
+}
+
+#[test]
+fn a_playing_track_can_be_followed_without_a_command() {
+    // A session is running and a song is already playing, say after the player restarted.
+    let t0 = Instant::now();
+    let mut guard = StopAtEnd::default();
+    assert!(guard.follow(&track("Song", 50, 200), t0));
+    assert!(guard.guarded(&track("Song", 60, 200)));
+    assert!(!guard.observe(&track("Song", 198, 200), t0));
+    assert!(guard.observe(&track("Song", 199, 200), t0));
+}
+
+#[test]
+fn following_on_demand_never_replaces_what_the_guard_already_does() {
+    let t0 = Instant::now();
+    let mut armed_guard = armed(&track("Old", 100, 200), t0);
+    assert!(!armed_guard.follow(&track("Old", 100, 200), t0));
+    assert_eq!(armed_guard.describe(), "waiting for the commanded track");
+
+    let mut following = StopAtEnd::default();
+    following.follow(&track("Song", 50, 200), t0);
+    assert!(!following.follow(&track("Other", 10, 200), t0));
+    assert!(
+        following.guarded(&track("Song", 51, 200)),
+        "still on the first one"
+    );
+}
+
+#[test]
+fn only_a_track_that_is_playing_with_time_left_is_followed() {
+    let t0 = Instant::now();
+    let paused = Snapshot {
+        playback: Playback::Paused,
+        ..track("Song", 50, 200)
+    };
+    assert!(!StopAtEnd::default().follow(&paused, t0));
+    assert!(
+        !StopAtEnd::default().follow(&track("Song", 0, 0), t0),
+        "no length"
+    );
+    // In its last second the pause is already due, or already made: nothing to follow.
+    assert!(!StopAtEnd::default().follow(&track("Song", 199, 200), t0));
+    assert!(!StopAtEnd::default().follow(&Snapshot::not_running(), t0));
+}
+
+#[test]
+fn run_stops_whatever_plays_at_its_end_while_a_session_is_running() {
+    use std::sync::atomic::AtomicBool;
+    struct Playing {
+        log: Arc<Mutex<Vec<String>>>,
+        position: u64,
+    }
+    impl Backend for Playing {
+        fn snapshot(&mut self) -> Result<Snapshot, String> {
+            self.position = (self.position + 4).min(179);
+            Ok(track("Song", self.position, 180))
+        }
+        fn toggle_play_pause(&mut self) -> Result<(), String> {
+            self.log.lock().unwrap().push("pause".into());
+            Ok(())
+        }
+        fn next(&mut self) -> Result<(), String> {
+            Ok(())
+        }
+        fn previous(&mut self) -> Result<(), String> {
+            Ok(())
+        }
+        fn set_volume(&mut self, _: f32) -> Result<(), String> {
+            Ok(())
+        }
+        fn play_uri(&mut self, _: &str) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    let run_for = |running: bool| {
+        let flag: &'static AtomicBool = Box::leak(Box::new(AtomicBool::new(running)));
+        let log = Arc::new(Mutex::new(Vec::new()));
+        let backend = Playing {
+            log: log.clone(),
+            position: 150,
+        };
+        let shared = Arc::new(Mutex::new(Snapshot::default()));
+        let (tx, rx) = channel();
+        let handle = std::thread::spawn(move || {
+            run_with(backend, &rx, shared, Duration::from_millis(5), flag)
+        });
+        std::thread::sleep(Duration::from_millis(400));
+        drop(tx);
+        handle.join().unwrap();
+        log.lock().unwrap().len()
+    };
+    assert_eq!(run_for(true), 1, "paused once, at the end");
+    assert_eq!(run_for(false), 0, "left alone when no session runs");
+}
+
+#[test]
+fn the_guard_does_not_lose_a_track_whose_length_jitters() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    let with_length = |ms: u64, position: u64| Snapshot {
+        length: Duration::from_millis(ms),
+        ..track("New", position, 180)
+    };
+    assert!(!guard.observe(&with_length(180_100, 1), t0));
+    assert!(
+        guard.guarded(&with_length(180_000, 90)),
+        "same track, length read again"
+    );
+    assert!(!guard.observe(&with_length(180_000, 90), t0 + Duration::from_secs(60)));
+    assert!(guard.guarded(&with_length(180_100, 91)));
+    assert!(guard.observe(&with_length(179_950, 179), t0 + Duration::from_secs(90)));
+}
+
+#[test]
+fn a_command_whose_track_is_the_one_playing_with_a_jittering_length_is_not_a_new_track() {
+    // The armed guard must not take the track that was loaded for the commanded one.
+    let t0 = Instant::now();
+    let before = Snapshot {
+        length: Duration::from_millis(194_100),
+        ..track("Song", 100, 194)
+    };
+    let mut guard = StopAtEnd::default();
+    guard.arm(&before, t0);
+    let jittered = Snapshot {
+        length: Duration::from_millis(194_000),
+        ..track("Song", 101, 194)
+    };
+    // Still playing the same track, a moment after: not yet "started".
+    assert!(!guard.observe(&jittered, t0 + Duration::from_secs(1)));
+    assert_eq!(guard.describe(), "waiting for the commanded track");
+}

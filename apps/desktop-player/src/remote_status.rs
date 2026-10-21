@@ -52,10 +52,33 @@ pub struct Exchange {
     pub last_command: Option<CommandLog>,
 }
 
+/// Whether the streamer has a listening session, as the server last said.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SessionState {
+    None,
+    /// Prepared, not started.
+    Preparing,
+    Active,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SessionInfo {
+    pub state: SessionState,
+    /// `album`, `playlist`, `track`, `free` or `clip`.
+    pub source: Option<String>,
+    pub name: Option<String>,
+    /// Position of the current track, for an album or a playlist.
+    pub track_number: Option<u32>,
+    pub track_count: Option<u32>,
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct RemoteStatus {
     pub link: Link,
     pub exchange: Exchange,
+    /// What the server last said about the streamer's session. `None` until it says, and again as
+    /// soon as the link is not live: an old answer must never be shown as current.
+    pub session: Option<SessionInfo>,
 }
 
 impl Link {
@@ -127,6 +150,17 @@ impl Exchange {
 }
 
 impl RemoteStatus {
+    /// Replaces the link. Returns true when the kind of link changed (a countdown that only changes
+    /// the delay is not a new state). Leaving the live link forgets the session.
+    pub fn set_link(&mut self, link: Link) -> bool {
+        let changed = std::mem::discriminant(&self.link) != std::mem::discriminant(&link);
+        if !matches!(link, Link::Connected) {
+            self.session = None;
+        }
+        self.link = link;
+        changed
+    }
+
     /// Fake states for looking at the UI without a backend: `PLAYER_UI_PREVIEW=connected|connecting|offline|unauthorized|failed`.
     pub fn preview(kind: &str, now: Instant) -> Option<Self> {
         let sent = Exchange {
@@ -159,7 +193,19 @@ impl RemoteStatus {
             ),
             _ => return None,
         };
-        Some(Self { link, exchange })
+        // A live link has heard from the server: a session on its fourth track of ten.
+        let session = matches!(link, Link::Connected).then(|| SessionInfo {
+            state: SessionState::Active,
+            source: Some("album".into()),
+            name: Some("Plantation Lullabies".into()),
+            track_number: Some(4),
+            track_count: Some(10),
+        });
+        Some(Self {
+            link,
+            exchange,
+            session,
+        })
     }
 }
 

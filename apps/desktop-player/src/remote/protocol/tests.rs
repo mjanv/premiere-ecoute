@@ -343,3 +343,121 @@ fn disconnect_reasons_and_unknown_events() {
         Inbound::ChannelEnded
     );
 }
+
+fn session_event(payload: Value) -> Inbound {
+    interpret(&Frame {
+        join_ref: None,
+        msg_ref: None,
+        topic: TOPIC.into(),
+        event: "session".into(),
+        payload,
+    })
+}
+
+#[test]
+fn a_running_session_is_read_with_its_position() {
+    let inbound = session_event(json!({
+        "state": "active", "source": "album", "name": "Plantation Lullabies",
+        "track_number": 4, "track_count": 10
+    }));
+    assert_eq!(
+        inbound,
+        Inbound::Session(SessionInfo {
+            state: SessionState::Active,
+            source: Some("album".into()),
+            name: Some("Plantation Lullabies".into()),
+            track_number: Some(4),
+            track_count: Some(10),
+        })
+    );
+}
+
+#[test]
+fn no_session_and_a_prepared_one_are_read() {
+    let none = session_event(json!({"state": "none", "source": null, "name": null,
+        "track_number": null, "track_count": null}));
+    assert!(matches!(
+        none,
+        Inbound::Session(SessionInfo {
+            state: SessionState::None,
+            source: None,
+            name: None,
+            ..
+        })
+    ));
+    let prepared = session_event(json!({"state": "preparing", "source": "playlist"}));
+    assert!(matches!(
+        prepared,
+        Inbound::Session(SessionInfo {
+            state: SessionState::Preparing,
+            track_number: None,
+            ..
+        })
+    ));
+}
+
+#[test]
+fn a_session_event_with_an_unknown_state_or_no_state_is_ignored() {
+    assert_eq!(
+        session_event(json!({"state": "exploding"})),
+        Inbound::Ignored
+    );
+    assert_eq!(session_event(json!({"source": "album"})), Inbound::Ignored);
+    assert_eq!(session_event(json!("nope")), Inbound::Ignored);
+}
+
+#[test]
+fn session_numbers_that_make_no_sense_are_dropped_and_the_name_is_cut() {
+    let Inbound::Session(info) = session_event(json!({
+        "state": "active", "name": "é".repeat(600), "track_number": 0, "track_count": -3
+    })) else {
+        panic!("a session");
+    };
+    assert_eq!((info.track_number, info.track_count), (None, None));
+    assert_eq!(info.name.unwrap().chars().count(), 512);
+}
+
+#[test]
+fn a_session_event_on_another_topic_is_ignored() {
+    let inbound = interpret(&Frame {
+        join_ref: None,
+        msg_ref: None,
+        topic: "desktop:other".into(),
+        event: "session".into(),
+        payload: json!({"state": "active"}),
+    });
+    assert_eq!(inbound, Inbound::Ignored);
+}
+
+#[test]
+fn a_track_number_with_play_uri_is_carried_to_the_player() {
+    let uri = format!("spotify:track:{ID}");
+    let command = |args: Value| match cmd(
+        json!({"id": "c1", "type": "play_uri", "args": args, "ttl_ms": 10000}),
+    ) {
+        Inbound::Command(Ok(c)) => c.command,
+        other => panic!("{other:?}"),
+    };
+    assert_eq!(
+        command(json!({"uri": uri, "track_number": 4})),
+        Command::PlayTrack {
+            uri: uri.clone(),
+            number: 4
+        }
+    );
+    // A number that makes no sense is ignored: the command still plays, only unchecked.
+    for bad in [
+        json!(0),
+        json!(-1),
+        json!("4"),
+        json!(1000),
+        json!(4.5),
+        Value::Null,
+    ] {
+        assert_eq!(
+            command(json!({"uri": uri, "track_number": bad})),
+            Command::PlayUri(uri.clone()),
+            "{bad}"
+        );
+    }
+}

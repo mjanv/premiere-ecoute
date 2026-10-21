@@ -6,6 +6,7 @@
 
 use crate::player::{Command, Playback, Repeat, Snapshot};
 use crate::remote_status::Outcome;
+use crate::remote_status::{SessionInfo, SessionState};
 use serde_json::{Value, json};
 use std::time::Duration;
 
@@ -13,6 +14,8 @@ pub const TOPIC: &str = "desktop:me";
 pub const PROTO: u32 = 1;
 const HEARTBEAT_TOPIC: &str = "phoenix";
 const MAX_TEXT: usize = 512;
+/// No album has more tracks than this.
+const MAX_TRACK_NUMBER: u64 = 999;
 const MAX_GENRES: usize = 10;
 const DEFAULT_TTL: Duration = Duration::from_millis(10_000);
 const MAX_TTL: Duration = Duration::from_secs(60);
@@ -204,6 +207,8 @@ pub enum Inbound {
     HeartbeatReply,
     Command(Result<RemoteCommand, Rejection>),
     Disconnect(Disconnect),
+    /// Whether the streamer has a listening session.
+    Session(SessionInfo),
     /// The channel ended (`phx_close` or `phx_error`).
     ChannelEnded,
     /// Unknown events and replies we do not care about.
@@ -220,9 +225,33 @@ pub fn interpret(f: &Frame) -> Inbound {
             Some("revoked") => Disconnect::Revoked,
             other => Disconnect::Other(other.unwrap_or("unknown").to_string()),
         }),
+        (TOPIC, "session") => session(&f.payload).map_or(Inbound::Ignored, Inbound::Session),
         (TOPIC, "phx_close" | "phx_error") => Inbound::ChannelEnded,
         _ => Inbound::Ignored,
     }
+}
+
+/// `None` when the state is missing or unknown: a server newer than the player may add states.
+fn session(p: &Value) -> Option<SessionInfo> {
+    let state = match p["state"].as_str()? {
+        "none" => SessionState::None,
+        "preparing" => SessionState::Preparing,
+        "active" => SessionState::Active,
+        _ => return None,
+    };
+    let count = |key: &str| {
+        p[key]
+            .as_u64()
+            .filter(|n| *n > 0)
+            .and_then(|n| u32::try_from(n).ok())
+    };
+    Some(SessionInfo {
+        state,
+        source: p["source"].as_str().map(cut),
+        name: p["name"].as_str().map(cut),
+        track_number: count("track_number"),
+        track_count: count("track_count"),
+    })
 }
 
 fn join_reply(payload: &Value) -> Inbound {
@@ -283,15 +312,23 @@ fn command(p: &Value) -> Result<RemoteCommand, Rejection> {
             )
         }
         Some("play_uri") => {
-            let uri = args["uri"].as_str().filter(|u| strict_track_uri(u));
+            let uri = args["uri"]
+                .as_str()
+                .filter(|u| strict_track_uri(u))
+                .ok_or_else(|| reject("uri must be spotify:track: and 22 letters or digits"))?
+                .to_string();
+            // The position of the track in its album, when the backend knows it. One that makes
+            // no sense is ignored: the track still plays, only unchecked.
+            let number = args["track_number"]
+                .as_u64()
+                .filter(|n| (1..=MAX_TRACK_NUMBER).contains(n))
+                .and_then(|n| u32::try_from(n).ok());
             (
                 "play_uri",
-                Command::PlayUri(
-                    uri.ok_or_else(|| {
-                        reject("uri must be spotify:track: and 22 letters or digits")
-                    })?
-                    .to_string(),
-                ),
+                match number {
+                    Some(number) => Command::PlayTrack { uri, number },
+                    None => Command::PlayUri(uri),
+                },
             )
         }
         Some(_) => return Err(reject("unknown command type")),

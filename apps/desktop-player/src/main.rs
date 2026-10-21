@@ -4,6 +4,7 @@
 mod artwork;
 #[cfg(windows)]
 mod capture;
+mod ending;
 mod identity;
 #[cfg(windows)]
 mod instance;
@@ -14,6 +15,8 @@ mod remote;
 mod remote_status;
 #[cfg(windows)]
 mod smtc;
+mod start;
+mod status;
 mod supervise;
 #[cfg(windows)]
 mod taskbar;
@@ -54,6 +57,27 @@ fn main() {
         let remote = Arc::new(Mutex::new(RemoteStatus::default()));
         let scope = Arc::new(Mutex::new(Scope::default()));
         let (commands, rx) = player::channel();
+        // Development only: play this `spotify:track:<id>` at start, as the backend would command it.
+        // `PLAYER_DEV_TRACK=<n>` adds the track's position in its album, as the backend sends it.
+        if let Ok(uri) = std::env::var("PLAYER_DEV_PLAY") {
+            let number = std::env::var("PLAYER_DEV_TRACK")
+                .ok()
+                .and_then(|n| n.parse::<u32>().ok());
+            let command = match number {
+                Some(number) => player::Command::PlayTrack { uri, number },
+                None => player::Command::PlayUri(uri),
+            };
+            let _ = commands.send(player::Request::local(command));
+        }
+        // Development only: behave as if the backend said a session is running.
+        if std::env::var_os("PLAYER_DEV_SESSION").is_some() {
+            std::thread::spawn(|| {
+                loop {
+                    player::session_running().store(true, std::sync::atomic::Ordering::Relaxed);
+                    std::thread::sleep(std::time::Duration::from_millis(300));
+                }
+            });
+        }
         let preview = ui::preview();
 
         if let Some(status) = preview.remote {
@@ -99,11 +123,20 @@ fn main() {
                 |decision, message| {
                     log::warn(format!("player-worker crashed: {message} ({decision:?})"))
                 },
-                move || player::run(smtc::Smtc::default(), &rx, shared.clone(), ui::POLL),
+                move || {
+                    player::run_with(
+                        smtc::Smtc::default(),
+                        &rx,
+                        shared.clone(),
+                        ui::POLL,
+                        player::session_running(),
+                    )
+                },
             );
         }
         if previewing {
             ui::fake_sound(scope.clone());
+            ui::keep_link_fresh(remote.clone());
         }
         #[cfg(not(windows))]
         {
@@ -114,10 +147,11 @@ fn main() {
         let options = WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(Bounds::centered(
                 None,
-                size(px(400.), px(840.)),
+                size(px(400.), px(730.)),
                 cx,
             ))),
-            window_min_size: Some(size(px(360.), px(660.))),
+            // Fixed: everything in the window has a fixed height, so a bigger window is only empty space.
+            is_resizable: false,
             ..TitleBar::window_options()
         };
         open_window(options, cx, |window, cx| {

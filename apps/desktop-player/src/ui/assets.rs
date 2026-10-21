@@ -3,7 +3,10 @@
 
 use gpui_kit::gpui::{self, AssetSource};
 
-gpui_kit::assets::icon_assets!(ExtraIcons, [SkipBack, SkipForward, Volume2]);
+gpui_kit::assets::icon_assets!(
+    ExtraIcons,
+    [Check, Ellipsis, Minus, SkipBack, SkipForward, Volume2, X]
+);
 
 pub struct AppAssets;
 

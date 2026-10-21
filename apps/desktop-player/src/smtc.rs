@@ -247,6 +247,38 @@ impl Backend for Smtc {
         )
     }
 
+    /// Spotify's own pause: asking a paused Spotify to pause changes nothing.
+    fn pause(&mut self) -> Result<(), String> {
+        let session = spotify_session()?.ok_or("Spotify is not running")?;
+        accepted(session.TryPauseAsync().map_err(err)?.join().map_err(err)?)
+    }
+
+    fn pause_is_idempotent(&self) -> bool {
+        true
+    }
+
+    fn verifies_start(&self) -> bool {
+        true
+    }
+
+    fn play(&mut self) -> Result<(), String> {
+        let session = spotify_session()?.ok_or("Spotify is not running")?;
+        accepted(session.TryPlayAsync().map_err(err)?.join().map_err(err)?)
+    }
+
+    /// Moves in the current track; `TryChangePlaybackPositionAsync` counts in 100 ns ticks.
+    fn seek(&mut self, to: Duration) -> Result<(), String> {
+        let session = spotify_session()?.ok_or("Spotify is not running")?;
+        let ticks = i64::try_from(to.as_nanos() / 100).unwrap_or(i64::MAX);
+        accepted(
+            session
+                .TryChangePlaybackPositionAsync(ticks)
+                .map_err(err)?
+                .join()
+                .map_err(err)?,
+        )
+    }
+
     fn next(&mut self) -> Result<(), String> {
         let session = spotify_session()?.ok_or("Spotify is not running")?;
         accepted(

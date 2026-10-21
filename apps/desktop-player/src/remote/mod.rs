@@ -202,12 +202,15 @@ impl Worker {
     }
 
     fn set_link(&self, link: Link) {
-        let mut status = lock(&self.status);
-        // Offline counts down every second: only the move into a state is worth a line.
-        if std::mem::discriminant(&status.link) != std::mem::discriminant(&link) {
-            crate::log::info(format!("link: {}", link.label()));
+        let label = link.label();
+        if !matches!(link, Link::Connected) {
+            // Without the server nothing says a session runs: the player stops guarding.
+            crate::player::session_running().store(false, std::sync::atomic::Ordering::Relaxed);
         }
-        status.link = link;
+        // Offline counts down every second: only the move into a state is worth a line.
+        if lock(&self.status).set_link(link) {
+            crate::log::info(format!("link: {label}"));
+        }
     }
 
     fn offline(&mut self) -> Next {
@@ -323,6 +326,7 @@ impl Worker {
                 *lock(&self.status) = RemoteStatus {
                     link: Link::Unauthorized,
                     exchange: Exchange::default(),
+                    session: None,
                 };
             }
         }

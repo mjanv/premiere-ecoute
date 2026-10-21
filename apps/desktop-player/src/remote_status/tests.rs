@@ -88,3 +88,66 @@ fn previews_exist_for_each_link_state_and_reject_unknown_names() {
         Link::Connected
     );
 }
+
+fn running() -> SessionInfo {
+    SessionInfo {
+        state: SessionState::Active,
+        source: Some("album".into()),
+        name: Some("Plantation Lullabies".into()),
+        track_number: Some(4),
+        track_count: Some(10),
+    }
+}
+
+#[test]
+fn the_session_is_unknown_until_the_server_says() {
+    assert_eq!(RemoteStatus::default().session, None);
+}
+
+#[test]
+fn the_session_is_forgotten_as_soon_as_the_link_is_not_live() {
+    for link in [
+        Link::Connecting,
+        Link::SigningIn,
+        Link::Offline {
+            retry_in: Duration::from_secs(5),
+        },
+        Link::Unauthorized,
+        Link::Failed("x".into()),
+        Link::Disabled,
+    ] {
+        let mut status = RemoteStatus {
+            link: Link::Connected,
+            session: Some(running()),
+            ..RemoteStatus::default()
+        };
+        status.set_link(link.clone());
+        assert_eq!(status.session, None, "{link:?}");
+        assert_eq!(status.link, link);
+    }
+}
+
+#[test]
+fn staying_linked_keeps_the_session() {
+    let mut status = RemoteStatus {
+        link: Link::Connected,
+        session: Some(running()),
+        ..RemoteStatus::default()
+    };
+    status.set_link(Link::Connected);
+    assert_eq!(status.session, Some(running()));
+}
+
+#[test]
+fn set_link_says_whether_the_kind_of_link_changed() {
+    let mut status = RemoteStatus::default();
+    assert!(status.set_link(Link::Connecting));
+    assert!(!status.set_link(Link::Connecting));
+    // A countdown that only changes the delay is not a new state.
+    assert!(status.set_link(Link::Offline {
+        retry_in: Duration::from_secs(9)
+    }));
+    assert!(!status.set_link(Link::Offline {
+        retry_in: Duration::from_secs(8)
+    }));
+}

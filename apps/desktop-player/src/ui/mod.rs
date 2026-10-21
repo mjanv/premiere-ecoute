@@ -8,7 +8,8 @@ use crate::artwork::{self, Artwork};
 use crate::light::Light;
 use crate::player::{self, Command, Request, Snapshot, format_time, lock};
 use crate::remote;
-use crate::remote_status::{Link, RemoteStatus, Tone};
+use crate::remote_status::{Link, RemoteStatus, SessionInfo, SessionState};
+use crate::status::{self, Check, CheckState, SessionView, Verdict};
 use crate::waveform::Scope;
 use gpui::prelude::FluentBuilder;
 use gpui_kit::component::input::{Input, InputEvent, InputState};
@@ -82,7 +83,7 @@ impl NowPlaying {
                     .timer(if busy { SMOOTH } else { POLL / 3 })
                     .await;
                 // The light is set here, not in `render`: a minimized window may not repaint.
-                let light = Light::of(&lock(&light_snapshot), &lock(&light_remote));
+                let light = Light::of(&lock(&light_snapshot), &lock(&light_remote), Instant::now());
                 let updated = this.update(cx, |this, cx| {
                     #[cfg(windows)]
                     {
@@ -230,15 +231,6 @@ impl NowPlaying {
     }
 }
 
-fn dot(color: Hsla, filled: bool) -> Div {
-    let d = div().flex_none().size(px(8.)).rounded_full();
-    if filled {
-        d.bg(color)
-    } else {
-        d.border_1().border_color(color)
-    }
-}
-
 /// How a round transport button looks.
 struct Control {
     id: &'static str,
@@ -283,6 +275,181 @@ fn control(spec: Control, enabled: bool) -> Stateful<Div> {
         )
 }
 
+/// Colour of a checklist row's state: the same green, amber and red as the status light, so the
+/// window and the taskbar badge say the same thing. They do not come from the cover: a green
+/// cover must never look like a green light.
+fn state_color(state: CheckState, off: Hsla) -> Hsla {
+    match state {
+        CheckState::Ok => status_color(Light::Green),
+        CheckState::Wait => status_color(Light::Amber),
+        CheckState::Bad => status_color(Light::Red),
+        CheckState::Off => off,
+    }
+}
+
+fn status_color(light: Light) -> Hsla {
+    let [r, g, b] = light.rgb();
+    rgb(((r as u32) << 16) | ((g as u32) << 8) | b as u32).into()
+}
+
+/// The big verdict: a beacon in the light's colour, the headline, and the first thing to fix.
+fn verdict_view(verdict: &Verdict, muted: Hsla) -> Div {
+    let color = status_color(verdict.light);
+    div()
+        .flex()
+        .items_center()
+        .gap(px(16.))
+        .child(
+            div()
+                .flex()
+                .flex_none()
+                .items_center()
+                .justify_center()
+                .size(px(44.))
+                .rounded_full()
+                .bg(color.opacity(0.2))
+                .child(div().size(px(22.)).rounded_full().bg(color)),
+        )
+        .child(
+            div()
+                .flex()
+                .flex_col()
+                .flex_1()
+                .min_w_0()
+                .gap(px(4.))
+                .child(
+                    div()
+                        .font_family(DISPLAY)
+                        .text_size(px(38.))
+                        .line_height(relative(1.0))
+                        .text_color(color)
+                        .child(verdict.title),
+                )
+                .child(
+                    div()
+                        .text_size(px(13.))
+                        .text_color(muted)
+                        .line_clamp(2)
+                        .child(verdict.hint.clone()),
+                ),
+        )
+}
+
+/// One row of the checklist: a state glyph, what is checked, and what is true right now.
+fn check_row(check: &Check, p: Palette) -> Div {
+    let color = state_color(check.state, col(p.muted));
+    let icon = match check.state {
+        CheckState::Ok => "icons/check.svg",
+        CheckState::Wait => "icons/ellipsis.svg",
+        CheckState::Bad => "icons/x.svg",
+        CheckState::Off => "icons/minus.svg",
+    };
+    div()
+        .flex()
+        .items_center()
+        .gap(px(12.))
+        .px(px(14.))
+        .min_h(px(34.))
+        .py(px(3.))
+        .child(
+            div()
+                .flex()
+                .flex_none()
+                .items_center()
+                .justify_center()
+                .size(px(20.))
+                .rounded_full()
+                .bg(color.opacity(0.18))
+                .child(svg().path(icon).size(px(12.)).text_color(color)),
+        )
+        .child(
+            div()
+                .flex_none()
+                .w(px(76.))
+                .text_size(px(11.))
+                .text_color(col(p.muted))
+                .child(check.label.to_uppercase()),
+        )
+        .child(
+            div()
+                .flex_1()
+                .min_w_0()
+                .line_clamp(2)
+                .text_size(px(13.))
+                .text_color(if check.state == CheckState::Off {
+                    col(p.muted)
+                } else {
+                    col(p.ink)
+                })
+                .child(check.detail.clone()),
+        )
+}
+
+/// A thin rule between sections of the window.
+fn separator(p: Palette) -> Div {
+    div().h(px(1.)).flex_none().bg(col(p.muted).opacity(0.25))
+}
+
+/// The listening session as the server reports it: its own section between the signals and the
+/// player, closed by separators. The state in its colour, then what it is about in full (it wraps
+/// to two lines, nothing is cut to an ellipsis on a normal name). Fixed height, like the rest.
+fn session_section(view: &SessionView, p: Palette) -> Div {
+    let color = state_color(view.state, col(p.ink));
+    div()
+        .flex()
+        .flex_col()
+        .flex_none()
+        .gap(px(4.))
+        .h(px(84.))
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .justify_between()
+                .text_size(px(11.))
+                .text_color(col(p.muted))
+                .child("LISTENING SESSION")
+                .children(
+                    view.position
+                        .as_ref()
+                        .map(|n| div().text_color(col(p.ink)).child(format!("TRACK {n}"))),
+                ),
+        )
+        .child(
+            div()
+                .font_family(DISPLAY)
+                .text_size(px(24.))
+                .line_height(relative(1.0))
+                .text_color(color)
+                .child(view.headline),
+        )
+        .child(
+            div()
+                .line_clamp(2)
+                .text_size(px(13.))
+                .text_color(col(p.ink))
+                .child(view.subtitle.clone()),
+        )
+}
+
+/// A small outlined action in the footer.
+fn action(id: &'static str, label: &'static str, p: Palette) -> Stateful<Div> {
+    div()
+        .id(id)
+        .flex()
+        .flex_none()
+        .items_center()
+        .px(px(12.))
+        .h(px(28.))
+        .rounded(px(4.))
+        .border_1()
+        .border_color(col(p.accent))
+        .text_color(col(p.accent))
+        .cursor_pointer()
+        .hover(|s| s.bg(col(p.surface)))
+        .child(label)
+}
+
 impl Render for NowPlaying {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let snap = lock(&self.shared).clone();
@@ -302,108 +469,69 @@ impl Render for NowPlaying {
                 let _ = commands.send(Request::local(command()));
             })
         };
-        // Top: the cover, or a quiet placeholder. It takes the height the controls leave over.
-        let cover_view = div()
-            .w_full()
-            .flex_1()
-            .min_h(px(140.))
+
+        // The point of the window: is the link good, and if not, what to fix.
+        let mut verdict = status::verdict(&snap, &remote, now);
+        let checklist = div()
+            .flex()
+            .flex_col()
+            .flex_none()
+            .py(px(4.))
+            .rounded(px(6.))
+            .bg(col(p.surface))
+            .children(
+                status::checks(&snap, &remote, now)
+                    .iter()
+                    .map(|c| check_row(c, p)),
+            );
+
+        // What plays: the cover, the track, the artist, and the album in full (up to two lines).
+        let thumb = div()
+            .flex_none()
+            .size(px(88.))
             .rounded(px(4.))
             .overflow_hidden()
             .bg(col(p.surface))
-            .shadow_lg()
-            .child(match cover {
-                Some(image) => img(image)
-                    .size_full()
-                    .object_fit(ObjectFit::Cover)
-                    .into_any_element(),
-                None => div()
-                    .size_full()
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .text_size(px(11.))
-                    .text_color(col(p.muted))
-                    .child("NO COVER")
-                    .into_any_element(),
-            });
-
-        // State eyebrow, poster title, credits.
-        let (title, credits) = if snap.can_control() {
+            .children(cover.map(|image| img(image).size_full().object_fit(ObjectFit::Cover)));
+        let (title, artist, album) = if enabled {
             (
                 snap.title.to_uppercase(),
-                Some((snap.artist.clone(), snap.album_line().map(str::to_string))),
+                Some(snap.artist.clone()),
+                snap.album_line().map(str::to_string),
             )
-        } else if snap.error.is_some() {
-            ("Can't read Spotify".to_uppercase(), None)
         } else {
-            ("Nothing playing".to_uppercase(), None)
+            ("Nothing playing".to_uppercase(), None, None)
         };
-        let hint = if !snap.can_control() {
-            Some(match &snap.error {
-                Some(e) => e.clone(),
-                None => {
-                    "Open Spotify on this PC. It shows up here as soon as it plays.".to_string()
-                }
-            })
-        } else {
-            None
-        };
-        let heading = div()
+        let track = div()
             .flex()
             .flex_col()
-            .gap(px(8.))
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(8.))
-                    .text_size(px(12.))
-                    .text_color(col(p.muted))
-                    .child(dot(
-                        if playing { col(p.accent) } else { col(p.muted) },
-                        playing || enabled,
-                    ))
-                    .child("SPOTIFY")
-                    .child(
-                        div()
-                            .text_color(col(p.ink))
-                            .child(snap.state_label().to_uppercase()),
-                    ),
-            )
+            .flex_1()
+            .min_w_0()
+            .gap(px(4.))
             .child(
                 div()
                     .font_family(DISPLAY)
-                    .text_size(px(40.))
-                    .line_height(relative(1.0))
+                    .text_size(px(20.))
+                    .line_height(relative(1.05))
                     .line_clamp(2)
                     .child(title),
             )
-            .when_some(credits, |d, (artist, album)| {
-                d.child(
-                    div()
-                        .flex()
-                        .gap(px(12.))
-                        .text_size(px(14.))
-                        .child(
-                            div()
-                                .flex_none()
-                                .max_w(relative(0.6))
-                                .truncate()
-                                .child(artist),
-                        )
-                        .children(album.map(|a| {
-                            div()
-                                .flex_1()
-                                .min_w_0()
-                                .truncate()
-                                .text_color(col(p.muted))
-                                .child(a)
-                        })),
-                )
-            })
-            .when_some(hint, |d, h| {
-                d.child(div().text_size(px(14.)).text_color(col(p.muted)).child(h))
-            });
+            .children(artist.map(|a| div().truncate().text_size(px(13.)).child(a)))
+            .children(album.map(|a| {
+                div()
+                    .line_clamp(2)
+                    .text_size(px(12.))
+                    .text_color(col(p.muted))
+                    .child(a)
+            }));
+        let now_playing = div()
+            .flex()
+            .flex_none()
+            .items_center()
+            .gap(px(14.))
+            .h(px(92.))
+            .child(thumb)
+            .child(track);
 
         // The ruler.
         let progress = snap.progress();
@@ -467,14 +595,14 @@ impl Render for NowPlaying {
             div()
                 .flex()
                 .flex_col()
-                .h(px(66.))
+                .h(px(62.))
                 .flex_none()
                 .when(!snap.length.is_zero(), |d| {
                     d.child(
                         div()
                             .flex()
                             .justify_between()
-                            .text_size(px(13.))
+                            .text_size(px(12.))
                             .child(div().child(format_time(snap.position)))
                             .child(
                                 div()
@@ -490,7 +618,7 @@ impl Render for NowPlaying {
         let (line, baseline) = (col(p.accent), col(p.muted).opacity(0.3));
         let wave = div()
             .flex_none()
-            .h(px(44.))
+            .h(px(36.))
             .px(px(8.))
             .rounded(px(4.))
             .bg(col(p.surface))
@@ -532,78 +660,82 @@ impl Render for NowPlaying {
                 .size_full(),
             );
 
-        // Transport, centred.
+        // Transport and volume on one row.
         let hover = col(p.surface);
-        let transport = div()
-            .flex()
-            .flex_none()
-            .items_center()
-            .justify_center()
-            .gap(px(22.))
-            .child(
-                control(
-                    Control {
-                        id: "previous",
-                        icon: "icons/skip-back.svg",
-                        size: 40.,
-                        glyph: 20.,
-                        fg: col(p.ink),
-                        fill: None,
-                        hover,
-                        nudge: 0.,
-                    },
-                    enabled,
-                )
-                .on_click(send(|| Command::Previous)),
+        let button = |id, icon, size, glyph, fg, fill, hover, nudge| {
+            control(
+                Control {
+                    id,
+                    icon,
+                    size,
+                    glyph,
+                    fg,
+                    fill,
+                    hover,
+                    nudge,
+                },
+                enabled,
             )
-            .child(
-                control(
-                    Control {
-                        id: "toggle",
-                        icon: if playing {
-                            "icons/pause.svg"
-                        } else {
-                            "icons/play.svg"
-                        },
-                        size: 56.,
-                        glyph: 22.,
-                        fg: col(p.on_accent),
-                        fill: Some(col(p.accent)),
-                        hover: col(p.accent).opacity(0.85),
-                        // A play triangle's weight sits left of its box; shift it right to look centred.
-                        nudge: if playing { 0. } else { 3. },
-                    },
-                    enabled,
-                )
-                .on_click(send(|| Command::TogglePlayPause)),
-            )
-            .child(
-                control(
-                    Control {
-                        id: "next",
-                        icon: "icons/skip-forward.svg",
-                        size: 40.,
-                        glyph: 20.,
-                        fg: col(p.ink),
-                        fill: None,
-                        hover,
-                        nudge: 0.,
-                    },
-                    enabled,
-                )
-                .on_click(send(|| Command::Next)),
-            );
-
-        // Volume, full width.
-        let volume_row = div()
+        };
+        let controls = div()
             .flex()
             .flex_none()
             .items_center()
             .gap(px(10.))
             .child(
+                button(
+                    "previous",
+                    "icons/skip-back.svg",
+                    32.,
+                    16.,
+                    col(p.ink),
+                    None,
+                    hover,
+                    0.,
+                )
+                .on_click(send(|| Command::Previous)),
+            )
+            .child(
+                button(
+                    "toggle",
+                    if playing {
+                        "icons/pause.svg"
+                    } else {
+                        "icons/play.svg"
+                    },
+                    44.,
+                    18.,
+                    col(p.on_accent),
+                    Some(col(p.accent)),
+                    col(p.accent).opacity(0.85),
+                    // A play triangle's weight sits left of its box; shift it right to look centred.
+                    if playing { 0. } else { 2. },
+                )
+                .on_click(send(|| Command::TogglePlayPause)),
+            )
+            .child(
+                button(
+                    "next",
+                    "icons/skip-forward.svg",
+                    32.,
+                    16.,
+                    col(p.ink),
+                    None,
+                    hover,
+                    0.,
+                )
+                .on_click(send(|| Command::Next)),
+            );
+        let volume = div()
+            .flex()
+            .flex_1()
+            .min_w_0()
+            .items_center()
+            .gap(px(8.))
+            .child(
                 svg()
                     .path("icons/volume-2.svg")
-                    .size(px(18.))
+                    .size(px(16.))
                     .text_color(col(p.muted)),
             )
             .child(
@@ -613,19 +745,16 @@ impl Render for NowPlaying {
                         .text_color(col(p.ink))
                         .disabled(!enabled || snap.volume.is_none()),
                 ),
-            )
-            .child(
-                div()
-                    .w(px(38.))
-                    .text_size(px(12.))
-                    .text_color(col(p.muted))
-                    .child(
-                        snap.volume
-                            .map_or("—".to_string(), |v| format!("{:.0}%", v * 100.0)),
-                    ),
             );
+        let transport = div()
+            .flex()
+            .flex_none()
+            .items_center()
+            .gap(px(16.))
+            .child(controls)
+            .child(volume);
 
-        // What went wrong with the last command, if anything.
+        // What went wrong with the last local command, if anything.
         let problem = snap
             .notice
             .clone()
@@ -637,27 +766,22 @@ impl Render for NowPlaying {
             .text_color(col(p.warn))
             .children(problem);
 
-        // Footer: the link to the backend and what was exchanged.
-        let tone = |t: Tone| match t {
-            Tone::Good => col(p.accent),
-            Tone::Idle => col(p.muted),
-            Tone::Warn => col(p.warn),
-        };
-        let link_color = tone(remote.link.tone());
-        let connected = matches!(remote.link, Link::Connected);
+        // Footer: only the actions the link needs, and the server field while it is being edited.
         let needs_sign_in = matches!(remote.link, Link::Unauthorized);
         let local_only = matches!(remote.link, Link::Disabled) && self.remote_handle.is_none();
         let editing = local_only && self.editing_server;
-        let open_editor = cx.listener(|this, _, _, cx| {
-            this.editing_server = !this.editing_server;
-            this.server_error = None;
-            cx.notify();
-        });
-        let connect = cx.listener(|this, _, _, cx| this.connect_server(cx));
         let enrolled = matches!(
             remote.link,
             Link::Connected | Link::Connecting | Link::Offline { .. }
         );
+        let toggle_editor = |this: &mut Self, cx: &mut Context<Self>| {
+            this.editing_server = !this.editing_server;
+            this.server_error = None;
+            cx.notify();
+        };
+        let open_editor = cx.listener(move |this, _, _, cx| toggle_editor(this, cx));
+        let close_editor = cx.listener(move |this, _, _, cx| toggle_editor(this, cx));
+        let connect = cx.listener(|this, _, _, cx| this.connect_server(cx));
         let sign_in = cx.listener(|this, _, _, _| {
             if let Some(handle) = &this.remote_handle {
                 handle.sign_in();
@@ -668,37 +792,50 @@ impl Render for NowPlaying {
                 handle.sign_out();
             }
         });
-        let status_row = div()
+        // The address field has no room for its error: it replaces the verdict's hint.
+        let hint_color = match (&self.server_error, editing) {
+            (Some(error), true) => {
+                verdict.hint = error.clone();
+                col(p.warn)
+            }
+            _ => col(p.muted),
+        };
+        // One fixed row, so the window never changes height: the actions, or the address field.
+        let footer = div()
             .flex()
+            .flex_none()
             .items_center()
-            .gap(px(10.))
-            .child(
-                div()
-                    .flex()
-                    .flex_none()
-                    .items_center()
-                    .gap(px(8.))
-                    .child(dot(
-                        link_color,
-                        remote.link.tone() == Tone::Good || remote.link.tone() == Tone::Warn,
-                    ))
-                    .child(div().text_color(link_color).child(remote.link.label())),
-            )
-            .when(connected, |d| {
-                d.child(div().flex_none().child(remote.exchange.sent_line(now)))
-                    .children(
-                        remote
-                            .exchange
-                            .command_line(now)
-                            .map(|c| div().flex_1().min_w_0().truncate().text_right().child(c)),
+            .justify_end()
+            .gap(px(8.))
+            .h(px(52.))
+            .px(px(24.))
+            .border_t_1()
+            .border_color(col(p.muted).opacity(0.25))
+            .text_size(px(12.))
+            .text_color(col(p.muted))
+            .when(editing, |d| {
+                d.child(div().flex_1().child(Input::new(&self.server_input)))
+                    .child(
+                        div()
+                            .id("connect")
+                            .flex_none()
+                            .px(px(12.))
+                            .h(px(28.))
+                            .flex()
+                            .items_center()
+                            .rounded(px(4.))
+                            .bg(col(p.accent))
+                            .text_color(col(p.on_accent))
+                            .cursor_pointer()
+                            .hover(|s| s.opacity(0.85))
+                            .on_click(connect)
+                            .child("Connect"),
                     )
             })
-            .when(enrolled, |d| {
+            .when(!editing && enrolled, |d| {
                 d.child(
                     div()
                         .id("sign-out")
-                        .ml_auto()
-                        .flex_none()
                         .px(px(4.))
                         .py(px(2.))
                         .rounded(px(4.))
@@ -708,92 +845,32 @@ impl Render for NowPlaying {
                         .child("Sign out"),
                 )
             })
-            .when(needs_sign_in, |d| {
-                d.child(
-                    div()
-                        .id("sign-in")
-                        .ml_auto()
-                        .flex_none()
-                        .px(px(12.))
-                        .h(px(26.))
-                        .flex()
-                        .items_center()
-                        .rounded(px(4.))
-                        .border_1()
-                        .border_color(col(p.accent))
-                        .text_color(col(p.accent))
-                        .cursor_pointer()
-                        .hover(|s| s.bg(col(p.surface)))
-                        .on_click(sign_in)
-                        .child("Sign in"),
-                )
+            .when(!editing && needs_sign_in, |d| {
+                d.child(action("sign-in", "Sign in", p).on_click(sign_in))
             })
-            .when(local_only, |d| {
+            .when(local_only && editing, |d| {
                 d.child(
                     div()
                         .id("connect-server")
-                        .ml_auto()
-                        .flex_none()
-                        .px(px(12.))
-                        .h(px(26.))
                         .flex()
+                        .flex_none()
                         .items_center()
+                        .justify_center()
+                        .size(px(28.))
                         .rounded(px(4.))
-                        .border_1()
-                        .border_color(col(p.accent))
-                        .text_color(col(p.accent))
                         .cursor_pointer()
                         .hover(|s| s.bg(col(p.surface)))
-                        .on_click(open_editor)
-                        .child(if editing {
-                            "Cancel"
-                        } else {
-                            "Connect to server"
-                        }),
-                )
-            });
-
-        let footer = div()
-            .flex()
-            .flex_col()
-            .flex_none()
-            .gap(px(10.))
-            .px(px(24.))
-            .py(px(12.))
-            .border_t_1()
-            .border_color(col(p.muted).opacity(0.25))
-            .text_size(px(12.))
-            .text_color(col(p.muted))
-            .child(status_row)
-            .when(editing, |d| {
-                d.child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap(px(8.))
-                        .child(div().flex_1().child(Input::new(&self.server_input)))
+                        .on_click(close_editor)
                         .child(
-                            div()
-                                .id("connect")
-                                .flex_none()
-                                .px(px(12.))
-                                .h(px(32.))
-                                .flex()
-                                .items_center()
-                                .rounded(px(4.))
-                                .bg(col(p.accent))
-                                .text_color(col(p.on_accent))
-                                .cursor_pointer()
-                                .hover(|s| s.opacity(0.85))
-                                .on_click(connect)
-                                .child("Connect"),
+                            svg()
+                                .path("icons/x.svg")
+                                .size(px(14.))
+                                .text_color(col(p.muted)),
                         ),
                 )
-                .children(
-                    self.server_error
-                        .clone()
-                        .map(|e| div().text_color(col(p.warn)).child(e)),
-                )
+            })
+            .when(local_only && !editing, |d| {
+                d.child(action("connect-server", "Connect to server", p).on_click(open_editor))
             });
 
         div()
@@ -813,7 +890,7 @@ impl Render for NowPlaying {
                     div()
                         .text_size(px(11.))
                         .text_color(col(p.muted))
-                        .child("PREMIÈRE ÉCOUTE PLAYER"),
+                        .child("PREMIÈRE ÉCOUTE"),
                 ),
             )
             .child(
@@ -824,14 +901,17 @@ impl Render for NowPlaying {
                     .min_h_0()
                     .gap(px(14.))
                     .px(px(24.))
-                    .pt(px(6.))
+                    .pt(px(8.))
                     .pb(px(14.))
-                    .child(cover_view)
-                    .child(heading)
+                    .child(verdict_view(&verdict, hint_color))
+                    .child(checklist)
+                    .child(separator(p))
+                    .child(session_section(&status::session_view(&remote), p))
+                    .child(separator(p))
+                    .child(now_playing)
                     .child(timeline)
                     .child(wave)
                     .child(transport)
-                    .child(volume_row)
                     .child(notice),
             )
             .child(footer)
@@ -840,7 +920,8 @@ impl Render for NowPlaying {
 
 /// Holds the dev-only preview switches read from `PLAYER_UI_PREVIEW` (comma separated):
 /// a remote state (`connected`, `connecting`, `offline`, `unauthorized`, `failed`), `idle`
-/// (nothing playing), `sample` (a fixed playing track with long names) and `connect` (server field open).
+/// (nothing playing), `sample` (a fixed playing track with long names), `no-session` and `preparing`
+/// (with `connected`: what the server says about the session) and `connect` (server field open).
 pub struct Preview {
     pub remote: Option<RemoteStatus>,
     pub snapshot: Option<Snapshot>,
@@ -869,13 +950,44 @@ pub fn preview() -> Preview {
     } else {
         None
     };
+    let mut remote = raw
+        .split(',')
+        .find_map(|k| RemoteStatus::preview(k.trim(), now));
+    // `no-session` and `preparing` change what a previewed live link says about the session.
+    if let Some(info) = remote.as_mut().and_then(|r| r.session.as_mut()) {
+        if has("no-session") {
+            *info = SessionInfo {
+                state: SessionState::None,
+                source: None,
+                name: None,
+                track_number: None,
+                track_count: None,
+            };
+        } else if has("preparing") {
+            info.state = SessionState::Preparing;
+            info.track_number = None;
+        }
+    }
     Preview {
-        remote: raw
-            .split(',')
-            .find_map(|k| RemoteStatus::preview(k.trim(), now)),
+        remote,
         snapshot,
         editing_server: has("connect"),
     }
+}
+
+/// Keeps a previewed live link sending, so the window does not report it as stale after 5 s.
+pub fn keep_link_fresh(remote: Arc<Mutex<RemoteStatus>>) {
+    std::thread::spawn(move || {
+        loop {
+            {
+                let mut status = lock(&remote);
+                if matches!(status.link, Link::Connected) {
+                    status.exchange.last_snapshot_at = Some(Instant::now());
+                }
+            }
+            std::thread::sleep(Duration::from_secs(1));
+        }
+    });
 }
 
 /// Feeds the scope with a believable pulse, for previews without Spotify.
