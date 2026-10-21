@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Players.Protocol
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Discography.TrackMatch
@@ -164,6 +165,14 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   defp reply(_status, _result), do: {:error, :unknown}
 
   @impl true
+  # A playlist as a context (what a playlist session asks for when it starts): the desktop player
+  # plays one track at a time, and the session starts them one by one (the first on autostart, as
+  # for an album), so there is nothing to play and nothing to ask the Web API.
+  def command({:play, %Playlist{}}, _from, data) do
+    Logger.info("Desktop player command skipped user=#{user(data)} command=play reason=playlist_context")
+    {:reply, {:ok, :skipped}, data}
+  end
+
   def command({:play, target}, from, data) do
     case track_uri(target) do
       nil ->

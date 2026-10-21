@@ -149,6 +149,8 @@ On join the backend starts the user's player process and switches it to local mo
 | `next`, `previous` | `{}` | Only on demand through `SpotifyPlayer.command/3`; no session flow sends them |
 | `set_volume` | `{"volume": 0.0..1.0}` | Only on demand through `SpotifyPlayer.command/3` |
 
+A playlist asked for as a context (what a playlist session does when it starts) is not played: the desktop player plays one track at a time, so the backend skips that command (`{:ok, :skipped}`, no Web API call) and the tracks start one by one, the first on autostart, as for an album.
+
 The desktop app does not always start the track it is asked for: asked for the first track of an album, it may go to where that album was last left, at another track and position. The player is the only one to deal with it, and the `ok` ack of a `play_uri` means *the track plays from its beginning*. When `track_number` is given, the player checks the track that plays against it (the track number Spotify reports) and navigates to the right one if they differ; without it, it can only detect a track that plays from the middle. An invalid `track_number` is ignored, not rejected.
 
 Rules the player must apply (the backend relies on them):

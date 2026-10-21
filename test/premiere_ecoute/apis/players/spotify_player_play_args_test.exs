@@ -64,4 +64,22 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerPlayArgsTest do
     assert play(scope, player, single) == %{uri: "spotify:track:aaaaaaaaaaaaaaaaaaaaaa"}
     assert play(scope, player, playlist_track) == %{uri: "spotify:track:bbbbbbbbbbbbbbbbbbbbbb"}
   end
+
+  describe "a playlist as a context" do
+    test "is not played: the tracks follow one by one, so nothing needs the Web API", %{scope: scope} do
+      playlist = %PremiereEcoute.Discography.Playlist{playlist_id: "37i9dQZF1DXcBWIGoYBM5M", tracks: []}
+      test = self()
+
+      assert {:ok, :skipped} = SpotifyPlayer.command(scope, {:play, playlist}, fn -> send(test, :web_api) && {:ok, :web_api} end)
+
+      refute_receive {:device, {:command, _command}}
+      refute_received :web_api
+    end
+
+    test "an album is still left to the Web API", %{scope: scope} do
+      album = %PremiereEcoute.Discography.Album{provider_ids: %{spotify: "x"}}
+
+      assert {:ok, :web_api} = SpotifyPlayer.command(scope, {:play, album}, fn -> {:ok, :web_api} end)
+    end
+  end
 end
