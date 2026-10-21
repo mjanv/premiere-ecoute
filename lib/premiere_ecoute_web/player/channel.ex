@@ -57,8 +57,14 @@ defmodule PremiereEcouteWeb.Player.Channel do
   def handle_in("snapshot", payload, socket) do
     with {:ok, rate, socket} <- rate(socket),
          {:ok, seq, snapshot} <- Protocol.snapshot(payload) do
-      if rate <= @snapshot_rate, do: forward(socket, {:device_snapshot, seq, snapshot})
-      {:noreply, socket}
+      # The reply says the server heard it: the player shows it. One dropped for arriving too fast
+      # was not heard.
+      if rate <= @snapshot_rate do
+        forward(socket, {:device_snapshot, seq, snapshot})
+        {:reply, :ok, socket}
+      else
+        {:noreply, socket}
+      end
     else
       {:error, :invalid} -> invalid(socket, "snapshot")
       {:error, :flood} -> {:stop, {:shutdown, :flood}, socket}

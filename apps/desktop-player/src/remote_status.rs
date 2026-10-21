@@ -76,6 +76,9 @@ pub struct SessionInfo {
 pub struct RemoteStatus {
     pub link: Link,
     pub exchange: Exchange,
+    /// When the server last replied to a snapshot. `None` until it does, and again as soon as the
+    /// link is not live; an older backend that does not reply leaves it `None` for good.
+    pub heard_at: Option<Instant>,
     /// What the server last said about the streamer's session. `None` until it says, and again as
     /// soon as the link is not live: an old answer must never be shown as current.
     pub session: Option<SessionInfo>,
@@ -156,6 +159,7 @@ impl RemoteStatus {
         let changed = std::mem::discriminant(&self.link) != std::mem::discriminant(&link);
         if !matches!(link, Link::Connected) {
             self.session = None;
+            self.heard_at = None;
         }
         self.link = link;
         changed
@@ -201,10 +205,15 @@ impl RemoteStatus {
             track_number: Some(4),
             track_count: Some(10),
         });
+        // A live link has been heard by the server a moment ago.
+        let heard_at = matches!(link, Link::Connected)
+            .then(|| now.checked_sub(Duration::from_secs(1)))
+            .flatten();
         Some(Self {
             link,
             exchange,
             session,
+            heard_at,
         })
     }
 }

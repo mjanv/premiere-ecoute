@@ -16,6 +16,7 @@ fn remote(
     RemoteStatus {
         link,
         session: None,
+        heard_at: None,
         exchange: Exchange {
             last_snapshot_at: sent_ago.and_then(|s| now.checked_sub(Duration::from_secs(s))),
             last_command: command.map(|(outcome, ago)| CommandLog {
@@ -233,14 +234,24 @@ fn green_means_every_link_row_is_ok_and_only_then() {
     ];
     for link in &links {
         for snap in &snaps {
-            for sent in [None, Some(1), Some(9)] {
-                let r = remote(link.clone(), sent, None, now);
+            for (sent, heard) in [
+                (None, None),
+                (Some(1), None),
+                (Some(9), None),
+                (Some(1), Some(1)),
+                (Some(1), Some(9)),
+            ] {
+                let mut r = remote(link.clone(), sent, None, now);
+                r.heard_at = heard.map(|s| now - Duration::from_secs(s));
                 let rows = checks(snap, &r, now);
                 let all_ok = ["Server", "Spotify", "Data"]
                     .iter()
                     .all(|l| find(&rows, l).state == CheckState::Ok);
                 let green = Light::of(snap, &r, now) == Light::Green;
-                assert_eq!(green, all_ok, "{link:?} {snap:?} sent {sent:?}");
+                assert_eq!(
+                    green, all_ok,
+                    "{link:?} {snap:?} sent {sent:?} heard {heard:?}"
+                );
             }
         }
     }
@@ -454,4 +465,55 @@ fn a_session_never_changes_the_verdict() {
         let v = verdict(&spotify(true, Playback::Playing), &r, now);
         assert_eq!(v.light, Light::Green);
     }
+}
+
+fn with_heard(sent_ago: u64, heard_ago: Option<u64>) -> (CheckState, String) {
+    let now = now();
+    let mut r = remote(Link::Connected, Some(sent_ago), None, now);
+    r.heard_at = heard_ago.map(|s| now - Duration::from_secs(s));
+    let rows = checks(&spotify(true, Playback::Playing), &r, now);
+    let data = find(&rows, "Data");
+    (data.state, data.detail.clone())
+}
+
+#[test]
+fn the_data_row_says_the_server_heard_when_it_replies() {
+    assert_eq!(
+        with_heard(0, Some(0)),
+        (CheckState::Ok, "Sent now, heard now".into())
+    );
+    assert_eq!(
+        with_heard(3, Some(2)),
+        (CheckState::Ok, "Sent 3s, heard 2s".into())
+    );
+}
+
+#[test]
+fn a_server_that_stops_replying_while_the_player_sends_is_a_problem() {
+    assert_eq!(
+        with_heard(3, Some(9)),
+        (CheckState::Bad, "Sent 3s, not heard for 9s".into())
+    );
+}
+
+#[test]
+fn a_server_that_never_replies_is_not_blamed() {
+    // An older backend does not acknowledge snapshots: the row is what it was.
+    assert_eq!(with_heard(3, None), (CheckState::Ok, "Sent 3s".into()));
+}
+
+#[test]
+fn a_server_that_stopped_replying_makes_the_light_amber() {
+    let now = now();
+    let mut r = remote(Link::Connected, Some(1), None, now);
+    r.heard_at = Some(now - Duration::from_secs(9));
+    assert_eq!(
+        Light::of(&spotify(true, Playback::Playing), &r, now),
+        Light::Amber
+    );
+    r.heard_at = Some(now - Duration::from_secs(1));
+    assert_eq!(
+        Light::of(&spotify(true, Playback::Playing), &r, now),
+        Light::Green
+    );
 }

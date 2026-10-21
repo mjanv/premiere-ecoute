@@ -505,3 +505,20 @@ fn the_exact_length_with_play_uri_is_carried_to_the_player() {
         );
     }
 }
+
+#[test]
+fn a_reply_to_a_snapshot_means_the_server_heard_it() {
+    // The join reply carries the join's own reference; any other reply on the topic is a reply to
+    // something the player pushed after it.
+    let heard = r#"["1","5","desktop:me","phx_reply",{"status":"ok","response":{}}]"#;
+    assert_eq!(parse(heard), Inbound::Heard);
+    let refused =
+        r#"["1","5","desktop:me","phx_reply",{"status":"error","response":{"reason":"x"}}]"#;
+    assert_eq!(parse(refused), Inbound::Ignored);
+}
+
+#[test]
+fn the_join_reply_is_still_the_join_reply() {
+    let join = r#"["1","1","desktop:me","phx_reply",{"status":"ok","response":{"snapshot_interval_ms":1000}}]"#;
+    assert!(matches!(parse(join), Inbound::JoinOk { .. }));
+}

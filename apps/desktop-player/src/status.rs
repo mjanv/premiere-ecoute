@@ -6,7 +6,9 @@
 
 use crate::light::{self, Light};
 use crate::player::Snapshot;
-use crate::remote_status::{Link, Outcome, RemoteStatus, SessionInfo, SessionState, Tone};
+use crate::remote_status::{
+    Link, Outcome, RemoteStatus, SessionInfo, SessionState, Tone, age_short,
+};
 use std::time::Instant;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -82,11 +84,23 @@ fn data(remote: &RemoteStatus, now: Instant) -> Check {
     }
     match remote.exchange.last_snapshot_at {
         None => check("Data", CheckState::Wait, "Waiting for the first send"),
-        Some(_) if light::sending(remote, now) => check(
-            "Data",
-            CheckState::Ok,
-            upper_first(&remote.exchange.sent_line(now)),
-        ),
+        Some(_) if light::sending(remote, now) => {
+            let sent = upper_first(&remote.exchange.sent_line(now));
+            match remote.heard_at {
+                // An older server does not reply: nothing to add.
+                None => check("Data", CheckState::Ok, sent),
+                Some(at) if !light::deaf(remote, now) => check(
+                    "Data",
+                    CheckState::Ok,
+                    format!("{sent}, heard {}", age_short(now, at)),
+                ),
+                Some(at) => check(
+                    "Data",
+                    CheckState::Bad,
+                    format!("{sent}, not heard for {}", age_short(now, at)),
+                ),
+            }
+        }
         Some(at) => {
             let age = crate::remote_status::age_short(now, at);
             check("Data", CheckState::Bad, format!("Nothing sent for {age}"))

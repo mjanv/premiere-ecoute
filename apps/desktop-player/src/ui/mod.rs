@@ -1021,6 +1021,7 @@ pub fn keep_link_fresh(remote: Arc<Mutex<RemoteStatus>>) {
                 let mut status = lock(&remote);
                 if matches!(status.link, Link::Connected) {
                     status.exchange.last_snapshot_at = Some(Instant::now());
+                    status.heard_at = Some(Instant::now());
                 }
             }
             std::thread::sleep(Duration::from_secs(1));

@@ -463,3 +463,28 @@ fn a_session_event_before_the_join_is_confirmed_is_ignored() {
     let (_, _, status, _) = drive(script, &ex, config());
     assert_eq!(lock(&status).session, None);
 }
+
+fn heard() -> Step {
+    frame(r#"["1","7","desktop:me","phx_reply",{"status":"ok","response":{}}]"#)
+}
+
+#[test]
+fn a_reply_after_the_join_records_that_the_server_heard() {
+    let ex = FakeExecutor::answering(vec![]);
+    let (_, _, status, _) = drive(vec![frame(JOIN_OK), heard(), revoked()], &ex, config());
+    assert!(lock(&status).heard_at.is_some());
+}
+
+#[test]
+fn a_reply_before_the_join_is_confirmed_is_ignored() {
+    let ex = FakeExecutor::answering(vec![]);
+    let (_, _, status, _) = drive(vec![heard(), frame(JOIN_OK), revoked()], &ex, config());
+    assert_eq!(lock(&status).heard_at, None);
+}
+
+#[test]
+fn nothing_is_heard_without_a_reply() {
+    let ex = FakeExecutor::answering(vec![]);
+    let (_, _, status, _) = drive(vec![frame(JOIN_OK), revoked()], &ex, config());
+    assert_eq!(lock(&status).heard_at, None);
+}

@@ -28,10 +28,10 @@ A compact card of a fixed size (400 by 730, not resizable): every block has a fi
 |---|---|---|---|---|
 | Server | `Linked` | `Connecting`, `Waiting for the browser` | `Offline, retry in 12 s`, `Sign in again`, `Error: …` | `Not linked` |
 | Spotify | `Playing`, `Paused`, `Stopped` | `Not running. Open Spotify` | `Can't read it: …` | |
-| Data | `Sent 3s`: a snapshot left lately | `Waiting for the first send` | `Nothing sent for 8s` | `Waiting for the server` |
+| Data | `Sent 3s, heard 2s`: a snapshot left lately and the server replied to it (`Sent 3s` alone for an older server that does not reply) | `Waiting for the first send` | `Nothing sent for 8s`, `Sent 3s, not heard for 9s` | `Waiting for the server` |
 | Commands | `next, ok 18s`: the last command and how it ended | | `next, failed 4s` | `None received yet` |
 
-`Data` is the proof that information flows: the backend gives up on a player that stays silent for 5 s and goes back to polling Spotify, so more than 5 s without a snapshot is Bad, and the light cannot be green. `Commands` is information only: it never decides the verdict, so one refused command does not turn a working link red.
+`Data` is the proof that information flows, both ways when the server replies to snapshots: the backend gives up on a player that stays silent for 5 s and goes back to polling Spotify, so more than 5 s without a snapshot is Bad, and the light cannot be green. `Commands` is information only: it never decides the verdict, so one refused command does not turn a working link red.
 
 The rules live in `src/status.rs` (pure and tested). A test checks the light is green exactly when `Server`, `Spotify` and `Data` are all Ok, for every combination, so the window and the taskbar badge cannot disagree.
 

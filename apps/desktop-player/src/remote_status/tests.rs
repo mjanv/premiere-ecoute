@@ -151,3 +151,20 @@ fn set_link_says_whether_the_kind_of_link_changed() {
         retry_in: Duration::from_secs(8)
     }));
 }
+
+#[test]
+fn the_server_is_not_heard_until_it_replies_and_not_after_the_link_is_lost() {
+    assert_eq!(RemoteStatus::default().heard_at, None);
+    let mut status = RemoteStatus {
+        link: Link::Connected,
+        heard_at: Some(Instant::now()),
+        ..RemoteStatus::default()
+    };
+    status.set_link(Link::Connected);
+    assert!(status.heard_at.is_some(), "staying linked keeps it");
+    status.set_link(Link::Connecting);
+    assert_eq!(
+        status.heard_at, None,
+        "an old reply is never shown as current"
+    );
+}

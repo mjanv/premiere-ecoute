@@ -6,6 +6,7 @@ fn status(link: Link, sent_ago: Option<u64>, now: Instant) -> RemoteStatus {
     RemoteStatus {
         link,
         session: None,
+        heard_at: None,
         exchange: Exchange {
             last_snapshot_at: sent_ago.and_then(|s| now.checked_sub(Duration::from_secs(s))),
             ..Exchange::default()

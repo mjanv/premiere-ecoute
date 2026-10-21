@@ -119,6 +119,7 @@ On join the backend starts the user's player process and switches it to local mo
    "volume": 0.5 }}
 ```
 
+- The backend replies `{"status":"ok","response":{}}` to every snapshot it forwards (not to an invalid one, nor to one dropped for arriving too fast), so the player can tell that it was heard. A player must not require it: an older backend does not reply.
 - `seq` is an integer increasing by 1 per snapshot per connection (start at 1). The backend ignores any `seq` not greater than the last one.
 - `running`: boolean. `playback`: `"playing" | "paused" | "stopped"`. `volume`: number in `0.0..1.0` or `null`. `position_ms`, `length_ms`: non-negative integers. `uri`: `null` when unknown or not a track. Strings are cut to 512 characters.
 - All of `running`, `playback`, `position_ms`, `length_ms` are required; `volume` may be `null`; unknown keys are ignored.

@@ -209,6 +209,8 @@ pub enum Inbound {
     HeartbeatReply,
     Command(Result<RemoteCommand, Rejection>),
     Disconnect(Disconnect),
+    /// The server replied to a snapshot: it heard it.
+    Heard,
     /// Whether the streamer has a listening session.
     Session(SessionInfo),
     /// The channel ended (`phx_close` or `phx_error`).
@@ -220,7 +222,13 @@ pub enum Inbound {
 pub fn interpret(f: &Frame) -> Inbound {
     match (f.topic.as_str(), f.event.as_str()) {
         (HEARTBEAT_TOPIC, "phx_reply") => Inbound::HeartbeatReply,
-        (TOPIC, "phx_reply") => join_reply(&f.payload),
+        // The join reply carries the join's own reference; any other reply on the topic answers
+        // something pushed after the join, that is a snapshot.
+        (TOPIC, "phx_reply") if f.msg_ref.is_some() && f.msg_ref == f.join_ref => {
+            join_reply(&f.payload)
+        }
+        (TOPIC, "phx_reply") if f.payload["status"].as_str() == Some("ok") => Inbound::Heard,
+        (TOPIC, "phx_reply") => Inbound::Ignored,
         (TOPIC, "command") => Inbound::Command(command(&f.payload)),
         (TOPIC, "disconnect") => Inbound::Disconnect(match f.payload["reason"].as_str() {
             Some("replaced") => Disconnect::Replaced,

@@ -12,6 +12,15 @@ use std::time::{Duration, Instant};
 /// that has sent nothing for longer is not really linked, whatever the connection says.
 pub const STALE_AFTER: Duration = Duration::from_secs(5);
 
+/// Whether the server replied to snapshots and then stopped: it used to confirm what it heard and
+/// no longer does, so what is sent may not arrive. A server that never replies (an older backend)
+/// is not deaf, only silent.
+pub fn deaf(remote: &RemoteStatus, now: Instant) -> bool {
+    remote
+        .heard_at
+        .is_some_and(|at| now.saturating_duration_since(at) > STALE_AFTER)
+}
+
 /// Whether a snapshot went out recently enough for the backend to still follow this player.
 pub fn sending(remote: &RemoteStatus, now: Instant) -> bool {
     remote
@@ -41,7 +50,9 @@ impl Light {
             Link::Disabled => Light::Grey,
             Link::Unauthorized | Link::Failed(_) => Light::Red,
             Link::SigningIn | Link::Connecting | Link::Offline { .. } => Light::Amber,
-            Link::Connected if snapshot.running && sending(remote, now) => Light::Green,
+            Link::Connected if snapshot.running && sending(remote, now) && !deaf(remote, now) => {
+                Light::Green
+            }
             Link::Connected => Light::Amber,
         }
     }

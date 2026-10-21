@@ -175,7 +175,12 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
                             joined_at = Some(now);
                             interval = snapshot_interval;
                             next_snapshot = now; // first snapshot immediately: the backend waits 5 s for it
-                            lock(status).link = Link::Connected;
+                            {
+                                let mut s = lock(status);
+                                s.link = Link::Connected;
+                                // A reply from a previous connection says nothing about this one.
+                                s.heard_at = None;
+                            }
                             crate::log::info("link: Server linked");
                         }
                         Inbound::JoinOk { .. } => {}
@@ -183,6 +188,8 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
                             return ended(transport, joined_at, now, End::Refused(reason));
                         }
                         Inbound::HeartbeatReply => heartbeat_sent = None,
+                        Inbound::Heard if joined_at.is_some() => lock(status).heard_at = Some(now),
+                        Inbound::Heard => {}
                         Inbound::Session(info) if joined_at.is_some() => {
                             // The player stops whatever plays at its end while a session runs.
                             crate::player::session_running().store(

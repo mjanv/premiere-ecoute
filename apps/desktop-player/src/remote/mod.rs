@@ -334,6 +334,7 @@ impl Worker {
                     link: Link::Unauthorized,
                     exchange: Exchange::default(),
                     session: None,
+                    heard_at: None,
                 };
             }
         }
