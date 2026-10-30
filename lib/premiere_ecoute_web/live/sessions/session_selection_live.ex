@@ -44,6 +44,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:track_submitter, "")
     |> assign(:autostart, true)
     |> assign(:spotify_commands_disabled, false)
+    |> assign(:album_vote, false)
     |> assign(:interlude_skip, true)
     |> assign(:interlude_threshold_s, 45)
     |> update_state()
@@ -187,6 +188,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     # Reset autostart and interlude to defaults
     |> assign(:autostart, true)
     |> assign(:spotify_commands_disabled, false)
+    |> assign(:album_vote, false)
     |> assign(:interlude_skip, true)
     |> assign(:interlude_threshold_s, 45)
     |> assign(:submitter_enabled, false)
@@ -344,7 +346,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       vote_options: vote_options,
       autostart: socket.assigns.autostart,
       spotify_commands_disabled: socket.assigns.spotify_commands_disabled,
-      interlude_threshold_ms: interlude_threshold_ms(socket.assigns)
+      interlude_threshold_ms: interlude_threshold_ms(socket.assigns),
+      vote_scope: if(socket.assigns.album_vote, do: :album, else: :track)
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -391,6 +394,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   def handle_event("toggle_spotify_commands_disabled", _params, socket) do
     {:noreply, socket |> assign(:spotify_commands_disabled, !socket.assigns.spotify_commands_disabled)}
+  end
+
+  def handle_event("toggle_album_vote", _params, socket) do
+    {:noreply, socket |> assign(:album_vote, !socket.assigns.album_vote)}
   end
 
   def handle_event("set_interlude", params, socket) do

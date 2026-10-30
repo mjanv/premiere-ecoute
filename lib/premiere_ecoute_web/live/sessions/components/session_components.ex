@@ -509,6 +509,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   """
   @spec distribution_graph(map()) :: Phoenix.LiveView.Rendered.t()
   def distribution_graph(assigns) do
+    assigns = assign_new(assigns, :track, fn -> nil end)
+
     ~H"""
     <.async_result :let={report} assign={@report}>
       <:loading>
@@ -522,7 +524,10 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
         <% end %>
       </:loading>
       <:failed></:failed>
-      <% distribution = track_vote_distribution(@track.id, report, @listening_session) %>
+      <% distribution =
+        if @track,
+          do: track_vote_distribution(@track.id, report, @listening_session),
+          else: session_vote_distribution(report, @listening_session) %>
       <% track_max_votes = distribution |> Enum.map(&elem(&1, 1)) |> Enum.max() %>
       <%= for {rating, votes} <- distribution do %>
         <div class="flex-1 flex flex-col items-center px-1 min-w-0">
@@ -563,6 +568,28 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
         Enum.reduce(p.votes, acc, fn {rating, count}, inner ->
           Map.update(inner, rating, count, &(&1 + count))
         end)
+      end)
+
+    for rating <- session.vote_options do
+      {rating, Map.get(individual, rating, 0) + Map.get(poll, rating, 0)}
+    end
+  end
+
+  @doc """
+  Calculates vote distribution of a whole session.
+
+  Returns list of tuples mapping each rating option to its vote count over every vote (album and track scope) and Twitch poll of the session.
+  """
+  @spec session_vote_distribution(map() | nil, map()) :: [{String.t(), integer()}]
+  def session_vote_distribution(nil, session),
+    do: for(rating <- session.vote_options, do: {rating, 0})
+
+  def session_vote_distribution(report, session) do
+    individual = report.votes |> Enum.frequencies_by(& &1.value)
+
+    poll =
+      Enum.reduce(report.polls, %{}, fn p, acc ->
+        Enum.reduce(p.votes, acc, fn {rating, count}, inner -> Map.update(inner, rating, count, &(&1 + count)) end)
       end)
 
     for rating <- session.vote_options do

@@ -88,12 +88,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_event("set_post_album_vote", %{"note" => value}, socket) do
+    {:noreply, assign(socket, :post_vote_selections, %{album: value})}
+  end
+
+  @impl true
   def handle_event("submit_post_votes", _params, %{assigns: %{listening_session: session}} = socket) do
     current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
     selections = socket.assigns.post_vote_selections
 
     if socket.assigns.post_vote_eligible && map_size(selections) > 0 do
-      case Sessions.submit_post_votes(session, current_user, selections) do
+      case submit_post_votes(session, current_user, selections) do
         {:ok, report} ->
           socket
           |> assign(:report, report)
@@ -331,6 +336,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       {:noreply, put_flash(socket, :error, gettext("Not authorized"))}
     end
   end
+
+  defp submit_post_votes(session, user, %{album: value}), do: Sessions.submit_post_album_vote(session, user, value)
+  defp submit_post_votes(session, user, selections), do: Sessions.submit_post_votes(session, user, selections)
 
   # The YouTube title when the video is known, else the name of the replay.
   defp replay_title(%{"title" => title}) when is_binary(title) and title != "", do: title

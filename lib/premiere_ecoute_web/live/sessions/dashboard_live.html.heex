@@ -69,6 +69,13 @@
               <.status_badge variant="primary" size="sm">
                 {gettext("Votes")}: {vote_type_display(@listening_session)}
               </.status_badge>
+              <.status_badge variant="primary" size="sm">
+                <%= if ListeningSession.album_vote?(@listening_session) do %>
+                  {gettext("Album")}
+                <% else %>
+                  {gettext("Track")}
+                <% end %>
+              </.status_badge>
               <div class="flex-1"></div>
               <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />
             </div>
@@ -522,6 +529,16 @@
           <% end %>
         </div>
 
+        <%= if @listening_session.source in [:album, :playlist] do %>
+          <div class="mt-8 rounded-lg overflow-hidden border-2 border-purple-300/50">
+            <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30">
+              <div class="flex items-end justify-center h-32 mx-auto w-4/5">
+                <.distribution_graph listening_session={@listening_session} report={@report} />
+              </div>
+            </div>
+          </div>
+        <% end %>
+
         <div class="mb-6 mt-8">
           <%= if @listening_session.source == :free do %>
             <!-- Free mode: show captured track markers list + current captured track -->
@@ -737,7 +754,7 @@
                               </div>
                             </div>
                           <% end %>
-                          <%= if @listening_session.options["votes"] do %>
+                          <%= if @listening_session.options["votes"] && not ListeningSession.album_vote?(@listening_session) do %>
                             <.session_track_stat
                               report={@report}
                               track={track}
@@ -746,7 +763,7 @@
                               legend={gettext("Votes")}
                             />
                           <% end %>
-                          <%= if @listening_session.options["scores"] do %>
+                          <%= if @listening_session.options["scores"] && not ListeningSession.album_vote?(@listening_session) do %>
                             <.session_track_stat
                               report={@report}
                               track={track}
@@ -766,7 +783,7 @@
                       </div>
                     </div>
 
-                    <%= if ListeningSession.current?(@listening_session, track) || @listening_session.status == :stopped do %>
+                    <%= if not ListeningSession.album_vote?(@listening_session) and (ListeningSession.current?(@listening_session, track) || @listening_session.status == :stopped) do %>
                       <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
                         <div class="flex items-end justify-center h-32 mx-auto w-4/5">
                           <.distribution_graph listening_session={@listening_session} report={@report} track={track} />

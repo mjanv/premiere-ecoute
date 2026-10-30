@@ -870,8 +870,10 @@
 
       <%!-- Post-session voting modal --%>
       <%= if @post_vote_modal_open do %>
+        <% album_vote = ListeningSession.album_vote?(@listening_session) %>
         <% vote_tracks =
           case @listening_session.source do
+            _ when album_vote -> []
             :album -> Enum.sort_by(@listening_session.album.tracks, & &1.track_number)
             :playlist -> @listening_session.playlist.tracks
             _ -> []
@@ -879,12 +881,34 @@
         <.modal id="post-vote-modal" show on_cancel="close_post_vote_modal" size="xl">
           <:header>{gettext("Cast your votes")}</:header>
           <p class="text-xs text-base-content/50 mb-5 shrink-0">
-            {gettext("Rate each track you heard. You can skip tracks you didn't listen to.")}
+            <%= if album_vote do %>
+              {gettext("Rate the whole album with a single vote.")}
+            <% else %>
+              {gettext("Rate each track you heard. You can skip tracks you didn't listen to.")}
+            <% end %>
           </p>
 
           <% vote_options = @listening_session.vote_options || [] %>
           <% many_options = length(vote_options) > 5 %>
           <div class="overflow-y-auto flex-1 space-y-3 pr-1">
+            <%= if album_vote do %>
+              <% selected = Map.get(@post_vote_selections, :album) %>
+              <div class="flex items-center gap-3">
+                <p class="text-slate-300 text-sm truncate min-w-0 flex-1">{@listening_session.album.name}</p>
+                <div class={if many_options, do: "flex gap-1 flex-1 justify-end", else: "flex gap-1 shrink-0"}>
+                  <%= for option <- vote_options do %>
+                    <button
+                      type="button"
+                      phx-click="set_post_album_vote"
+                      phx-value-note={option}
+                      class={"#{if many_options, do: "flex-1 py-1 text-center", else: "px-2.5 py-1"} rounded text-xs font-semibold transition-all border #{if selected == option, do: "bg-purple-600 border-purple-400 text-white", else: "bg-white/5 border-white/10 text-slate-400 hover:border-purple-400 hover:text-white"}"}
+                    >
+                      {option}
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
             <%= for track <- vote_tracks do %>
               <% selected = Map.get(@post_vote_selections, track.id) %>
               <div class="flex items-center gap-3">

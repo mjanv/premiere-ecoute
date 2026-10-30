@@ -469,6 +469,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
+  # Album votes are not tied to a track: only the album overview is shown.
+  defp get_session_tracks(%{options: %{"vote_scope" => "album"}}), do: []
   defp get_session_tracks(%{source: :free, track_markers: markers}) when is_list(markers), do: markers
   defp get_session_tracks(%{album: %{tracks: tracks}}) when is_list(tracks), do: tracks
   defp get_session_tracks(%{playlist: %{tracks: tracks}}) when is_list(tracks), do: tracks

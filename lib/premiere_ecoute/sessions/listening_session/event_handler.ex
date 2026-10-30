@@ -53,6 +53,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
 
   defp notify_playback_failure(_event), do: :ok
 
+  # Album votes stay open for the whole session: only track votes are closed and reopened on track changes.
+  defp reopen_track_vote(%ListeningSession{id: session_id, user_id: user_id} = session, track) do
+    unless ListeningSession.album_vote?(session) do
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
+      open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
+      ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, open_delay)
+    end
+  end
+
   @impl true
   def dispatch(%SessionPrepared{source: :track, session_id: session_id, user_id: user_id}) do
     with %Scope{user: %{spotify: spotify}} = scope when not is_nil(spotify) <-
@@ -75,6 +84,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   def dispatch(%SessionStarted{source: :album, session_id: session_id, user_id: user_id}) do
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
+
+    if ListeningSession.album_vote?(session) do
+      ListeningSessionWorker.in_seconds(%{action: "open_album_vote", session_id: session_id, user_id: user_id}, 10)
+    end
+
     ListeningSessionWorker.in_seconds(%{action: "send_instructions", user_id: user_id}, 15)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 30)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_started, session_id})
@@ -110,13 +124,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%NextTrackStarted{source: :album, session_id: session_id, user_id: user_id, track: track} = event) do
+  def dispatch(%NextTrackStarted{source: :album, session_id: session_id, track: track} = event) do
     notify_playback_failure(event)
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
-    ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
-    open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
-    ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, open_delay)
+    reopen_track_vote(session, track)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, track})
     :ok
   end
@@ -132,13 +144,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%PreviousTrackStarted{session_id: session_id, user_id: user_id, track: track} = event) do
+  def dispatch(%PreviousTrackStarted{session_id: session_id, track: track} = event) do
     notify_playback_failure(event)
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
-    ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
-    open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
-    ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, open_delay)
+    reopen_track_vote(session, track)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, track})
     :ok
   end

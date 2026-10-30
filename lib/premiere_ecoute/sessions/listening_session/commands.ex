@@ -21,7 +21,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
             autostart: boolean(),
             interlude_threshold_ms: integer() | nil,
             submitter: String.t() | nil,
-            spotify_commands_disabled: boolean()
+            spotify_commands_disabled: boolean(),
+            vote_scope: :track | :album
           }
 
     defstruct [
@@ -37,7 +38,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
       autostart: true,
       interlude_threshold_ms: nil,
       submitter: nil,
-      spotify_commands_disabled: false
+      spotify_commands_disabled: false,
+      vote_scope: :track
     ]
   end
 

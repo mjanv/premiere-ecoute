@@ -44,13 +44,35 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
           {:ok, Report.t()} | {:error, term()}
   def submit(%ListeningSession{status: :stopped} = session, %User{twitch: %{user_id: viewer_id}}, votes) do
     if valid_votes?(session, votes) do
-      insert_votes(session, viewer_id, votes)
+      insert_votes(session, viewer_id, votes, :track)
     else
       {:error, :invalid_votes}
     end
   end
 
   def submit(_session, _viewer_id, _votes), do: {:error, :invalid}
+
+  @doc """
+  Inserts a post-session album vote and regenerates the session report.
+
+  Only accepts a stopped session in album vote scope. Returns `{:error, :invalid_votes}`
+  if the value is not one of the session vote options. An existing album vote of the
+  viewer is kept: the new one is silently ignored.
+  """
+  @spec submit_album(ListeningSession.t(), User.t(), String.t()) :: {:ok, Report.t()} | {:error, term()}
+  def submit_album(
+        %ListeningSession{status: :stopped, vote_options: vote_options} = session,
+        %User{twitch: %{user_id: viewer_id}},
+        value
+      ) do
+    cond do
+      not ListeningSession.album_vote?(session) -> {:error, :invalid}
+      value not in vote_options -> {:error, :invalid_votes}
+      true -> insert_votes(session, viewer_id, [{nil, value}], :album)
+    end
+  end
+
+  def submit_album(_session, _viewer, _value), do: {:error, :invalid}
 
   defp valid_votes?(%ListeningSession{vote_options: vote_options} = session, votes) do
     track_ids = session_track_ids(session)
@@ -68,7 +90,7 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
 
   defp session_track_ids(_session), do: MapSet.new()
 
-  defp insert_votes(%ListeningSession{id: session_id} = session, viewer_id, votes) do
+  defp insert_votes(%ListeningSession{id: session_id} = session, viewer_id, votes, scope) do
     now = DateTime.truncate(DateTime.utc_now(), :second)
 
     votes
@@ -77,6 +99,7 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
         viewer_id: viewer_id,
         session_id: session_id,
         track_id: track_id,
+        scope: scope,
         value: value,
         is_streamer: false,
         inserted_at: now,

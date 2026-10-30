@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   alias Broadway.Message
 
   alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
@@ -53,12 +54,12 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   @doc """
   Extracts vote data from chat message event.
 
-  Validates that the session has an active track, parses the vote value from the message text, and constructs a vote map with all required fields including timestamps.
+  Validates that the session has an active track, or an open album vote, parses the vote value from the message text, and constructs a vote map with all required fields including timestamps.
   """
   @spec process(MessageSent.t()) :: {:ok, map()} | {:error, term()}
   def process(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message, is_streamer: is_streamer}) do
-    with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <-
-           Cache.get(:sessions, broadcaster_id),
+    with {:ok, session} when not is_nil(session) <- Cache.get(:sessions, broadcaster_id),
+         {:ok, scope, track_id} <- vote_target(session),
          {:ok, value} <-
            Vote.from_message(message, session.vote_options),
          now <- DateTime.truncate(DateTime.utc_now(), :second),
@@ -66,6 +67,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
            viewer_id: user_id,
            session_id: session.id,
            track_id: track_id,
+           scope: scope,
            value: value,
            is_streamer: is_streamer,
            updated_at: now,
@@ -77,19 +79,27 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     end
   end
 
+  defp vote_target(%{vote_scope: :album}), do: {:ok, :album, nil}
+  defp vote_target(%{current_track_id: track_id}) when not is_nil(track_id), do: {:ok, :track, track_id}
+  defp vote_target(_session), do: {:error, :no_track}
+
   @doc """
   Processes batched votes for bulk insertion and broadcasts session summaries.
 
-  Inserts all votes in the batch, generates an updated session report, extracts the relevant track summary, and broadcasts it via PubSub for real-time UI updates.
+  Inserts all votes in the batch, generates an updated session report, extracts the relevant track summary (or the session summary for album votes), and broadcasts it via PubSub for real-time UI updates.
   """
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
     Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
 
-    {:ok, report} = Report.generate(%ListeningSession{id: session_id})
+    # The report needs the session vote options to compute scores of text vote scales (smash/pass).
+    {:ok, report} = Report.generate(Repo.get(ListeningSession, session_id) || %ListeningSession{id: session_id})
 
-    track_id = hd(messages).data.track_id
-    summary = Enum.find(report.track_summaries, fn s -> s.track_id == track_id end)
+    summary =
+      case hd(messages).data do
+        %{scope: :album} -> report.session_summary
+        %{track_id: track_id} -> Enum.find(report.track_summaries, fn s -> s.track_id == track_id end)
+      end
 
     if summary do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, summary})

@@ -2,11 +2,11 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   @moduledoc """
   Individual vote aggregate.
 
-  Stores viewer votes on tracks during listening sessions, parses vote values from chat messages against configured vote options, and enforces uniqueness per viewer-session-track combination.
+  Stores viewer votes during listening sessions, parses vote values from chat messages against configured vote options, and enforces uniqueness per viewer-session-track combination. Votes of `:album` scope rate the whole album: they have no track and are unique per viewer-session combination.
   """
 
   use PremiereEcouteCore.Aggregate,
-    json: [:value, :track_id, :session_id, :viewer_id, :inserted_at]
+    json: [:value, :scope, :track_id, :session_id, :viewer_id, :inserted_at]
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
@@ -15,6 +15,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
           id: integer() | nil,
           viewer_id: String.t() | nil,
           track_id: String.t() | nil,
+          scope: :track | :album,
           value: integer() | nil,
           is_streamer: boolean(),
           session: entity(ListeningSession.t()),
@@ -25,6 +26,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   schema "votes" do
     field :viewer_id, :string
     field :track_id, :id
+    field :scope, Ecto.Enum, values: [:track, :album], default: :track
     field :value, :string
     field :is_streamer, :boolean, default: false
 
@@ -36,15 +38,25 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   @doc """
   Creates changeset for vote validation.
 
-  Validates required fields and enforces uniqueness per viewer-session-track combination.
+  Validates required fields and enforces uniqueness per viewer-session-track combination, or per viewer-session combination for album votes.
   """
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(vote, attrs) do
     vote
-    |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])
-    |> validate_required([:viewer_id, :session_id, :track_id, :is_streamer, :value])
+    |> cast(attrs, [:viewer_id, :session_id, :track_id, :scope, :is_streamer, :value])
+    |> validate_required([:viewer_id, :session_id, :scope, :is_streamer, :value])
+    |> validate_scope()
     |> unique_constraint([:viewer_id, :session_id, :track_id], name: :vote_index)
+    |> unique_constraint([:viewer_id, :session_id], name: :album_vote_index)
+    |> check_constraint(:track_id, name: :vote_scope_track)
     |> foreign_key_constraint(:session_id)
+  end
+
+  defp validate_scope(changeset) do
+    case get_field(changeset, :scope) do
+      :album -> put_change(changeset, :track_id, nil)
+      _ -> validate_required(changeset, [:track_id])
+    end
   end
 
   @doc "Counts all votes cast by a viewer."

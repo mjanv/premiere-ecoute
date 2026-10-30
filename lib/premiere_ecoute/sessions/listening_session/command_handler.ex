@@ -55,7 +55,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         vote_options: vote_options,
         autostart: autostart,
         interlude_threshold_ms: interlude_threshold_ms,
-        spotify_commands_disabled: spotify_commands_disabled
+        spotify_commands_disabled: spotify_commands_disabled,
+        vote_scope: vote_scope
       }) do
     with {:ok, album} <- EnrichDiscography.create_album(album_id, :spotify),
          {:ok, session} <-
@@ -70,7 +71,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
                "next_track" => 0,
                "autostart" => autostart,
                "interlude_threshold_ms" => interlude_threshold_ms,
-               "spotify_commands_disabled" => spotify_commands_disabled
+               "spotify_commands_disabled" => spotify_commands_disabled,
+               "vote_scope" => Atom.to_string(vote_scope)
              }
            }) do
       {:ok, session,

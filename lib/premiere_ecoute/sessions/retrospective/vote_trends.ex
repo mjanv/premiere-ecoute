@@ -43,7 +43,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.VoteTrends do
     """
     SELECT track_id, value, COUNT(*) as count
     FROM votes
-    WHERE session_id = $1
+    WHERE session_id = $1 AND scope = 'track'
     GROUP BY track_id, value
     ORDER BY track_id, value
     """

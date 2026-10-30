@@ -1052,6 +1052,40 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     """
   end
 
+  @doc "Renders the album vote toggle: viewers cast a single vote for the whole album instead of one per track"
+  attr :album_vote, :boolean, required: true
+
+  @spec album_vote_toggle(map()) :: Phoenix.LiveView.Rendered.t()
+  def album_vote_toggle(assigns) do
+    ~H"""
+    <div class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
+      <button
+        type="button"
+        phx-click="toggle_album_vote"
+        class={[
+          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+          if(@album_vote, do: "bg-purple-600", else: "bg-gray-700")
+        ]}
+      >
+        <span class={[
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+          if(@album_vote, do: "translate-x-5", else: "translate-x-0")
+        ]} />
+      </button>
+      <div class="flex-1">
+        <label class="text-sm font-medium text-gray-200 cursor-pointer">
+          {gettext("Vote for the whole album")}
+        </label>
+        <p class="text-xs text-gray-400 mt-0.5">
+          {gettext(
+            "Viewers cast a single vote for the album, open during the whole session, instead of one vote per track. Their first vote counts."
+          )}
+        </p>
+      </div>
+    </div>
+    """
+  end
+
   @doc "Renders the degraded-mode toggle disabling Spotify play/pause/next/previous commands"
   attr :spotify_commands_disabled, :boolean, required: true
 

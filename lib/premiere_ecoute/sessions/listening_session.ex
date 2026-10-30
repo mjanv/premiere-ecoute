@@ -720,6 +720,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def submitter(%__MODULE__{options: options}), do: options["submitter"]
 
   @doc """
+  Returns true when viewers cast a single vote for the whole album instead of one vote per track.
+  """
+  @spec album_vote?(t()) :: boolean()
+  def album_vote?(%__MODULE__{options: %{"vote_scope" => "album"}}), do: true
+  def album_vote?(_session), do: false
+
+  @doc """
   Reads a single key out of the session's `options` map, or `default` when absent.
   """
   @spec option(t(), String.t(), term()) :: term()

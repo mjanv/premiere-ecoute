@@ -78,7 +78,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
               AsyncResult.loading()
 
             report ->
-              summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
+              summary = current_summary(report, session)
 
               if is_nil(summary) do
                 AsyncResult.ok(%{viewer_score: nil, streamer_score: nil})
@@ -124,6 +124,10 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info({:next_track_started, %ListeningSession{options: %{"vote_scope" => "album"}} = session}, socket) do
+    {:noreply, assign(socket, :listening_session, session)}
+  end
+
   def handle_info({:next_track_started, session}, %{assigns: %{summary: summary}} = socket) do
     socket
     |> assign(:listening_session, session)
@@ -265,10 +269,20 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp progress_bar_height(score) when score in [:viewer, :streamer, :both], do: "10vh"
   defp progress_bar_height(_), do: "24px"
 
+  # Album votes are not tied to a track: the session summary is the album score.
+  defp current_summary(report, %ListeningSession{} = session) do
+    if ListeningSession.album_vote?(session) do
+      report.session_summary
+    else
+      Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
+    end
+  end
+
   defp compute_vote_distribution(summary, %ListeningSession{} = session) do
+    album_vote = ListeningSession.album_vote?(session)
     track_id = summary[:track_id] || summary["track_id"]
 
-    if is_nil(track_id) or is_nil(session.vote_options) do
+    if (is_nil(track_id) and not album_vote) or is_nil(session.vote_options) do
       []
     else
       report = Report.get_by(session_id: session.id)
@@ -278,7 +292,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       else
         individual =
           report.votes
-          |> Enum.filter(&(&1.track_id == track_id))
+          |> Enum.filter(&if(album_vote, do: &1.scope == :album, else: &1.track_id == track_id))
           |> Enum.group_by(& &1.value)
           |> Map.new(fn {value, votes} -> {value, length(votes)} end)
 

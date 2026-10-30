@@ -84,6 +84,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   2. Twitch polls
   3. Calculates unique voter counts and aggregated scores
 
+  Album votes (votes of `:album` scope) have no track: they are left out of track summaries and define the session score.
+
   The scoring logic adapts based on the session's vote_options:
   - Integer values: scores computed as averages
   - String values: scores computed as most frequent ("even" if tied)
@@ -99,14 +101,15 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
 
     votes = Vote.all(where: [session_id: session_id])
     polls = Poll.all(where: [session_id: session_id])
+    {album_votes, track_votes} = Enum.split_with(votes, &(&1.scope == :album))
 
-    track_summaries = calculate_track_summaries(session, votes, polls, mode)
+    track_summaries = calculate_track_summaries(session, track_votes, polls, mode)
 
     session_summary = %{
       unique_votes: length(votes) + Enum.sum(Enum.map(polls, fn poll -> poll.total_votes end)),
       unique_voters: votes |> Enum.map(fn vote -> vote.viewer_id end) |> Enum.uniq() |> length(),
-      viewer_score: calculate_session_score(track_summaries, :viewer_score, mode),
-      streamer_score: calculate_session_score(track_summaries, :streamer_score, mode),
+      viewer_score: calculate_session_score(track_summaries, album_votes, :viewer_score, mode),
+      streamer_score: calculate_session_score(track_summaries, album_votes, :streamer_score, mode),
       tracks_rated: length(track_summaries)
     }
 
@@ -141,7 +144,17 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
     end
   end
 
-  defp calculate_session_score(track_summaries, key, mode) do
+  # Album votes rate the whole album: when present, they define the session score.
+  defp calculate_session_score(_track_summaries, [_ | _] = album_votes, key, mode) do
+    is_streamer = key == :streamer_score
+
+    album_votes
+    |> Enum.filter(&(&1.is_streamer == is_streamer))
+    |> Enum.map(& &1.value)
+    |> calculate_average_score(mode)
+  end
+
+  defp calculate_session_score(track_summaries, [], key, mode) do
     track_summaries
     |> Enum.map(&Map.fetch!(&1, key))
     |> Enum.reject(&is_nil/1)
