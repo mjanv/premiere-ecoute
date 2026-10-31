@@ -701,6 +701,66 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> preload()
   end
 
+  @prepared_for_hours 2
+
+  @doc """
+  Returns the session the streamer is in: the most recent running one, else one prepared in the last two hours.
+
+  A session prepared long ago and never started is abandoned, not pending.
+  """
+  @spec current(User.t() | nil) :: t() | nil
+  def current(nil), do: nil
+
+  def current(%User{id: user_id} = user) do
+    case get_active_session(user) do
+      nil ->
+        since = DateTime.add(DateTime.utc_now(:second), -@prepared_for_hours * 3600)
+
+        from(s in __MODULE__,
+          where: s.user_id == ^user_id and s.status == :preparing and s.updated_at > ^since,
+          order_by: [desc: s.updated_at],
+          limit: 1
+        )
+        |> Repo.one()
+        |> preload()
+
+      session ->
+        session
+    end
+  end
+
+  @doc """
+  Describes a session for a companion that only needs to show where the streamer is: its state, its source, its title and, for an album or a playlist, the position of the current track.
+
+  A missing or stopped session is `:none`.
+  """
+  @spec summary(t() | nil) :: %{
+          state: :none | :preparing | :active,
+          source: atom() | nil,
+          title: String.t() | nil,
+          track_number: pos_integer() | nil,
+          track_count: pos_integer() | nil
+        }
+  def summary(%__MODULE__{status: status} = session) when status in [:preparing, :active] do
+    {track_number, track_count} = position(session)
+
+    %{state: status, source: session.source, title: title(session), track_number: track_number, track_count: track_count}
+  end
+
+  def summary(_session), do: %{state: :none, source: nil, title: nil, track_number: nil, track_count: nil}
+
+  defp position(%__MODULE__{source: :album, album: %{} = album, current_track: current}) do
+    {current && current.track_number, album.total_tracks || length(album.tracks)}
+  end
+
+  defp position(%__MODULE__{source: :playlist, playlist: %{tracks: tracks}, current_playlist_track: current})
+       when is_list(tracks) do
+    index = current && Enum.find_index(tracks, &(&1.id == current.id))
+    {index && index + 1, length(tracks)}
+  end
+
+  defp position(_session), do: {nil, nil}
+
   @doc """
   Returns the session's title.
 

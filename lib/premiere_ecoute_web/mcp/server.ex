@@ -85,7 +85,8 @@ defmodule PremiereEcouteWeb.Mcp.Server do
   # PremiereEcouteWeb.Oauth.RegistrationController; `sub` is the user id set in ResourceOwners.
   defp by_bearer_token(authorization) do
     with "Bearer " <> token <- authorization,
-         {:ok, %{sub: sub}} <- AccessToken.authorize(value: token),
+         {:ok, %{sub: sub, scope: scope}} <- AccessToken.authorize(value: token),
+         true <- "mcp" in String.split(scope, " ", trim: true),
          %User{} = user <- Repo.get(User, sub) do
       {:ok, User.preload(user)}
     else

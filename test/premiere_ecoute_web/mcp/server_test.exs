@@ -96,6 +96,23 @@ defmodule PremiereEcouteWeb.Mcp.ServerTest do
     end
   end
 
+  describe "authenticate/2 bearer token scope" do
+    test "rejects a valid access token that does not carry the mcp scope" do
+      user = user_fixture()
+      access_token = issue_access_token(user, "player")
+
+      assert Server.authenticate(nil, ["Bearer #{access_token}"]) == :error
+    end
+
+    test "authenticates an access token carrying mcp among other scopes" do
+      user = user_fixture()
+      access_token = issue_access_token(user, "player mcp")
+
+      assert {:ok, authenticated} = Server.authenticate(nil, ["Bearer #{access_token}"])
+      assert authenticated.id == user.id
+    end
+  end
+
   describe "handle_request/2" do
     test "rejects tools/call when current_user is not assigned" do
       frame = Frame.new()
@@ -128,6 +145,50 @@ defmodule PremiereEcouteWeb.Mcp.ServerTest do
       assert {:error, %Error{message: message}, _frame} = Server.handle_request(request, frame)
       refute message == "Unauthorized"
     end
+  end
+
+  defp issue_access_token(user, scope) do
+    {:ok, client} =
+      Admin.create_client(%{
+        name: "client-#{System.unique_integer([:positive])}",
+        redirect_uris: ["https://example.com/callback"],
+        supported_grant_types: ["authorization_code", "refresh_token"],
+        pkce: true,
+        authorize_scope: true,
+        authorized_scopes: [%{name: "player"}, %{name: "mcp"}]
+      })
+
+    code_verifier = "AaypQFt5gKjNdyiPjJ6AQ1UDbPJtbym3Oa6OpwiRV0g"
+    code_challenge = :crypto.hash(:sha256, code_verifier) |> Base.url_encode64(padding: false)
+    resource_owner = %ResourceOwner{sub: to_string(user.id), username: user.email}
+
+    authorize_conn = %Plug.Conn{
+      query_params: %{
+        "response_type" => "code",
+        "client_id" => client.id,
+        "redirect_uri" => "https://example.com/callback",
+        "scope" => scope,
+        "state" => "xyz",
+        "code_challenge" => code_challenge,
+        "code_challenge_method" => "S256"
+      }
+    }
+
+    %AuthorizeResponse{code: code} = Boruta.Oauth.authorize(authorize_conn, resource_owner, AuthorizeCallback)
+
+    token_conn = %Plug.Conn{
+      body_params: %{
+        "grant_type" => "authorization_code",
+        "code" => code,
+        "redirect_uri" => "https://example.com/callback",
+        "client_id" => client.id,
+        "code_verifier" => code_verifier
+      },
+      query_params: %{}
+    }
+
+    %TokenResponse{access_token: access_token} = Boruta.Oauth.token(token_conn, TokenCallback)
+    access_token
   end
 end
 

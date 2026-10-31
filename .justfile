@@ -22,6 +22,32 @@ server:
     echo "==> http://localhost:$port (node dev$suffix)"
     exec iex --sname "dev$suffix" -S mix phx.server
 
+# Run the desktop player on Windows against this checkout's server, rebuilding on every change
+player:
+    #!/usr/bin/env bash
+    {{wt}}
+    cd apps/desktop-player
+    export CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUNNER="$PWD/tools/win-run.sh"
+    export PLAYER_HUB_URL="http://localhost:$port"
+    echo "==> desktop player -> $PLAYER_HUB_URL (watching apps/desktop-player)"
+    exec watchexec --restart --quiet -w src -w assets -w build.rs -w Cargo.toml -- \
+      cargo xwin run --target x86_64-pc-windows-msvc --release --features dev-tools
+
+# Format, lint, test (on Windows), unused dependencies and advisories for the desktop player
+player-check:
+    apps/desktop-player/tools/check.sh
+
+# Run the desktop player tests on Windows, optionally filtered: just player-test remote::session
+player-test *filter:
+    #!/usr/bin/env bash
+    cd apps/desktop-player
+    export CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUNNER="$PWD/tools/win-run.sh"
+    exec cargo xwin test --target x86_64-pc-windows-msvc --release -- {{filter}}
+
+# Start the release exe without Spotify on Windows and check that its window opens
+player-smoke:
+    cd apps/desktop-player && cargo xwin build --target x86_64-pc-windows-msvc --release && tools/smoke.sh
+
 # Connect to development server
 connect:
     #!/usr/bin/env bash
