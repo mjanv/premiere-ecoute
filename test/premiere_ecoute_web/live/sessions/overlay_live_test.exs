@@ -43,7 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       # Verify overlay is rendered with proper dimensions (default streamer width: 100vw)
       assert has_element?(view, "div[style*='width: 100vw']")
       assert html =~ "width: 100vw"
-      assert html =~ "height: 10vh"
+      assert html =~ "height: 12vh"
     end
 
     test "displays overlay with correct score type from query params", %{conn: conn, user: user, album: album} do
@@ -69,7 +69,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       # Default overlay should render with streamer dimensions
       assert has_element?(view, "div[style*='width: 100vw']")
       assert html =~ "width: 100vw"
-      assert html =~ "height: 10vh"
+      assert html =~ "height: 12vh"
     end
 
     test "displays default overlay when user has only preparing session", %{conn: conn, user: user, album: album} do
@@ -267,7 +267,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       # Verify the overlay shows the active session with proper rendering
       assert has_element?(view, "div[style*='width: 100vw']")
       assert html =~ "width: 100vw"
-      assert html =~ "height: 10vh"
+      assert html =~ "height: 12vh"
     end
 
     test "overlay updates when session is stopped", %{conn: conn, user: user, album: album} do

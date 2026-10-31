@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
 
   use Phoenix.Component
 
+  alias Phoenix.LiveView.AsyncResult
   alias PremiereEcouteWeb.Sessions.Components.SessionComponents
 
   embed_templates "overlay/*"
@@ -35,8 +36,16 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_nil?(summary, :streamer), do: is_nil(summary["streamer_score"] || Map.get(summary, :streamer_score))
 
   defp score_label(_user, :viewer), do: "Chat"
-  defp score_label(%{username: username}, :streamer), do: username
   defp score_label(_user, :streamer), do: "Streamer"
+
+  # Longer labels get a smaller font so the vertical text fits the strip.
+  defp label_size(:viewer), do: "28vh"
+  defp label_size(:streamer), do: "14vh"
+
+  defp track_counter(%AsyncResult{ok?: true, result: %{item: %{track_number: n, album: %{total_tracks: t}}}}),
+    do: "#{n}/#{t}"
+
+  defp track_counter(_progress), do: "-/-"
 
   @doc """
   Returns the widget background color for a vote state.
