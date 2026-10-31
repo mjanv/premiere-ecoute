@@ -1,6 +1,20 @@
 # Changelog
 
-<!-- Last analyzed commit: 0e531c03 (2026-09-27) -->
+<!-- Last analyzed commit: 64c127eb (2026-10-31) -->
+
+## October 2026
+
+* [Feature] Replay tracking: connect your YouTube channel and each album session's replay is matched automatically, with an optional reminder when a session has no replay uploaded yet.
+* [Feature] Replays page: add replays manually, sync them from YouTube, track upload status, and backfill an existing session by hand.
+* [Feature] Replay status and actions now appear directly on the My Sessions cards.
+* [Feature] Album sessions can now be voted once for the whole album.
+* [Feature] My Sessions list now has search and filters, which are kept when you come back from a session detail.
+* [Feature] Spotify player commands are tested when a streamer goes live, to catch playback problems before the session starts.
+* [Feature] Streamers receive an email when their account is created.
+* [Improvement] Restyled overlay widgets, including the single score widget.
+* [Improvement] The session vote distribution is only shown for album votes.
+* [Fix] Radio playback tracking no longer stops after some Spotify responses.
+* [Fix] Fixed a crash when opening the terms acceptance page without a pending Twitch login.
 
 ## September 2026
 
