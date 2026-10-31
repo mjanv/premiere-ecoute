@@ -1,0 +1,13 @@
+<div style={"width: #{@width}; flex-shrink: 0; display: flex; flex-direction: column; background: #000000; color: #{@color}; border: 1.5vh solid #{@color}; box-sizing: border-box; overflow: hidden;"}>
+  <div style="flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;">
+    <span style={"writing-mode: vertical-rl; transform: rotate(180deg); font-family: Impact, 'Arial Black', sans-serif; font-weight: 900; -webkit-text-stroke: 0.8vh #{@color}; font-size: #{label_size(@score)}; line-height: 1; text-box: trim-both cap alphabetic; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap;"}>
+      {score_label(@user, @score)}
+    </span>
+  </div>
+  <div
+    :if={@counter}
+    style={"height: calc(#{bar_height()} - 1.5vh); display: flex; align-items: center; justify-content: center; background: #{@color}; color: #000000; font-family: Impact, 'Arial Black', sans-serif; font-weight: 900; font-size: 9vh; -webkit-text-stroke: 0.25vh #000000; line-height: 1; white-space: nowrap;"}
+  >
+    {track_counter(@progress)}
+  </div>
+</div>

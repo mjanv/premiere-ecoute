@@ -2,6 +2,9 @@
   <%= if @score in [:player] do %>
     <.player
       progress={@progress}
+      percent={@percent}
+      color={@color_primary}
+      secondary={@color_secondary}
       summary={@summary}
       widget_state={@widget_state}
       score={@score}
@@ -11,14 +14,11 @@
   <% end %>
   <%= if @score in [:viewer, :streamer] do %>
     <.single
-      summary={@summary}
       progress={@progress}
       percent={@percent}
       color={@color_primary}
-      bar_height="12vh"
-      bar_played={bar_played_color(@widget_state, @color_primary, @color_secondary)}
-      bar_remaining="#d4d4cc"
-      bg_color={widget_bg(@widget_state, @color_primary, @color_secondary)}
+      secondary={@color_secondary}
+      summary={@summary}
       widget_state={@widget_state}
       score={@score}
       user={@user}
@@ -27,6 +27,10 @@
   <% end %>
   <%= if @score in [:both] do %>
     <.double
+      progress={@progress}
+      percent={@percent}
+      color={@color_primary}
+      secondary={@color_secondary}
       summary={@summary}
       widget_state={@widget_state}
       score={@score}
@@ -37,13 +41,11 @@
   <%= if @score in [:votes] do %>
     <.vote_bar
       vote_distribution={@vote_distribution}
+      color={@color_primary}
+      user={@user}
       widget_state={@widget_state}
       score={@score}
       text_color={widget_text_color(@widget_state, @color_primary, @color_secondary)}
     />
-  <% end %>
-  <%= if @score not in [:votes, :viewer, :streamer] do %>
-    <div style={"position: absolute; bottom: 0; left: 0; width: 100%; height: #{progress_bar_height(@score)}; background: linear-gradient(to right, #{bar_played_color(@widget_state, @color_primary, @color_secondary)} 0%, #{bar_played_color(@widget_state, @color_primary, @color_secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color_primary, @color_secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color_primary, @color_secondary)} 100%);"}>
-    </div>
   <% end %>
 </div>

@@ -37,10 +37,17 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
 
   defp score_label(_user, :viewer), do: "Chat"
   defp score_label(_user, :streamer), do: "Streamer"
+  defp score_label(_user, :votes), do: "Votes"
+  defp score_label(_user, :player), do: "Playing"
 
   # Longer labels get a smaller font so the vertical text fits the strip.
   defp label_size(:viewer), do: "28vh"
   defp label_size(:streamer), do: "14vh"
+  defp label_size(:votes), do: "24vh"
+  defp label_size(:player), do: "16vh"
+
+  # Height shared by the track counter and the progress bar, so they line up.
+  defp bar_height, do: "12vh"
 
   defp track_counter(%AsyncResult{ok?: true, result: %{item: %{track_number: n, album: %{total_tracks: t}}}}),
     do: "#{n}/#{t}"
@@ -75,5 +82,5 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   Returns the color of the remaining part of the progress bar.
   """
   @spec bar_remaining_color(atom(), String.t(), String.t()) :: String.t()
-  def bar_remaining_color(_state, _c1, _c2), do: "rgba(255,255,255,0.3)"
+  def bar_remaining_color(_state, _c1, _c2), do: "#d4d4cc"
 end

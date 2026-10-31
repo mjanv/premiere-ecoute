@@ -2,30 +2,33 @@
 max_count = @vote_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end)
 
 vote_options = Enum.map(@vote_distribution, &elem(&1, 0)) %>
-<div :if={@score in [:votes]} style="width: 100%; height: 100%; display: flex; overflow: hidden; gap: 2px;">
-  <%= for {option, count} <- @vote_distribution do %>
-    <% color = SessionComponents.vote_option_color(option, vote_options)
-    is_winner = @widget_state == :closed && count == max_count && max_count > 0
-    is_closed = @widget_state == :closed && max_count > 0
-    pct = if total > 0, do: round(count * 100 / total), else: 0
-    flex = if total > 0, do: max(count, 1), else: 1
-    max_w = if is_closed && !is_winner, do: "0%", else: "100%"
-    opacity = if is_closed && !is_winner, do: 0, else: 1 %>
-    <div style={"flex: #{flex}; max-width: #{max_w}; overflow: hidden; background: #{color}; opacity: #{opacity}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; position: relative; transition: max-width 0.8s ease, opacity 0.5s ease;"}>
-      <%= if is_winner do %>
-        <div style="position: absolute; inset: 0; box-shadow: inset 0 0 30px rgba(255,255,255,0.2);"></div>
-      <% end %>
-      <span style="position: relative; font-size: 28px; font-weight: 800; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.5); white-space: nowrap;">
-        {option}
-      </span>
-      <%= if total > 0 do %>
-        <span style="position: relative; font-size: 18px; font-weight: 600; color: white; opacity: 0.85; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
-          {pct}%
+<div :if={@score in [:votes]} style="width: 100%; height: 100%; display: flex;">
+  <.label_strip score={@score} user={@user} color={@color} progress={nil} counter={false} width="28vh" />
+  <div style={"flex: 1; min-width: 0; display: flex; overflow: hidden; gap: 2px; box-sizing: border-box; border: 1.5vh solid #{@color}; border-left: 0;"}>
+    <%= for {option, count} <- @vote_distribution do %>
+      <% color = SessionComponents.vote_option_color(option, vote_options)
+      is_winner = @widget_state == :closed && count == max_count && max_count > 0
+      is_closed = @widget_state == :closed && max_count > 0
+      pct = if total > 0, do: round(count * 100 / total), else: 0
+      flex = if total > 0, do: max(count, 1), else: 1
+      max_w = if is_closed && !is_winner, do: "0%", else: "100%"
+      opacity = if is_closed && !is_winner, do: 0, else: 1 %>
+      <div style={"flex: #{flex}; max-width: #{max_w}; overflow: hidden; background: #{color}; opacity: #{opacity}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; position: relative; transition: max-width 0.8s ease, opacity 0.5s ease;"}>
+        <%= if is_winner do %>
+          <div style="position: absolute; inset: 0; box-shadow: inset 0 0 30px rgba(255,255,255,0.2);"></div>
+        <% end %>
+        <span style="position: relative; font-size: 28px; font-weight: 800; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.5); white-space: nowrap;">
+          {option}
         </span>
-      <% end %>
-      <%= if is_winner do %>
-        <span style="position: relative; font-size: 20px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">★</span>
-      <% end %>
-    </div>
-  <% end %>
+        <%= if total > 0 do %>
+          <span style="position: relative; font-size: 18px; font-weight: 600; color: white; opacity: 0.85; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+            {pct}%
+          </span>
+        <% end %>
+        <%= if is_winner do %>
+          <span style="position: relative; font-size: 20px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">★</span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 </div>

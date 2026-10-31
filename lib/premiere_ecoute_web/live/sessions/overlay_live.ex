@@ -266,9 +266,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp overlay_size(:votes), do: "width: 800px; height: 240px; "
   defp overlay_size(_), do: "width: 100vw; height: 100vh; "
 
-  defp progress_bar_height(:both), do: "10vh"
-  defp progress_bar_height(_), do: "24px"
-
   # Album votes are not tied to a track: the session summary is the album score.
   defp current_summary(report, %ListeningSession{} = session) do
     if ListeningSession.album_vote?(session) do
