@@ -529,7 +529,7 @@
           <% end %>
         </div>
 
-        <%= if @listening_session.source in [:album, :playlist] do %>
+        <%= if @listening_session.source in [:album, :playlist] and ListeningSession.album_vote?(@listening_session) do %>
           <div class="mt-8 rounded-lg overflow-hidden border-2 border-purple-300/50">
             <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30">
               <div class="flex items-end justify-center h-32 mx-auto w-4/5">
