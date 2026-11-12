@@ -105,7 +105,7 @@ defmodule PremiereEcoute.MixProject do
       {:dotenvy, "~> 1.2"},
       {:boundary, "~> 0.11"},
       {:uuid, "~> 1.1"},
-      {:timex, "~> 3.7"},
+      {:timex, "~> 4.0"},
       {:ex_cldr, "~> 2.47"},
       {:ex_cldr_dates_times, "~> 2.25"},
       {:req, "~> 0.7"},
