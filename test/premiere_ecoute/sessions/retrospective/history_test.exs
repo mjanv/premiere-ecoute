@@ -279,4 +279,120 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
       assert %{streamer_score: nil, viewer_score: 7.0} = summary2
     end
   end
+
+  describe "get_viewer_votes_by_year/3" do
+    import PremiereEcoute.Wrapped.WrappedFixtures, only: [listened: 3, listened: 4, listened_single: 3, listened_single: 4]
+
+    setup do
+      {:ok, streamer: user_fixture(%{role: :streamer}), voter: user_fixture(%{twitch: %{user_id: "voter"}})}
+    end
+
+    test "lists the album votes of a viewer with their session", %{streamer: streamer, voter: voter} do
+      album = listened(streamer, 901, ["8", "6"], viewer: "voter", album: "9", voted_at: ~U[2026-05-05 20:00:00Z])
+
+      votes = History.get_viewer_votes_by_year(voter, 2026, :album)
+
+      assert length(votes) == 3
+      assert Enum.all?(votes, &(&1.album_id == album.id and &1.single_id == nil and &1.streamer == streamer.username))
+
+      assert Enum.all?(
+               votes,
+               &(&1.vote_options == ListeningSession.vote_options("0-10") and &1.voted_at == ~U[2026-05-05 20:00:00Z])
+             )
+
+      assert votes |> Enum.map(&{&1.scope, &1.value}) |> Enum.sort() == [album: "9", track: "6", track: "8"]
+
+      assert votes |> Enum.map(& &1.track_id) |> Enum.reject(&is_nil/1) |> Enum.sort() ==
+               album.tracks |> Enum.map(& &1.id) |> Enum.sort()
+
+      assert votes |> Enum.map(& &1.session_id) |> Enum.uniq() |> length() == 1
+    end
+
+    test "lists the single votes of a viewer apart from the album ones", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["8"], viewer: "voter")
+      single = listened_single(streamer, 901, "7", viewer: "voter")
+      year = Date.utc_today().year
+
+      assert [%{single_id: single_id, album_id: nil, value: "7", scope: :track}] =
+               History.get_viewer_votes_by_year(voter, year, :track)
+
+      assert single_id == single.id
+      assert [%{single_id: nil, value: "8"}] = History.get_viewer_votes_by_year(voter, year, :album)
+    end
+
+    test "keeps the votes cast in the UTC year", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["1"], viewer: "voter", voted_at: ~U[2025-12-31 23:59:59Z])
+      listened(streamer, 902, ["2"], viewer: "voter", voted_at: ~U[2026-01-01 00:00:00Z])
+      listened(streamer, 903, ["3"], viewer: "voter", voted_at: ~U[2026-12-31 23:59:59Z])
+      listened(streamer, 904, ["4"], viewer: "voter", voted_at: ~U[2027-01-01 00:00:00Z])
+
+      assert [%{value: "1"}] = History.get_viewer_votes_by_year(voter, 2025, :album)
+      assert History.get_viewer_votes_by_year(voter, 2026, :album) |> Enum.map(& &1.value) |> Enum.sort() == ["2", "3"]
+      assert [%{value: "4"}] = History.get_viewer_votes_by_year(voter, 2027, :album)
+    end
+
+    test "counts votes cast as a streamer and in private sessions", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["8"], viewer: "voter", is_streamer: true, visibility: :private)
+
+      assert [%{value: "8"}] = History.get_viewer_votes_by_year(voter, Date.utc_today().year, :album)
+    end
+
+    test "ignores the votes of other viewers", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["8"], viewer: "someone", others: [{"voter", "3"}])
+
+      assert [%{value: "3"}] = History.get_viewer_votes_by_year(voter, Date.utc_today().year, :album)
+    end
+
+    test "lists nothing for a user without Twitch account", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["8"], viewer: "voter")
+      year = Date.utc_today().year
+
+      assert History.get_viewer_votes_by_year(streamer, year, :album) == []
+      assert History.get_viewer_votes_by_year(%{voter | twitch: nil}, year, :album) == []
+      assert History.get_viewer_votes_by_year(%{voter | twitch: %{voter.twitch | user_id: nil}}, year, :album) == []
+    end
+  end
+
+  describe "list_voter_ids/1" do
+    import PremiereEcoute.Wrapped.WrappedFixtures, only: [listened: 4, listened_single: 4]
+
+    setup do
+      {:ok, streamer: user_fixture(%{role: :streamer}), voter: user_fixture(%{twitch: %{user_id: "voter"}})}
+    end
+
+    test "lists the users whose Twitch account voted on an album or a single during the year", %{
+      streamer: streamer,
+      voter: voter,
+      viewer: viewer
+    } do
+      other = user_fixture(%{twitch: %{user_id: "other"}})
+      _silent = user_fixture(%{twitch: %{user_id: "silent"}})
+      listened(streamer, 901, ["8", "6"], viewer: "voter", others: [{"stranger", "4"}])
+      listened_single(streamer, 901, "8", viewer: "other")
+
+      # `viewer` voted in the sessions of the setup
+      assert Enum.sort(History.list_voter_ids(Date.utc_today().year)) == Enum.sort([viewer.id, voter.id, other.id])
+    end
+
+    test "ignores the votes of other years", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["8"], viewer: "voter", voted_at: ~U[2025-12-31 23:59:59Z])
+
+      assert History.list_voter_ids(2025) == [voter.id]
+      assert History.list_voter_ids(2024) == []
+      refute voter.id in History.list_voter_ids(2026)
+    end
+
+    test "counts votes cast as a streamer", %{streamer: streamer, voter: voter} do
+      listened(streamer, 901, ["8"], viewer: "voter", is_streamer: true)
+
+      assert voter.id in History.list_voter_ids(Date.utc_today().year)
+    end
+
+    test "ignores votes in sessions that are neither album nor single sessions", %{voter: voter, sessions: [session | _]} do
+      {:ok, _} = session |> Ecto.Changeset.change(source: :free) |> Repo.update()
+      {:ok, _} = Vote.create(%Vote{viewer_id: "voter", session_id: session.id, track_id: 1, value: "8"})
+
+      refute voter.id in History.list_voter_ids(Date.utc_today().year)
+    end
+  end
 end

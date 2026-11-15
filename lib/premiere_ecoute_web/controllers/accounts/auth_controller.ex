@@ -23,12 +23,14 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   Redirects users to provider authorization page with appropriate scopes based on provider type and role, or shows error if provider credentials are not configured.
   """
   @spec request(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def request(conn, %{"provider" => "twitch", "role" => role}) do
+  def request(conn, %{"provider" => "twitch", "role" => role} = params) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
 
     if client_id && redirect_uri && role in ~w(viewer streamer admin bot) do
-      redirect(conn, external: TwitchApi.authorization_url(String.to_existing_atom(role)))
+      conn
+      |> store_return_to(params["return_to"])
+      |> redirect(external: TwitchApi.authorization_url(String.to_existing_atom(role)))
     else
       conn
       |> put_flash(:error, "Twitch login not configured")
@@ -72,7 +74,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
          {user, auth_data} when not is_nil(user) <- {User.get_user_by_email(auth_data.email), auth_data},
          {:ok, user} <- AccountRegistration.register_twitch_user(auth_data) do
       conn
-      |> put_session(:user_return_to, ~p"/")
+      |> put_session(:user_return_to, get_session(conn, :user_return_to) || ~p"/")
       |> UserAuth.log_in_user(user, %{})
     else
       {nil, auth_data} ->
@@ -129,7 +131,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
          {:ok, _} <- Consent.accept(user, documents) do
       conn
       |> delete_session(:pending_twitch_auth)
-      |> put_session(:user_return_to, ~p"/home")
+      |> put_session(:user_return_to, get_session(conn, :user_return_to) || ~p"/home")
       |> put_flash(:info, "Welcome! Your account has been created successfully.")
       |> UserAuth.log_in_user(user, %{})
     else
@@ -149,4 +151,13 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
         |> redirect(to: ~p"/")
     end
   end
+
+  # Keeps the page a visitor came from through the login. Only local paths are accepted: anything else would be an open redirect.
+  defp store_return_to(conn, "/" <> _ = path) do
+    if String.starts_with?(path, "//") or String.contains?(path, ["\\", "\r", "\n"]),
+      do: conn,
+      else: put_session(conn, :user_return_to, path)
+  end
+
+  defp store_return_to(conn, _path), do: conn
 end

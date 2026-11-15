@@ -21,6 +21,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
     @callback search_album(title :: String.t(), artist :: String.t()) :: {:ok, [map()]} | {:error, term()}
     @callback get_artist(artist_id :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback get_artist_albums(artist_id :: String.t()) :: {:ok, [map()]} | {:error, term()}
+    @callback get_track_preview(artist :: String.t(), title :: String.t()) :: {:ok, String.t() | nil} | {:error, term()}
 
     @callback placeholder() :: any()
     @optional_callbacks placeholder: 0
@@ -63,4 +64,5 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
 
   # Search
   defdelegate search_tracks(query), to: __MODULE__.Search
+  defdelegate get_track_preview(artist, title), to: __MODULE__.Search
 end

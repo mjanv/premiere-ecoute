@@ -178,6 +178,18 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
+  scope "/wrapped", PremiereEcouteWeb.Wrapped do
+    pipe_through [:browser]
+
+    get "/:year/s/:share_token/card.svg", ShareCardController, :show
+
+    live_session :wrapped_shared, on_mount: [{UserAuth, :current_scope}] do
+      live "/:year/preview", WrappedLive, :preview
+      live "/:year/s/:share_token", WrappedLive, :shared
+      live "/:year", WrappedLive, :own
+    end
+  end
+
   scope "/playlists", PremiereEcouteWeb.Playlists do
     pipe_through [:browser]
 
@@ -326,6 +338,11 @@ defmodule PremiereEcouteWeb.Router do
       live "/donations", Donations.DonationsLive, :index
       live "/donations/goals/:id", Donations.GoalLive, :show
       live "/broadcast", AdminBroadcastLive, :index
+      live "/wrapped", AdminWrappedLive, :index
+
+      scope "/", alias: false do
+        live "/wrapped/:year/:id", PremiereEcouteWeb.Wrapped.WrappedLive, :admin
+      end
     end
 
     pipe_through [:require_authenticated_user]
@@ -488,6 +505,9 @@ defmodule PremiereEcouteWeb.Router do
       live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
       forward("/mailbox", Plug.Swoosh.MailboxPreview)
       live("/audio", PremiereEcouteWeb.Models.AudioLive)
+      live("/dev/wrapped/:year", PremiereEcouteWeb.Wrapped.WrappedLive, :demo)
+      get("/dev/demos", PremiereEcouteWeb.Dev.DemoController, :index)
+      get("/dev/demos/:name", PremiereEcouteWeb.Dev.DemoController, :show)
     end
   end
 end

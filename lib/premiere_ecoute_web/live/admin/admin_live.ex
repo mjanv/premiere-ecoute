@@ -13,8 +13,10 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Donations.Goal
+  alias PremiereEcoute.Podcasts.Show
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
+  alias PremiereEcoute.Wrapped
 
   # High-signal events shown in the activity feed — noisy or
   # internal events (e.g. ConsentGiven) are intentionally excluded.
@@ -39,7 +41,9 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
        artists_count: Artist.count(:id),
        reviews_count: Review.count(:id),
        billboards_count: Billboard.count(:id),
-       goals_count: Goal.count(:id)
+       goals_count: Goal.count(:id),
+       podcasts_count: Show.count(:id),
+       wrapped_count: Wrapped.recap_stats(Date.utc_today().year).total
      })
      |> assign(:feed, load_feed())
      |> assign(:overview_charts, load_overview_charts())}

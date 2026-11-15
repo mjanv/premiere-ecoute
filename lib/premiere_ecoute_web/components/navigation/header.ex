@@ -54,6 +54,16 @@ defmodule PremiereEcouteWeb.Components.Header do
         <div class="flex items-center space-x-4">
           <%= if @current_user do %>
             <!-- Authenticated user navigation -->
+            <%= if recap = wrapped_recap(@current_user) do %>
+              <.link
+                id="wrapped-link"
+                href={~p"/wrapped/#{recap.year}"}
+                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-pink-500/20 hover:opacity-90 transition-opacity"
+                style="background: var(--gradient-primary);"
+              >
+                <.icon name="hero-sparkles" class="w-4 h-4" /> {gettext("Wrapped %{year}", year: recap.year)}
+              </.link>
+            <% end %>
             <%= if @current_user.role in [:streamer, :admin] and PremiereEcouteCore.FeatureFlag.enabled?(:radio, for: @current_user) do %>
               <.link
                 href={~p"/radio/#{@current_user.username}"}
@@ -239,5 +249,10 @@ defmodule PremiereEcouteWeb.Components.Header do
       </div>
     </header>
     """
+  end
+
+  # The Wrapped shown in the navbar: only for users the feature is enabled for, once their recap is ready.
+  defp wrapped_recap(user) do
+    if PremiereEcouteCore.FeatureFlag.enabled?(:wrapped, for: user), do: PremiereEcoute.Wrapped.available_recap(user)
   end
 end

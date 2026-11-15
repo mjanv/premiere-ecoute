@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vinyl sleeve</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { background: radial-gradient(120% 90% at 50% 38%, #3a3340 0%, #17141b 55%, #08070a 100%); }
+  .stage { position: fixed; inset: 0; touch-action: none; cursor: grab; }
+  .stage.dragging { cursor: grabbing; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .shadow { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: #000; filter: blur(22px); opacity: 0.55; pointer-events: none; }
+  form { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 16px; pointer-events: none; }
+  form > * { pointer-events: auto; }
+  button, label.file { padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: #00000050; color: #ffffffd0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(8px); }
+  input[type="text"] { width: min(170px, 40vw); padding: 9px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: #00000050; color: #fff; font: 600 13px/1 inherit; backdrop-filter: blur(8px); }
+  input[type="text"]:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible, label.file:focus-within, .stage:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  label.file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .hint { position: fixed; bottom: 18px; left: 0; right: 0; margin: 0; text-align: center; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff60; pointer-events: none; }
+  .error { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #ffffffb0; }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage" tabindex="0" role="img" aria-label="A vinyl record in its cardboard sleeve. Drag or use the arrow keys to rotate it.">
+    <div class="shadow" id="shadow"></div>
+    <canvas id="gl"></canvas>
+  </div>
+  <form id="controls">
+    <input id="artist" type="text" maxlength="40" aria-label="Artist" placeholder="Artist" value="Premiere Ecoute">
+    <input id="album" type="text" maxlength="60" aria-label="Album" placeholder="Album" value="Wrapped 2026">
+    <button type="button" id="pull" aria-pressed="false">Pull record</button>
+    <button type="button" id="spin" aria-pressed="true">Auto-rotate</button>
+    <label class="file">Your cover<input id="cover" type="file" accept="image/*"></label>
+  </form>
+  <p class="hint">Drag to rotate</p>
+
+<script>
+const VERT = `#version 300 es
+in vec3 aPos;
+in vec3 aNormal;
+in vec2 aUv;
+uniform mat4 uViewProj;
+uniform mat4 uModel;
+out vec3 vPos;
+out vec3 vNormal;
+out vec3 vLocalNormal;
+out vec2 vUv;
+void main() {
+  vec4 world = uModel * vec4(aPos, 1.0);
+  vPos = world.xyz;
+  vNormal = mat3(uModel) * aNormal;
+  vLocalNormal = aNormal;
+  vUv = aUv;
+  gl_Position = uViewProj * world;
+}`;
+
+// uKind: 0 printed face (front/back), 1 folded edge, 2 sleeve opening, 3 record, 4 spine.
+const FRAG = `#version 300 es
+precision highp float;
+in vec3 vPos;
+in vec3 vNormal;
+in vec3 vLocalNormal;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uTex;
+uniform mat4 uModel;
+uniform vec3 uCam;
+uniform vec3 uEdgePoint;
+uniform vec3 uEdgeDir;
+uniform int uKind;
+
+const vec3 L1 = vec3(-0.42, 0.62, 0.66);
+const vec3 C1 = vec3(1.0, 0.95, 0.88) * 0.95;
+const vec3 L2 = vec3(0.86, 0.1, 0.5);
+const vec3 C2 = vec3(0.5, 0.62, 0.95) * 0.5;
+const vec3 L3 = vec3(0.05, -0.75, 0.66);
+const vec3 C3 = vec3(1.0, 0.8, 0.7) * 0.18;
+const vec3 BOARD = vec3(0.62, 0.56, 0.46);
+
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 4; i++) { s += a * noise(p); p *= 2.03; a *= 0.5; }
+  return s;
+}
+
+// The room: a dark studio with three soft light panels. Shiny surfaces
+// reflect it, which is what makes them read as glossy rather than painted.
+float panel(vec3 d, vec3 c, float w, float h) {
+  vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), c));
+  vec3 up = cross(c, right);
+  float z = dot(d, c);
+  if (z <= 0.0) return 0.0;
+  vec2 q = vec2(dot(d, right), dot(d, up)) / z;
+  return smoothstep(w, w * 0.55, abs(q.x)) * smoothstep(h, h * 0.55, abs(q.y));
+}
+vec3 env(vec3 d) {
+  vec3 c = mix(vec3(0.012, 0.012, 0.016), vec3(0.07, 0.065, 0.08), smoothstep(-0.4, 1.0, d.y));
+  c += C1 * 2.6 * panel(d, normalize(L1), 0.36, 0.24);
+  c += C2 * 3.2 * panel(d, normalize(L2), 0.1, 0.55);
+  c += vec3(0.9, 0.85, 0.8) * 0.5 * panel(d, normalize(vec3(0.25, 0.95, 0.1)), 0.5, 0.3);
+  return c;
+}
+
+vec3 lit(vec3 albedo, vec3 N, vec3 V, float gloss, float amount) {
+  vec3 col = albedo * 0.16;
+  vec3 Ls[3] = vec3[3](normalize(L1), normalize(L2), normalize(L3));
+  vec3 Cs[3] = vec3[3](C1, C2, C3);
+  for (int i = 0; i < 3; i++) {
+    float d = max(dot(N, Ls[i]), 0.0);
+    vec3 H = normalize(Ls[i] + V);
+    col += albedo * d * Cs[i] + Cs[i] * pow(max(dot(N, H), 0.0), gloss) * amount * step(0.0, dot(N, Ls[i]));
+  }
+  return col;
+}
+
+float fresnel(vec3 N, vec3 V, float f0) {
+  return f0 + (1.0 - f0) * pow(1.0 - max(dot(N, V), 0.0), 5.0);
+}
+
+vec3 sleeveFace(vec3 N, vec3 V) {
+  vec3 albedo = pow(texture(uTex, vUv).rgb, vec3(2.2));
+  vec2 e = min(vUv, 1.0 - vUv);
+  float edge = min(e.x, e.y);
+  float corner = length(max(vec2(0.06) - e, 0.0)) / 0.06;
+  float rough = fbm(vUv * 46.0);
+
+  // Scuffed, whitened edges and corners where the print has rubbed off.
+  float wear = smoothstep(0.011, 0.0, edge + (rough - 0.6) * 0.02) * 0.6;
+  wear = max(wear, smoothstep(0.72, 1.0, corner + (rough - 0.5) * 0.35));
+  // Ring wear: the record inside presses a faint circle into the cardboard.
+  vec2 c = vUv - 0.5;
+  float r = length(c) * 2.0;
+  float ring = smoothstep(0.035, 0.0, abs(r - 0.9 + (fbm(vUv * 5.0) - 0.5) * 0.05)) * smoothstep(0.35, 0.75, fbm(vUv * 28.0));
+  wear = max(wear, ring * 0.28);
+  albedo = mix(albedo, vec3(0.74, 0.7, 0.62), wear * 0.85);
+
+  // Normal detail: paper grain, a slight warp of the board, folded edges that
+  // round off, and the lip the record's rim pushes up from inside.
+  float side = vLocalNormal.z > 0.0 ? 1.0 : -1.0;
+  vec3 T = normalize(mat3(uModel) * vec3(side, 0, 0));
+  vec3 B = normalize(mat3(uModel) * vec3(0, 1, 0));
+  vec2 grain = vec2(noise(vUv * 520.0), noise(vUv * 520.0 + 31.7)) - 0.5;
+  vec2 warp = vec2(fbm(vUv * 3.0 + 4.0), fbm(vUv * 3.0 + 9.0)) - 0.5;
+  vec2 outward = e.x < e.y ? vec2(sign(c.x), 0.0) : vec2(0.0, sign(c.y));
+  float fold = smoothstep(0.016, 0.0, edge);
+  float lip = smoothstep(0.86, 0.92, r) * (1.0 - smoothstep(0.92, 0.985, r));
+  vec2 tilt = grain * 0.05 + warp * 0.08 + outward * fold * 0.7 + normalize(c + 1e-5) * lip * 0.1;
+  N = normalize(N + T * tilt.x + B * tilt.y);
+
+  float lam = 1.0 - wear;
+  vec3 col = lit(albedo, N, V, 60.0, 0.08 * lam);
+  col += env(reflect(-V, N)) * fresnel(N, V, 0.045) * lam * 1.5;
+  return col * (0.86 + 0.14 * smoothstep(0.0, 0.03, edge));
+}
+
+vec3 sleeveEdge(vec3 N, vec3 V) {
+  // Same dark print as the spine, lightly rubbed along the two folds.
+  vec3 albedo = pow(vec3(0.102, 0.063, 0.188), vec3(2.2));
+  float across = min(vUv.y, 1.0 - vUv.y);
+  float wear = smoothstep(0.1, 0.0, across + (fbm(vUv * vec2(120.0, 3.0)) - 0.45) * 0.16) * 0.55;
+  albedo = mix(albedo, BOARD * 1.15, wear);
+  return lit(albedo, N, V, 30.0, 0.05 * (1.0 - wear));
+}
+
+vec3 sleeveSpine(vec3 N, vec3 V) {
+  vec3 albedo = pow(texture(uTex, vUv).rgb, vec3(2.2));
+  float across = min(vUv.y, 1.0 - vUv.y);
+  // Light rubbing along the two folds only, so the text stays readable.
+  float wear = smoothstep(0.1, 0.0, across + (fbm(vUv * vec2(120.0, 3.0)) - 0.45) * 0.16) * 0.55;
+  albedo = mix(albedo, BOARD * 1.15, wear);
+  return lit(albedo, N, V, 30.0, 0.05 * (1.0 - wear));
+}
+
+vec3 sleeveOpening(vec3 N, vec3 V) {
+  // Two sheets of board with the dark pocket between them.
+  float sheet = step(vUv.x, 0.26) + step(0.74, vUv.x);
+  vec3 board = BOARD * (0.8 + 0.3 * noise(vUv * vec2(6.0, 300.0)));
+  return mix(vec3(0.004), lit(board, N, V, 6.0, 0.02), sheet);
+}
+
+vec3 record(vec3 N, vec3 V) {
+  // How far this point is past the sleeve's opening; the sleeve shades the
+  // part of the record closest to it.
+  float beyond = dot(vPos - uEdgePoint, uEdgeDir);
+  float shade = mix(0.22, 1.0, smoothstep(-0.02, 0.32, beyond));
+
+  if (abs(vLocalNormal.z) < 0.5) {
+    return lit(vec3(0.014), N, V, 18.0, 0.06) * shade;
+  }
+  float r = length(vUv);
+  if (r < 0.024) discard;
+  vec3 radial = normalize(mat3(uModel) * vec3(vUv / max(r, 1e-4), 0.0));
+  // No pressing is perfectly flat: a slight warp makes reflections wobble.
+  N = normalize(N + radial * 0.035 * sin(atan(vUv.y, vUv.x) * 2.0 + 0.8));
+
+  if (r < 0.34) {
+    vec2 uv = vUv / 0.34 * 0.5 + 0.5;
+    if (vLocalNormal.z < 0.0) uv.x = 1.0 - uv.x;
+    vec3 albedo = pow(texture(uTex, uv).rgb, vec3(2.2));
+    float press = smoothstep(0.325, 0.34, r);
+    albedo *= 1.0 - 0.5 * press;
+    return (lit(albedo, N, V, 24.0, 0.06) + env(reflect(-V, N)) * fresnel(N, V, 0.03) * 0.4) * shade;
+  }
+
+  float grooved = smoothstep(0.375, 0.39, r) * (1.0 - smoothstep(0.95, 0.962, r));
+  float gap = 0.0;
+  gap = max(gap, 1.0 - smoothstep(0.0, 0.006, abs(r - 0.52)));
+  gap = max(gap, 1.0 - smoothstep(0.0, 0.006, abs(r - 0.655)));
+  gap = max(gap, 1.0 - smoothstep(0.0, 0.006, abs(r - 0.81)));
+  grooved *= 1.0 - gap;
+  float streak = 0.3 + 1.2 * noise(vec2(r * 460.0, 2.0)) * (0.5 + noise(vec2(r * 90.0, 7.0)));
+
+  // Each groove is a tiny V-shaped trench, so across a groove the surface
+  // faces a whole fan of directions. Reflecting the room through that fan
+  // gives the stretched wedges of light seen on real records.
+  vec3 fan = vec3(0.0);
+  for (int i = 0; i < 9; i++) {
+    float s = (float(i) - 4.0) / 4.0;
+    vec3 n = normalize(N + radial * s * 0.95);
+    vec3 tint = 0.965 + 0.035 * cos(6.2831853 * (s * 1.3 + r * 3.0 + vec3(0.0, 0.33, 0.67)));
+    fan += env(reflect(-V, n)) * tint;
+  }
+  fan /= 9.0;
+  // A neutral white streak from the main light, so the wedge has a bright core.
+  vec3 Tg = normalize(mat3(uModel) * vec3(-vUv.y, vUv.x, 0.0) / max(r, 1e-4));
+  vec3 Hk = normalize(normalize(L1) + V);
+  float th = dot(Tg, Hk);
+  float core = pow(max(1.0 - th * th, 0.0), 160.0) * smoothstep(0.0, 0.3, dot(N, normalize(L1)));
+  fan += C1 * core * 0.5;
+  vec3 mirror = env(reflect(-V, N));
+  float f = fresnel(N, V, 0.05);
+  // Smooth areas (outer border, run-out, track gaps) are plain satin black:
+  // a soft highlight, no mirror image of the room.
+  vec3 satin = lit(vec3(0.014), N, V, 22.0, 0.07);
+  vec3 col = vec3(0.006) + fan * streak * grooved * 0.55 + satin * (1.0 - grooved) + mirror * f * grooved * 0.12;
+
+  // Dust and a few hairline scratches catch the light.
+  vec2 cell = floor(vUv * 150.0);
+  float speck = step(0.9965, hash(cell)) * smoothstep(0.35, 0.0, length(fract(vUv * 150.0) - 0.5));
+  float scratch = 0.0;
+  for (int i = 0; i < 4; i++) {
+    float k = float(i);
+    vec2 p0 = vec2(hash(vec2(k, 1.0)), hash(vec2(k, 2.0))) * 1.4 - 0.7;
+    float a = hash(vec2(k, 3.0)) * 6.2831853;
+    vec2 dir = vec2(cos(a), sin(a));
+    vec2 q = vUv - p0;
+    float along = dot(q, dir);
+    scratch += smoothstep(0.0016, 0.0, abs(dot(q, vec2(-dir.y, dir.x)))) * smoothstep(0.32, 0.2, abs(along));
+  }
+  float key = max(dot(N, normalize(L1)), 0.0);
+  col += (speck * 0.1 + scratch * 0.05) * key * C1;
+  return col * shade;
+}
+
+vec3 aces(vec3 x) {
+  return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
+}
+
+void main() {
+  vec3 N = normalize(vNormal);
+  vec3 V = normalize(uCam - vPos);
+  vec3 col;
+  if (uKind == 0) col = sleeveFace(N, V);
+  else if (uKind == 1) col = sleeveEdge(N, V);
+  else if (uKind == 2) col = sleeveOpening(N, V);
+  else if (uKind == 4) col = sleeveSpine(N, V);
+  else col = record(N, V);
+  col = pow(aces(col * 1.1), vec3(1.0 / 2.2));
+  col += (hash(gl_FragCoord.xy) - 0.5) * 0.012;
+  outColor = vec4(col, 1.0);
+}`;
+
+// --- Small matrix helpers (column-major) -------------------------------------
+
+const mat = {
+  mul(a, b) {
+    const o = new Float32Array(16);
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
+      o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3];
+    }
+    return o;
+  },
+  perspective(fovy, aspect, near, far) {
+    const f = 1 / Math.tan(fovy / 2);
+    return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) / (near - far), -1, 0, 0, (2 * far * near) / (near - far), 0]);
+  },
+  translate(x, y, z) { return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]); },
+  rotX(a) { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); },
+  rotY(a) { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); },
+  rotZ(a) { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]); },
+};
+
+// --- Geometry ----------------------------------------------------------------
+
+const HALF = 1;        // sleeve half width/height
+const DEPTH = 0.03;    // sleeve half thickness
+const RADIUS = 0.94;   // record radius
+const SLIDE = 0.98;    // how far the record comes out
+
+function geometry() {
+  const data = [];
+  const ranges = {};
+  const quad = (p, n, uv) => {
+    for (const i of [0, 1, 2, 0, 2, 3]) data.push(...p[i], ...n, ...uv[i]);
+  };
+  const group = (name, build) => {
+    const first = data.length / 8;
+    build();
+    ranges[name] = [first, data.length / 8 - first];
+  };
+  const h = HALF, d = DEPTH;
+  const unit = [[0, 0], [1, 0], [1, 1], [0, 1]];
+
+  group("front", () => quad([[-h, -h, d], [h, -h, d], [h, h, d], [-h, h, d]], [0, 0, 1], unit));
+  group("back", () => quad([[h, -h, -d], [-h, -h, -d], [-h, h, -d], [h, h, -d]], [0, 0, -1], unit));
+  group("edges", () => {
+    // Top and bottom folds: uv.x runs along the edge, uv.y across its thickness.
+    quad([[-h, h, d], [h, h, d], [h, h, -d], [-h, h, -d]], [0, 1, 0], [[0, 1], [1, 1], [1, 0], [0, 0]]);
+    quad([[-h, -h, -d], [h, -h, -d], [h, -h, d], [-h, -h, d]], [0, -1, 0], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  });
+  // The spine. Its texture is a long strip read from top to bottom, with the
+  // tops of the letters towards the front cover.
+  group("spine", () => quad([[-h, -h, -d], [-h, -h, d], [-h, h, d], [-h, h, -d]], [-1, 0, 0], [[1, 0], [1, 1], [0, 1], [0, 0]]));
+  group("opening", () => quad([[h, -h, d], [h, -h, -d], [h, h, -d], [h, h, d]], [1, 0, 0], unit));
+  group("record", () => {
+    const steps = 128, z = 0.006;
+    for (const side of [1, -1]) {
+      for (let i = 0; i < steps; i++) {
+        const a = (i / steps) * Math.PI * 2, b = ((i + 1) / steps) * Math.PI * 2;
+        const pts = [[0, 0], [Math.cos(a), Math.sin(a)], [Math.cos(b), Math.sin(b)]];
+        for (const [x, y] of pts) data.push(x * RADIUS, y * RADIUS, z * side, 0, 0, side, x, y);
+      }
+    }
+    // The rim: a thin band around the circumference.
+    for (let i = 0; i < steps; i++) {
+      const a = (i / steps) * Math.PI * 2, b = ((i + 1) / steps) * Math.PI * 2;
+      const band = [[a, z], [b, z], [b, -z], [a, z], [b, -z], [a, -z]];
+      for (const [t, k] of band) data.push(Math.cos(t) * RADIUS, Math.sin(t) * RADIUS, k, Math.cos(t), Math.sin(t), 0, Math.cos(t), Math.sin(t));
+    }
+  });
+  return { data: new Float32Array(data), ranges };
+}
+
+// --- Artwork (drawn on 2D canvases, used as textures) --------------------------
+
+const FONT = '"Bricolage Demo", "Arial Black", sans-serif';
+
+function grain(ctx, size, amount) {
+  const image = ctx.getImageData(0, 0, size, size);
+  const px = image.data;
+  for (let i = 0; i < px.length; i += 4) {
+    const n = (Math.random() - 0.5) * amount;
+    px[i] += n; px[i + 1] += n; px[i + 2] += n;
+  }
+  ctx.putImageData(image, 0, 0);
+}
+
+function frontArt() {
+  const size = 1024;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d");
+  const bg = ctx.createLinearGradient(0, 0, size, size);
+  bg.addColorStop(0, "#ff7a1a");
+  bg.addColorStop(0.55, "#e0245e");
+  bg.addColorStop(1, "#3b1a8f");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+  ctx.lineWidth = 26;
+  for (let i = 0; i < 9; i++) {
+    ctx.strokeStyle = i % 2 ? "#f6ead2" : "#1a1030";
+    ctx.beginPath();
+    ctx.arc(size * 0.72, size * 0.36, 70 + i * 58, Math.PI * 0.55, Math.PI * 1.75);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#120b22";
+  ctx.beginPath();
+  ctx.arc(size * 0.72, size * 0.36, 96, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f6ead2";
+  ctx.beginPath();
+  ctx.arc(size * 0.72, size * 0.36, 26, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.font = `800 148px ${FONT}`;
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("PREMIERE", 62, size - 210);
+  ctx.fillText("ECOUTE", 62, size - 78);
+  ctx.font = `700 34px ${FONT}`;
+  ctx.fillText("WRAPPED 2026  ·  STEREO", 66, 96);
+  grain(ctx, size, 22);
+  return c;
+}
+
+function backArt() {
+  const size = 1024;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#e7dfcc";
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = "#1a1030";
+  ctx.font = `800 64px ${FONT}`;
+  ctx.fillText("PREMIERE ECOUTE", 70, 130);
+  ctx.fillRect(70, 160, size - 140, 6);
+  const sides = [
+    ["SIDE A", ["Ouverture", "Nuit blanche", "Le premier soir", "Chambre 12", "Interlude"]],
+    ["SIDE B", ["Retour au calme", "Les heures bleues", "Dernier metro", "Encore", "Fin de bande"]],
+  ];
+  sides.forEach(([title, tracks], column) => {
+    const x = 70 + column * 460;
+    ctx.font = `800 30px ${FONT}`;
+    ctx.fillText(title, x, 250);
+    ctx.font = `600 30px ${FONT}`;
+    tracks.forEach((track, i) => ctx.fillText(`${i + 1}  ${track}`, x, 310 + i * 52));
+  });
+  ctx.font = `500 20px ${FONT}`;
+  const lines = [
+    "Listened to and rated live with the chat. Every score on this record",
+    "was cast by a viewer. Play loud, vote honestly.",
+    "Demo artwork, not a real release.",
+  ];
+  lines.forEach((line, i) => ctx.fillText(line, 70, 700 + i * 32));
+  let x = size - 330;
+  for (let i = 0; i < 46; i++) {
+    const w = 2 + ((i * 7) % 5);
+    ctx.fillRect(x, size - 190, w, 110);
+    x += w + 2 + ((i * 3) % 3);
+  }
+  ctx.beginPath();
+  ctx.arc(120, size - 135, 50, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#e7dfcc";
+  ctx.beginPath();
+  ctx.arc(120, size - 135, 14, 0, Math.PI * 2);
+  ctx.fill();
+  grain(ctx, size, 16);
+  return c;
+}
+
+function labelArt() {
+  const size = 512;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#ff7a1a";
+  ctx.fillRect(0, 0, size, size);
+  ctx.strokeStyle = "#1a1030";
+  ctx.lineWidth = 5;
+  for (const r of [236, 222, 96]) {
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#1a1030";
+  ctx.textAlign = "center";
+  ctx.font = `800 44px ${FONT}`;
+  ctx.fillText("PREMIERE", size / 2, 150);
+  ctx.fillText("ECOUTE", size / 2, 196);
+  ctx.font = `700 24px ${FONT}`;
+  ctx.fillText("SIDE A  ·  33 RPM", size / 2, 370);
+  ctx.fillText("STEREO", size / 2, 404);
+  grain(ctx, size, 14);
+  return c;
+}
+
+function spineArt(artist, album) {
+  const w = 2048, h = 64;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#1a1030";
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#f6ead2";
+  ctx.textBaseline = "middle";
+  ctx.font = `800 44px ${FONT}`;
+  const name = artist.toUpperCase();
+  ctx.fillText(name, 90, h / 2 + 2, 800);
+  const x = 90 + Math.min(800, ctx.measureText(name).width) + 48;
+  ctx.font = `600 44px ${FONT}`;
+  ctx.fillText(album, x, h / 2 + 2, w - x - 330);
+  ctx.font = `600 26px ${FONT}`;
+  ctx.textAlign = "right";
+  ctx.fillText("PE 2026 · STEREO", w - 90, h / 2 + 2);
+  return c;
+}
+
+// --- Scene -------------------------------------------------------------------
+
+const stage = document.getElementById("stage");
+const canvas = document.getElementById("gl");
+const shadow = document.getElementById("shadow");
+const artistInput = document.getElementById("artist");
+const albumInput = document.getElementById("album");
+const gl = canvas.getContext("webgl2", { antialias: true, alpha: true, premultipliedAlpha: false });
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const frozen = query.has("yaw");
+const state = {
+  yaw: query.has("yaw") ? Number(query.get("yaw")) : -0.5,
+  pitch: query.has("pitch") ? Number(query.get("pitch")) : 0.12,
+  spinVelocity: 0,
+  auto: !reduced && !frozen,
+  pulled: query.get("pull") === "1",
+  slide: query.get("pull") === "1" ? 1 : 0,
+  turn: 0,
+  idleAt: 0,
+  last: 0,
+};
+const scene = { uniforms: {}, textures: {}, ranges: {} };
+
+function fail(message) {
+  const p = document.createElement("p");
+  p.className = "error";
+  p.textContent = message;
+  document.body.replaceChildren(p);
+}
+
+function compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+function texture(source) {
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  const ext = gl.getExtension("EXT_texture_filter_anisotropic");
+  if (ext) gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+  return tex;
+}
+
+function setup() {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+  gl.useProgram(program);
+
+  const { data, ranges } = geometry();
+  scene.ranges = ranges;
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+  const attributes = [["aPos", 3, 0], ["aNormal", 3, 12], ["aUv", 2, 24]];
+  for (const [name, size, offset] of attributes) {
+    const location = gl.getAttribLocation(program, name);
+    gl.enableVertexAttribArray(location);
+    gl.vertexAttribPointer(location, size, gl.FLOAT, false, 32, offset);
+  }
+  for (const name of ["uViewProj", "uModel", "uCam", "uKind", "uTex", "uEdgePoint", "uEdgeDir"]) {
+    scene.uniforms[name] = gl.getUniformLocation(program, name);
+  }
+  gl.uniform1i(scene.uniforms.uTex, 0);
+  scene.textures = { front: texture(frontArt()), back: texture(backArt()), label: texture(labelArt()), spine: texture(spineArt(artistInput.value, albumInput.value)) };
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0, 0, 0, 0);
+}
+
+function resize() {
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(2, Math.round(stage.clientWidth * ratio));
+  const h = Math.max(2, Math.round(stage.clientHeight * ratio));
+  if (w !== canvas.width || h !== canvas.height) {
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+}
+
+function draw(name, kind, tex, model) {
+  const u = scene.uniforms;
+  gl.uniformMatrix4fv(u.uModel, false, model);
+  gl.uniform1i(u.uKind, kind);
+  if (tex) gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.drawArrays(gl.TRIANGLES, ...scene.ranges[name]);
+}
+
+function render() {
+  const u = scene.uniforms;
+  const aspect = canvas.width / canvas.height;
+  const fov = (28 * Math.PI) / 180;
+  const t = Math.tan(fov / 2);
+  // Far enough to fit the sleeve plus the part of the record that sticks out.
+  const reach = HALF * 1.22 + (state.slide * SLIDE) / 2;
+  const dist = Math.max(1.8 / t, reach / (t * aspect));
+  const viewProj = mat.mul(mat.perspective(fov, aspect, 0.1, 100), mat.translate(0, 0, -dist));
+  const out = state.slide * SLIDE;
+  const base = mat.mul(mat.mul(mat.rotX(state.pitch), mat.rotY(state.yaw)), mat.translate(-out / 2, 0, 0));
+  const record = mat.mul(mat.mul(base, mat.translate(out, 0, 0)), mat.rotZ(state.turn));
+
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.uniformMatrix4fv(u.uViewProj, false, viewProj);
+  gl.uniform3f(u.uCam, 0, 0, dist);
+  gl.uniform3f(u.uEdgeDir, base[0], base[1], base[2]);
+  gl.uniform3f(u.uEdgePoint, base[0] * HALF + base[12], base[1] * HALF + base[13], base[2] * HALF + base[14]);
+  draw("front", 0, scene.textures.front, base);
+  draw("back", 0, scene.textures.back, base);
+  draw("edges", 1, null, base);
+  draw("spine", 4, scene.textures.spine, base);
+  draw("opening", 2, null, base);
+  draw("record", 3, scene.textures.label, record);
+
+  // Soft floor shadow: narrows as the sleeve turns edge-on.
+  const px = stage.clientHeight / (2 * t * dist);
+  const width = (Math.abs(Math.cos(state.yaw)) * (2 * HALF + out) + 0.25) * px;
+  shadow.style.width = `${width}px`;
+  shadow.style.height = `${0.16 * px}px`;
+  shadow.style.transform = `translate(-50%, -50%) translateY(${(HALF + 0.22) * px}px)`;
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!gl.isContextLost()) {
+    if (!state.dragging) {
+      const cruising = state.auto && now - state.idleAt > 1200;
+      const target = cruising ? 0.45 : 0;
+      state.spinVelocity += (target - state.spinVelocity) * Math.min(1, dt * (cruising ? 1.2 : 2.5));
+      state.yaw += state.spinVelocity * dt;
+    }
+    const goal = state.pulled ? 1 : 0;
+    state.slide += (goal - state.slide) * Math.min(1, dt * 5);
+    if (Math.abs(goal - state.slide) < 0.0005) state.slide = goal;
+    if (!reduced && !frozen) state.turn -= dt * 1.1 * state.slide;
+    resize();
+    render();
+  }
+  requestAnimationFrame(frame);
+}
+
+// --- Interaction -------------------------------------------------------------
+
+function controls() {
+  let lastX = 0, lastY = 0, lastT = 0;
+  stage.addEventListener("pointerdown", (e) => {
+    state.dragging = true;
+    stage.classList.add("dragging");
+    stage.setPointerCapture(e.pointerId);
+    lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
+    state.spinVelocity = 0;
+  });
+  stage.addEventListener("pointermove", (e) => {
+    if (!state.dragging) return;
+    const now = performance.now();
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    const speed = 3.2 / Math.min(stage.clientWidth, stage.clientHeight);
+    state.yaw += dx * speed;
+    state.pitch = Math.max(-0.7, Math.min(0.7, state.pitch + dy * speed));
+    const dt = Math.max(1, now - lastT) / 1000;
+    state.spinVelocity = Math.max(-12, Math.min(12, (dx * speed) / dt));
+    lastX = e.clientX; lastY = e.clientY; lastT = now;
+  });
+  const release = () => {
+    if (!state.dragging) return;
+    state.dragging = false;
+    stage.classList.remove("dragging");
+    state.idleAt = performance.now();
+    if (performance.now() - lastT > 80) state.spinVelocity = 0;
+  };
+  stage.addEventListener("pointerup", release);
+  stage.addEventListener("pointercancel", release);
+  stage.addEventListener("keydown", (e) => {
+    const step = 0.12;
+    if (e.key === "ArrowLeft") state.yaw -= step;
+    else if (e.key === "ArrowRight") state.yaw += step;
+    else if (e.key === "ArrowUp") state.pitch = Math.max(-0.7, state.pitch - step);
+    else if (e.key === "ArrowDown") state.pitch = Math.min(0.7, state.pitch + step);
+    else return;
+    e.preventDefault();
+    state.idleAt = performance.now();
+    state.spinVelocity = 0;
+  });
+
+  const pull = document.getElementById("pull");
+  pull.setAttribute("aria-pressed", String(state.pulled));
+  pull.addEventListener("click", () => {
+    state.pulled = !state.pulled;
+    pull.setAttribute("aria-pressed", String(state.pulled));
+  });
+  const spin = document.getElementById("spin");
+  spin.setAttribute("aria-pressed", String(state.auto));
+  spin.addEventListener("click", () => {
+    state.auto = !state.auto;
+    spin.setAttribute("aria-pressed", String(state.auto));
+  });
+  document.getElementById("cover").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const size = 1024;
+        const c = document.createElement("canvas");
+        c.width = c.height = size;
+        const side = Math.min(image.naturalWidth, image.naturalHeight);
+        c.getContext("2d").drawImage(image, (image.naturalWidth - side) / 2, (image.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+        gl.deleteTexture(scene.textures.front);
+        scene.textures.front = texture(c);
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  const respine = () => {
+    gl.deleteTexture(scene.textures.spine);
+    scene.textures.spine = texture(spineArt(artistInput.value, albumInput.value));
+  };
+  artistInput.addEventListener("input", respine);
+  albumInput.addEventListener("input", respine);
+  if (query.get("artist")) artistInput.value = query.get("artist").slice(0, 40);
+  if (query.get("album")) albumInput.value = query.get("album").slice(0, 60);
+  if (query.get("artist") || query.get("album")) respine();
+  document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+}
+
+async function start() {
+  if (!gl) return fail("WebGL 2 is not available in this browser.");
+  try { await document.fonts.load(`800 40px ${FONT}`, "A"); } catch (_) {}
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", () => setup());
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) return fail(String(error.message || error));
+  }
+  controls();
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

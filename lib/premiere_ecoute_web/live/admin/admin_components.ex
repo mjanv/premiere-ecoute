@@ -73,6 +73,7 @@ defmodule PremiereEcouteWeb.Admin.AdminComponents do
   # Search bar
   # ---------------------------------------------------------------------------
 
+  attr :id, :string, default: "search-form"
   attr :value, :string, default: ""
   attr :placeholder, :string, default: "Search…"
   attr :event, :string, default: "search"
@@ -82,7 +83,7 @@ defmodule PremiereEcouteWeb.Admin.AdminComponents do
   @spec search_bar(map()) :: Phoenix.LiveView.Rendered.t()
   def search_bar(assigns) do
     ~H"""
-    <form phx-change={@event} class="flex gap-3 mb-4">
+    <form id={@id} phx-change={@event} class="flex gap-3 mb-4">
       <div class="relative flex-1">
         <svg
           class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"

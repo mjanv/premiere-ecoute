@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Block type</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #ff0019; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  form { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 16px; pointer-events: none; }
+  button, input { pointer-events: auto; padding: 10px 14px; border-radius: 999px; border: 1px solid #00000050; background: #000000a0; color: #fff; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; }
+  button { cursor: pointer; }
+  input { width: 120px; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .error { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; }
+</style>
+</head>
+<body>
+  <canvas id="gl" role="img" aria-label="A tall condensed word repeated across the screen as solid blocks: cream faces, pink tops, on a red background."></canvas>
+  <form id="controls">
+    <input id="text" aria-label="Word" value="Vote" maxlength="8">
+    <div id="palettes" role="group" aria-label="Palette" style="display: flex; gap: 8px; pointer-events: auto"></div>
+    <button type="button" id="pause" aria-pressed="false">Pause</button>
+  </form>
+
+<script>
+// page: background. side: the upright walls of the blocks (the same as the
+// background in the first palette, so only the tops show). top: the faces
+// that look up. face: the front of the letters.
+const PALETTES = {
+  Red: { page: "#ff0019", side: "#ff0019", top: "#ff73cf", face: "#efe6da" },
+  Night: { page: "#10123a", side: "#2a2fd0", top: "#7ee0ff", face: "#f4f0e4" },
+  Lime: { page: "#c8f03c", side: "#0f7a4a", top: "#103a2a", face: "#fffbe8" },
+};
+
+const VERT = `#version 300 es
+in vec2 position;
+void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+
+// The word is a flat black and white picture that repeats like bricks. For
+// each pixel that is not on a letter, the shader walks down and to the right
+// in small steps. If it meets a letter within the block's depth, the pixel is
+// part of that letter's block. The edge it met tells which wall: a flat top
+// edge gives the top colour, anything else the side colour.
+const FRAG = `#version 300 es
+precision highp float;
+out vec4 outColor;
+uniform vec2 uRes;
+uniform float uTime;
+uniform float uDepth;
+uniform vec2 uLean;
+uniform sampler2D uText;
+uniform vec3 uPage;
+uniform vec3 uSide;
+uniform vec3 uTop;
+uniform vec3 uFace;
+
+const vec2 TILE = vec2(1.3, 1.8);
+
+float ink(vec2 p) {
+  vec2 q = p / TILE;
+  float row = floor(q.y);
+  return texture(uText, vec2(q.x + row * 0.37, q.y)).r;
+}
+
+vec3 shade(vec2 p) {
+  if (ink(p) > 0.5) return uFace;
+  vec2 dir = normalize(uLean);
+  const int STEPS = 44;
+  float stride = uDepth / float(STEPS);
+  for (int i = 1; i <= STEPS; i++) {
+    vec2 at = p + dir * stride * float(i);
+    if (ink(at) > 0.5) {
+      // Step back to the edge, then look at how the letter changes around it.
+      float lo = stride * float(i - 1), hi = stride * float(i);
+      for (int k = 0; k < 5; k++) {
+        float mid = 0.5 * (lo + hi);
+        if (ink(p + dir * mid) > 0.5) hi = mid; else lo = mid;
+      }
+      vec2 hit = p + dir * hi;
+      float e = 0.012;
+      float gx = ink(hit + vec2(e, 0.0)) - ink(hit - vec2(e, 0.0));
+      float gy = ink(hit + vec2(0.0, e)) - ink(hit - vec2(0.0, e));
+      return gy > 1.4 * abs(gx) ? uTop : uSide;
+    }
+  }
+  return uPage;
+}
+
+void main() {
+  float scale = min(uRes.x, uRes.y);
+  vec3 col = vec3(0.0);
+  // Four samples per pixel to smooth the edges.
+  for (int i = 0; i < 4; i++) {
+    vec2 jitter = vec2(float(i % 2), float(i / 2)) * 0.5 - 0.25;
+    vec2 p = (gl_FragCoord.xy + jitter - 0.5 * uRes) / scale;
+    p.y = -p.y;
+    p = p * 2.3 + vec2(uTime * 0.035, uTime * 0.02);
+    col += shade(p);
+  }
+  outColor = vec4(col * 0.25, 1.0);
+}`;
+
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const input = document.getElementById("text");
+if (query.get("text")) input.value = query.get("text").slice(0, 8);
+const state = {
+  palette: PALETTES[query.get("palette")] ? query.get("palette") : "Red",
+  paused: reduced,
+  frozen: query.has("time") ? Number(query.get("time")) : null,
+  clock: 0,
+  last: 0,
+  lean: [0.88, 0.47],
+  target: [0.88, 0.47],
+};
+let uniforms = {};
+let texture = null;
+
+function fail(message) {
+  const p = document.createElement("p");
+  p.className = "error";
+  p.textContent = message;
+  document.body.replaceChildren(p);
+}
+
+function compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+function rgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+// One brick: the word in white on black, stretched to fill the square. The
+// shader shows it taller than wide, which makes the letters condensed.
+function brick() {
+  const size = 1024;
+  const word = input.value.trim().toUpperCase() || "VOTE";
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = "#fff";
+  ctx.font = '800 400px "Bricolage Demo", Impact, sans-serif';
+  const m = ctx.measureText(word);
+  const width = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+  const height = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+  ctx.translate(size * 0.035, size * 0.03);
+  ctx.scale((size * 0.9) / width, (size * 0.93) / height);
+  ctx.fillText(word, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent);
+  return c;
+}
+
+function upload() {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, brick());
+}
+
+function setup() {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const position = gl.getAttribLocation(program, "position");
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  for (const name of ["uRes", "uTime", "uDepth", "uLean", "uText", "uPage", "uSide", "uTop", "uFace"]) uniforms[name] = gl.getUniformLocation(program, name);
+  texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  upload();
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!gl.isContextLost()) {
+    if (!state.paused) state.clock += dt;
+    for (const i of [0, 1]) state.lean[i] += (state.target[i] - state.lean[i]) * Math.min(1, dt * 4);
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+    const w = Math.max(2, Math.round(canvas.clientWidth * ratio));
+    const h = Math.max(2, Math.round(canvas.clientHeight * ratio));
+    if (w !== canvas.width || h !== canvas.height) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+    const t = state.frozen ?? state.clock;
+    const colors = PALETTES[state.palette];
+    gl.uniform2f(uniforms.uRes, w, h);
+    gl.uniform1f(uniforms.uTime, t);
+    // The blocks slowly grow deeper and shallower.
+    gl.uniform1f(uniforms.uDepth, 0.3 + 0.12 * Math.sin(t * 0.7));
+    gl.uniform2f(uniforms.uLean, state.lean[0], state.lean[1]);
+    gl.uniform1i(uniforms.uText, 0);
+    gl.uniform3fv(uniforms.uPage, rgb(colors.page));
+    gl.uniform3fv(uniforms.uSide, rgb(colors.side));
+    gl.uniform3fv(uniforms.uTop, rgb(colors.top));
+    gl.uniform3fv(uniforms.uFace, rgb(colors.face));
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  requestAnimationFrame(frame);
+}
+
+async function start() {
+  if (!gl) return fail("WebGL 2 is not available in this browser.");
+  try { await document.fonts.load('800 100px "Bricolage Demo"'); } catch (_) {}
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", () => setup());
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) return fail(String(error.message || error));
+  }
+  // The pointer turns the direction the blocks are pushed in. It stays in the
+  // lower right quarter, so the tops always face up.
+  canvas.addEventListener("pointermove", (e) => {
+    const x = e.clientX / window.innerWidth, y = e.clientY / window.innerHeight;
+    const angle = 0.2 + 0.75 * y + 0.2 * (1 - x);
+    state.target = [Math.cos(angle), Math.sin(angle)];
+  });
+  input.addEventListener("input", () => { if (!gl.isContextLost()) upload(); });
+  const palettes = document.getElementById("palettes");
+  for (const name of Object.keys(PALETTES)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = name;
+    b.setAttribute("aria-pressed", String(name === state.palette));
+    b.addEventListener("click", () => {
+      state.palette = name;
+      document.body.style.background = PALETTES[name].page;
+      for (const other of palettes.querySelectorAll("button")) other.setAttribute("aria-pressed", String(other === b));
+    });
+    palettes.append(b);
+  }
+  const pause = document.getElementById("pause");
+  pause.setAttribute("aria-pressed", String(state.paused));
+  pause.addEventListener("click", () => {
+    state.paused = !state.paused;
+    pause.setAttribute("aria-pressed", String(state.paused));
+  });
+  document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

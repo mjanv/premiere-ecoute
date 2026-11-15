@@ -18,5 +18,6 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.Models.Supervisor,
       PremiereEcoute.Radio.EventHandler,
       PremiereEcoute.Discography.Supervisor
-    ]
+    ],
+    optionals: [PremiereEcoute.Wrapped.Subscriber]
 end

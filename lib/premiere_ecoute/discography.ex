@@ -31,6 +31,7 @@ defmodule PremiereEcoute.Discography do
   defdelegate list_albums(), to: Album, as: :all
   defdelegate last_albums(n \\ 5), to: Album, as: :last
   defdelegate list_albums_for_artist(artist_id), to: Album, as: :list_for_artist
+  defdelegate list_albums_by_ids(ids), to: Album, as: :list_by_ids
 
   # Artist
   defdelegate get_artist_by_slug(slug), to: Artist, as: :get_by_slug
@@ -43,6 +44,7 @@ defmodule PremiereEcoute.Discography do
   defdelegate list_singles(), to: Single, as: :all
   defdelegate last_singles(n \\ 5), to: Single, as: :last
   defdelegate list_singles_for_artist(artist_id), to: Single, as: :list_for_artist
+  defdelegate list_singles_by_ids(ids), to: Single, as: :list_by_ids
 
   # Playlist
   defdelegate create_playlist(playlist), to: Playlist, as: :create

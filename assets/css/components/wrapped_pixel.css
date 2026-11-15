@@ -1,0 +1,160 @@
+/*
+  Wrapped — pixel render.
+
+  One canvas carries the whole show: the hook draws posters on it, pixels under real type.
+  The stage is a size container, so the controls are sized in the same units as the pixels:
+  the screen is 126 pixels wide, hence one pixel is 100cqw / 126.
+*/
+
+.wrapped-pixel {
+  --px: calc(100cqw / 126);
+
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050506;
+  color: #fff;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
+}
+
+.wrapped-pixel [hidden] {
+  display: none !important;
+}
+
+.wrapped-pixel-stage {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  container-type: size;
+  overflow: hidden;
+}
+
+@media (min-aspect-ratio: 3/4) {
+  .wrapped-pixel-stage {
+    height: min(100dvh - 2rem, 920px);
+    width: auto;
+    aspect-ratio: 9 / 16;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.16), 0 40px 120px rgb(0 0 0 / 0.6);
+  }
+}
+
+.wrapped-pixel-screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wrapped-pixel :focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Controls: square, hard-edged, sized in pixels of the screen */
+
+.wrapped-pixel-bar {
+  position: absolute;
+  top: calc(var(--px) * 7);
+  right: calc(var(--px) * 3);
+  z-index: 3;
+  display: flex;
+  gap: calc(var(--px) * 1);
+}
+
+.wrapped-pixel-bar button,
+.wrapped-pixel-bar a {
+  display: grid;
+  place-items: center;
+  width: calc(var(--px) * 11);
+  height: calc(var(--px) * 11);
+  min-width: 36px;
+  min-height: 36px;
+  color: #fff;
+  background: rgb(0 0 0 / 0.45);
+  cursor: pointer;
+}
+
+.wrapped-pixel-bar button:hover,
+.wrapped-pixel-bar a:hover {
+  background: #fff;
+  color: #000;
+}
+
+.wrapped-pixel-button {
+  position: relative;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 calc(var(--px) * 7);
+  border: calc(var(--px) * 1) solid #fff;
+  background: #fff;
+  color: #050506;
+  font-size: calc(var(--px) * 6.5);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: calc(var(--px) * 2) calc(var(--px) * 2) 0 rgb(0 0 0 / 0.55);
+  cursor: pointer;
+}
+
+.wrapped-pixel-button:active {
+  transform: translate(calc(var(--px) * 2), calc(var(--px) * 2));
+  box-shadow: none;
+}
+
+.wrapped-pixel-ghost {
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+  box-shadow: none;
+}
+
+.wrapped-pixel-begin {
+  position: absolute;
+  left: calc(var(--px) * 6);
+  bottom: calc(var(--px) * 16);
+}
+
+.wrapped-pixel-actions {
+  position: absolute;
+  left: calc(var(--px) * 6);
+  right: calc(var(--px) * 6);
+  bottom: calc(var(--px) * 5);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--px) * 4);
+}
+
+/* Tap zones: previous on the left third, next on the rest */
+
+.wrapped-pixel-tap {
+  position: absolute;
+  top: calc(var(--px) * 20);
+  bottom: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.wrapped-pixel-tap-prev {
+  left: 0;
+  width: 32%;
+}
+
+.wrapped-pixel-tap-next {
+  right: 0;
+  width: 68%;
+}
+
+.wrapped-pixel-tap:focus-visible {
+  outline-offset: -6px;
+}

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dither cards</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { --ink: #111114; --orange: #f04a00; --blue: #1741e0; --pale: #d6dcfb; --tint: #a9bbff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #ececec; color: var(--ink); font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr; justify-items: center; min-height: 100dvh; }
+  form { display: flex; gap: 8px; justify-content: center; padding: 16px 16px 0; }
+  button { padding: 10px 14px; border-radius: 999px; border: 1px solid #11111440; background: none; color: #111114c0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .cards { align-self: center; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px 16px 32px; width: 100%; }
+  .card { position: relative; width: min(100%, 380px, calc((100dvh - 140px) * 0.62)); aspect-ratio: 0.62; border-radius: 10px; overflow: hidden; container-type: inline-size; display: flex; flex-direction: column; }
+  .mark { display: block; width: 7.5cqw; height: 7.5cqw; border-radius: 50%; background: radial-gradient(circle, transparent 0 17%, currentColor 18% 100%); }
+  canvas { display: block; }
+
+  .flow { background: #fff; }
+  .flow .inner { flex: 1; display: flex; flex-direction: column; padding: 6cqw; }
+  .flow canvas { flex: none; width: 100%; aspect-ratio: 1; }
+  .flow .mark { margin-top: auto; }
+  .flow h2 { margin: 3.5cqw 0 5cqw; font: 400 9.4cqw/1.08 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; letter-spacing: -0.01em; }
+
+  .stats { background: var(--blue); color: #fff; }
+  .stats header { background: var(--pale); color: var(--blue); padding: 5cqw 4.5cqw 6cqw; }
+  .stats h2 { margin: 0; font-size: 12.2cqw; font-weight: 500; line-height: 0.98; letter-spacing: -0.035em; }
+  .stats .body { position: relative; flex: 1; padding: 5.5cqw; display: flex; flex-direction: column; }
+  .stats .mark { margin-top: auto; }
+  .stats p { margin: 4cqw 0 0; max-width: 62%; font-size: 4.1cqw; font-weight: 400; line-height: 1.32; }
+  .stats canvas { position: absolute; top: 7cqw; right: 5cqw; bottom: 5cqw; width: 19cqw; height: calc(100% - 12cqw); }
+  .error { padding: 24px; text-align: center; }
+</style>
+</head>
+<body>
+  <form id="controls">
+    <button type="button" id="pause" aria-pressed="false">Pause</button>
+  </form>
+  <div class="cards" id="cards">
+    <article class="card flow">
+      <div class="inner">
+        <canvas id="flow" aria-hidden="true"></canvas>
+        <span class="mark" aria-hidden="true"></span>
+        <h2>Albums Heard Together, Rated One Vote at a Time.</h2>
+      </div>
+    </article>
+    <article class="card stats">
+      <header><h2>Turning a Year of Listening into One Page.</h2></header>
+      <div class="body">
+        <canvas id="shapes" aria-hidden="true"></canvas>
+        <span class="mark" aria-hidden="true"></span>
+        <p>Every score comes from a vote cast in chat during a live listening session.</p>
+      </div>
+    </article>
+  </div>
+
+<script>
+const VERT = `#version 300 es
+in vec2 position;
+void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+
+// Both pictures are a smooth grey-scale value turned into square dots by
+// ordered (Bayer) dithering: each cell compares the value to a fixed
+// threshold pattern, which gives the print-like halftone edges.
+// uMode 0: flowing liquid ribbons. uMode 1: a column of morphing shapes.
+const FRAG = `#version 300 es
+precision highp float;
+out vec4 outColor;
+uniform vec2 uRes;
+uniform float uTime;
+uniform float uCells;
+uniform int uMode;
+uniform vec3 uPaper;
+uniform vec3 uInk;
+uniform vec3 uAlt;
+
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 5; i++) { s += a * noise(p); p = p * 2.02 + 7.1; a *= 0.5; }
+  return s;
+}
+
+float bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+float bayer4(vec2 a) { return bayer2(0.5 * a) * 0.25 + bayer2(a); }
+float bayer8(vec2 a) { return bayer4(0.5 * a) * 0.25 + bayer2(a); }
+
+// Smooth, large-scale noise: only two octaves, so ribbons stay clean.
+float soft(vec2 p) { return noise(p) * 0.7 + noise(p * 2.1 + 4.3) * 0.3; }
+
+float liquid(vec2 uv, float t) {
+  vec2 p = uv * 1.05 + vec2(0.0, t * 0.02);
+  vec2 w = vec2(soft(p + t * 0.06), soft(p + 5.2 - t * 0.05));
+  vec2 w2 = vec2(soft(p + 2.6 * w + 1.7 + t * 0.04), soft(p + 2.6 * w + 9.2));
+  float n = soft(p + 2.4 * w2);
+  // Ribbons run along the lines where the warped noise crosses its middle
+  // value; a wide soft falloff around them becomes the halftone halo.
+  float ridge = clamp(1.0 - abs(n - 0.5) * 7.0, 0.0, 1.0);
+  float second = clamp(1.0 - abs(n - 0.36) * 14.0, 0.0, 1.0);
+  float body = pow(ridge, 2.5) * 1.3 + pow(second, 4.0) * 0.9;
+  float halo = pow(clamp(1.0 - abs(n - 0.5) * 3.0, 0.0, 1.0), 1.5) * 0.4 + soft(p * 1.6 + 3.0) * 0.1;
+  return clamp(body + halo, 0.0, 1.0);
+}
+
+float box(vec2 p, vec2 b, float r) {
+  vec2 q = abs(p) - b + r;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+}
+
+float shapes(vec2 uv, float t) {
+  float aspect = uRes.y / uRes.x;
+  float slots = 5.0;
+  float y = uv.y * slots;
+  float i = floor(y);
+  vec2 p = vec2(uv.x - 0.5, (fract(y) - 0.5) * aspect / slots);
+  float k = 0.5 + 0.5 * sin(t * 0.7 + i * 1.9);
+  float slot = aspect / slots;
+  float tall = mix(0.3, 0.44, 0.5 + 0.5 * sin(t * 0.45 + i * 2.7)) * slot;
+  float d = box(p, vec2(0.47, tall), mix(0.04, min(0.47, tall), k * k));
+  // A short falloff at the edge (about two dots), then a dense fill with a
+  // few holes drifting through it.
+  float fill = smoothstep(0.015, -0.11, d);
+  float grain = 0.74 + 0.3 * noise(uv * vec2(3.0, 8.0) + vec2(i * 3.0, t * 0.3));
+  return fill * grain;
+}
+
+void main() {
+  float unit = uRes.x / uCells;
+  vec2 q = gl_FragCoord.xy / unit;
+  vec2 cell = floor(q);
+  vec2 center = (cell + 0.5) * unit / uRes;
+  float v = uMode == 0 ? liquid(center * vec2(1.0, uRes.y / uRes.x), uTime) : shapes(center, uTime);
+
+  float on = step(bayer8(cell) * 0.94 + 0.03, v);
+  // Sparse areas keep small separate squares; dense areas close up.
+  float size = mix(0.62, 1.02, smoothstep(0.45, 0.8, v));
+  vec2 f = abs(fract(q) - 0.5);
+  float square = step(max(f.x, f.y), size * 0.5);
+  vec3 ink = mix(uInk, uAlt, step(0.86, hash(cell + 2.0)) * (1.0 - smoothstep(0.4, 0.75, v)));
+  outColor = vec4(mix(uPaper, ink, on * square), 1.0);
+}`;
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const state = { paused: reduced, frozen: query.has("time") ? Number(query.get("time")) : null, clock: 12, last: 0 };
+
+function rgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+function compile(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+// One small renderer per picture. options: mode, cells across, colours.
+function picture(canvas, options) {
+  const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+  if (!gl) return null;
+  let u = {};
+  const setup = () => {
+    const program = gl.createProgram();
+    gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, VERT));
+    gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const position = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    for (const name of ["uRes", "uTime", "uCells", "uMode", "uPaper", "uInk", "uAlt"]) u[name] = gl.getUniformLocation(program, name);
+  };
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", setup);
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) throw error;
+  }
+  return (time) => {
+    if (gl.isContextLost()) return;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(2, Math.round(canvas.clientWidth * ratio));
+    const h = Math.max(2, Math.round(canvas.clientHeight * ratio));
+    if (w !== canvas.width || h !== canvas.height) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+    gl.uniform2f(u.uRes, w, h);
+    gl.uniform1f(u.uTime, time);
+    gl.uniform1f(u.uCells, options.cells);
+    gl.uniform1i(u.uMode, options.mode);
+    gl.uniform3fv(u.uPaper, rgb(options.paper));
+    gl.uniform3fv(u.uInk, rgb(options.ink));
+    gl.uniform3fv(u.uAlt, rgb(options.alt));
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  };
+}
+
+function start() {
+  let pictures;
+  try {
+    pictures = [
+      picture(document.getElementById("flow"), { mode: 0, cells: 72, paper: "#ffffff", ink: "#f04a00", alt: "#ff9a3d" }),
+      picture(document.getElementById("shapes"), { mode: 1, cells: 17, paper: "#1741e0", ink: "#a9bbff", alt: "#a9bbff" }),
+    ];
+  } catch (error) {
+    pictures = [null];
+    console.error(error);
+  }
+  if (pictures.some((p) => !p)) {
+    const p = document.createElement("p");
+    p.className = "error";
+    p.textContent = "WebGL 2 is not available in this browser.";
+    document.getElementById("cards").replaceWith(p);
+    return;
+  }
+  const pause = document.getElementById("pause");
+  pause.setAttribute("aria-pressed", String(state.paused));
+  pause.addEventListener("click", () => {
+    state.paused = !state.paused;
+    pause.setAttribute("aria-pressed", String(state.paused));
+  });
+  const frame = (now) => {
+    const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+    state.last = now;
+    if (!state.paused) state.clock += dt;
+    for (const draw of pictures) draw(state.frozen ?? state.clock);
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

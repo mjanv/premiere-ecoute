@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dot card</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #1f1f1f; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr; justify-items: center; min-height: 100dvh; }
+  form { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 16px 16px 0; }
+  button { padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: none; color: #ffffffc0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible, .card p:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .card { position: relative; align-self: center; margin: 20px 16px 28px; height: min(calc(100dvh - 120px), calc((100vw - 32px) * 1.5)); aspect-ratio: 2 / 3; background: #05050c; overflow: hidden; container-type: inline-size; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .card p { position: absolute; top: 6.2cqw; left: 6.2cqw; right: 6.2cqw; margin: 0; font-size: 4.6cqw; font-weight: 400; line-height: 1.25; letter-spacing: 0.01em; white-space: pre-line; }
+  .error { align-self: center; padding: 24px; text-align: center; color: #ffffffb0; }
+</style>
+</head>
+<body>
+  <form id="controls">
+    <div id="palettes" role="group" aria-label="Palette" style="display: flex; gap: 8px"></div>
+    <button type="button" id="still" aria-pressed="false">Pause</button>
+  </form>
+  <div class="card" id="card">
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <p id="text" contenteditable="plaintext-only" spellcheck="false" aria-label="Card text">Premiere + Ecoute ++
+Wrapped + 2026 __</p>
+  </div>
+
+<script>
+const PALETTES = {
+  Ice: { low: "#5b1fd0", mid: "#2a52d6", high: "#43d3e6", beam: "#0f5c8c" },
+  Ember: { low: "#8a1040", mid: "#e2431f", high: "#ffc65c", beam: "#8a3312" },
+  Acid: { low: "#0a5540", mid: "#10b984", high: "#d9ff5c", beam: "#0c6046" },
+};
+
+const VERT = `#version 300 es
+in vec2 position;
+void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+
+// A staggered grid of dots. A moving skyline decides which dots are lit:
+// those below it glow (white at the crest, then the palette), those above
+// stay dark while beams of light rise from the tallest columns.
+const FRAG = `#version 300 es
+precision highp float;
+out vec4 outColor;
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec3 uPointer;
+uniform vec3 uLow;
+uniform vec3 uMid;
+uniform vec3 uHigh;
+uniform vec3 uBeam;
+
+const float COLUMNS = 112.0;
+
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+
+// Skyline height (0 bottom, 1 top) at horizontal position x.
+float skyline(float x, float t) {
+  float level = 0.44 + 0.17 * sin(t * 0.7) + 0.05 * sin(t * 1.9 + 1.0);
+  float broad = noise(vec2(x * 4.6 + 3.0, t * 0.16)) - 0.5;
+  float mid = noise(vec2(x * 7.5 + 11.0, t * 0.3)) - 0.5;
+  float fine = noise(vec2(x * 34.0, t * 0.75)) - 0.5;
+  float spike = pow(noise(vec2(x * 70.0, t * 0.5 + 9.0)), 4.0);
+  float lift = uPointer.z * 0.3 * exp(-pow((x - uPointer.x) / 0.14, 2.0));
+  return level + broad * 0.46 + mid * 0.26 + fine * 0.1 + spike * 0.14 + lift;
+}
+
+void main() {
+  float unit = uRes.x / COLUMNS;
+  vec2 q = gl_FragCoord.xy / unit;
+  vec2 cell = floor(q);
+  float staggered = 1.0 - mod(cell.x + cell.y, 2.0);
+  float dot = smoothstep(0.47, 0.3, length(fract(q) - 0.5)) * staggered;
+  vec2 center = (cell + 0.5) * unit / uRes;
+  vec2 uv = gl_FragCoord.xy / uRes;
+  float t = uTime;
+
+  // Background: evaluated per column pair so beams have crisp vertical edges.
+  float column = floor(q.x / 2.0);
+  float hx = skyline((column * 2.0 + 1.0) * unit / uRes.x, t);
+  float above = uv.y - hx;
+  vec3 ramp = mix(uLow, uMid, smoothstep(0.0, 0.42, uv.y));
+  vec3 bg = vec3(0.012, 0.012, 0.03);
+  if (above < 0.0) {
+    bg += ramp * 0.4;
+  } else {
+    float tall = smoothstep(0.2, 0.62, hx);
+    float streak = 0.25 + 0.75 * noise(vec2(column * 0.31, t * 0.2)) * noise(vec2(column * 1.7, 4.0 + t * 0.1));
+    bg += uBeam * tall * streak * exp(-above * 2.0) * 1.9;
+    bg += uLow * 0.05 * (1.0 - uv.y);
+  }
+
+  float h = skyline(center.x, t);
+  vec3 col;
+  if (center.y < h) {
+    float depth = (h - center.y) * uRes.y / unit;
+    vec3 lit = mix(uLow, uMid, smoothstep(0.0, 0.36, center.y));
+    lit = mix(lit, uHigh, clamp(smoothstep(0.14, 0.55, center.y) * 0.75 + exp(-depth * 0.06) * 0.6, 0.0, 1.0));
+    float crest = exp(-depth * 0.16) * (0.3 + 0.7 * hash(cell)) + step(0.965, hash(cell + 3.0)) * exp(-depth * 0.04);
+    lit = mix(lit, vec3(0.92, 0.98, 1.0), clamp(crest * 1.3, 0.0, 1.0));
+    float twinkle = 0.72 + 0.28 * hash(cell + floor(t * 5.0) * 17.0);
+    col = mix(bg, lit * twinkle, dot);
+  } else {
+    col = bg * (1.0 - 0.38 * dot);
+  }
+  col += (hash(gl_FragCoord.xy + t) - 0.5) * 0.012;
+  outColor = vec4(pow(max(col, 0.0), vec3(1.0 / 1.15)), 1.0);
+}`;
+
+const card = document.getElementById("card");
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const state = {
+  palette: PALETTES[query.get("palette")] ? query.get("palette") : "Ice",
+  paused: reduced,
+  frozen: query.has("time") ? Number(query.get("time")) : null,
+  clock: 2,
+  last: 0,
+  pointerX: 0.5,
+  pointerOn: 0,
+  pointerStrength: 0,
+};
+let uniforms = {};
+
+function fail(message) {
+  const p = document.createElement("p");
+  p.className = "error";
+  p.textContent = message;
+  card.replaceWith(p);
+}
+
+function compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+function rgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  // Colours are authored in sRGB; the shader works in roughly linear light.
+  return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255].map((v) => Math.pow(v, 1.25));
+}
+
+function setup() {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const position = gl.getAttribLocation(program, "position");
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  for (const name of ["uRes", "uTime", "uPointer", "uLow", "uMid", "uHigh", "uBeam"]) {
+    uniforms[name] = gl.getUniformLocation(program, name);
+  }
+}
+
+function resize() {
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(2, Math.round(card.clientWidth * ratio));
+  const h = Math.max(2, Math.round(card.clientHeight * ratio));
+  if (w !== canvas.width || h !== canvas.height) {
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!gl.isContextLost()) {
+    if (!state.paused) state.clock += dt;
+    state.pointerStrength += (state.pointerOn - state.pointerStrength) * Math.min(1, dt * 4);
+    resize();
+    const colors = PALETTES[state.palette];
+    gl.uniform2f(uniforms.uRes, canvas.width, canvas.height);
+    gl.uniform1f(uniforms.uTime, state.frozen ?? state.clock);
+    gl.uniform3f(uniforms.uPointer, state.pointerX, 0, state.pointerStrength);
+    gl.uniform3fv(uniforms.uLow, rgb(colors.low));
+    gl.uniform3fv(uniforms.uMid, rgb(colors.mid));
+    gl.uniform3fv(uniforms.uHigh, rgb(colors.high));
+    gl.uniform3fv(uniforms.uBeam, rgb(colors.beam));
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  requestAnimationFrame(frame);
+}
+
+function controls() {
+  const palettes = document.getElementById("palettes");
+  for (const name of Object.keys(PALETTES)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = name;
+    b.setAttribute("aria-pressed", String(name === state.palette));
+    b.addEventListener("click", () => {
+      state.palette = name;
+      for (const other of palettes.querySelectorAll("button")) other.setAttribute("aria-pressed", String(other === b));
+    });
+    palettes.append(b);
+  }
+  const still = document.getElementById("still");
+  still.setAttribute("aria-pressed", String(state.paused));
+  still.addEventListener("click", () => {
+    state.paused = !state.paused;
+    still.setAttribute("aria-pressed", String(state.paused));
+  });
+  // The skyline rises under the pointer.
+  card.addEventListener("pointermove", (e) => {
+    const box = card.getBoundingClientRect();
+    state.pointerX = (e.clientX - box.left) / box.width;
+    state.pointerOn = 1;
+  });
+  card.addEventListener("pointerleave", () => { state.pointerOn = 0; });
+  document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+}
+
+function start() {
+  if (!gl) return fail("WebGL 2 is not available in this browser.");
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", () => setup());
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) return fail(String(error.message || error));
+  }
+  controls();
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

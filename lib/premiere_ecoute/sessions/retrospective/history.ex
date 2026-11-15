@@ -679,4 +679,71 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
     end
     |> Repo.all()
   end
+
+  @typedoc "A vote of a viewer with what its session was about: the album or single played, its vote scale and the name of its streamer."
+  @type viewer_vote :: %{
+          session_id: integer(),
+          album_id: integer() | nil,
+          single_id: integer() | nil,
+          streamer: String.t(),
+          vote_options: [String.t()],
+          track_id: integer() | nil,
+          scope: :track | :album,
+          value: String.t(),
+          voted_at: DateTime.t()
+        }
+
+  @doc """
+  Lists the votes a user cast during a year in album sessions (`:album`) or single sessions (`:track`).
+
+  Every vote of their Twitch account counts, whatever the visibility of the session and whether or not it was cast as the streamer. A vote belongs to the UTC year it was cast in.
+  """
+  @spec get_viewer_votes_by_year(User.t(), integer(), :album | :track) :: [viewer_vote()]
+  def get_viewer_votes_by_year(%User{twitch: %{user_id: viewer_id}}, year, source) when is_binary(viewer_id) do
+    {from, to} = year_bounds(year)
+
+    Repo.all(
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: u in User,
+        on: u.id == s.user_id,
+        where: v.viewer_id == ^viewer_id,
+        where: v.inserted_at >= ^from and v.inserted_at < ^to,
+        where: s.source == ^source,
+        select: %{
+          session_id: s.id,
+          album_id: s.album_id,
+          single_id: s.single_id,
+          streamer: u.username,
+          vote_options: s.vote_options,
+          track_id: v.track_id,
+          scope: v.scope,
+          value: v.value,
+          voted_at: v.inserted_at
+        }
+    )
+  end
+
+  def get_viewer_votes_by_year(_user, _year, _source), do: []
+
+  @doc "Lists the ids of the users whose Twitch account voted in an album or a single session during a year."
+  @spec list_voter_ids(integer()) :: [integer()]
+  def list_voter_ids(year) do
+    {from, to} = year_bounds(year)
+
+    viewers =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        where: v.inserted_at >= ^from and v.inserted_at < ^to,
+        where: s.source in [:album, :track],
+        distinct: true,
+        select: v.viewer_id
+
+    Repo.all(from(u in User, join: t in assoc(u, :twitch), where: t.user_id in subquery(viewers), select: u.id))
+  end
+
+  defp year_bounds(year),
+    do: {DateTime.new!(Date.new!(year, 1, 1), ~T[00:00:00]), DateTime.new!(Date.new!(year + 1, 1, 1), ~T[00:00:00])}
 end

@@ -29,6 +29,7 @@ defmodule PremiereEcoute do
       {Telemetry, except: []},
       {Twitch, except: []},
       {Wantlists, except: []},
+      {Wrapped, except: []},
       PubSub,
       Presence,
       Repo,

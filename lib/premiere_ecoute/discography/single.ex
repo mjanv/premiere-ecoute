@@ -132,6 +132,10 @@ defmodule PremiereEcoute.Discography.Single do
   @spec last(non_neg_integer()) :: [t()]
   def last(n \\ 5), do: all(order_by: [desc: :inserted_at], limit: n) |> Enum.map(&put_artist/1)
 
+  @doc "Returns the singles with the given ids, with their artists."
+  @spec list_by_ids([integer()]) :: [t()]
+  def list_by_ids(ids), do: __MODULE__ |> where([s], s.id in ^ids) |> Repo.all() |> preload()
+
   @doc "Returns all singles associated with a given artist."
   @spec list_for_artist(integer()) :: [t()]
   def list_for_artist(artist_id) do

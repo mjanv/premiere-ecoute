@@ -136,6 +136,7 @@ defmodule PremiereEcoute.MixProject do
       {:jose, "~> 1.11"},
       {:hammer, "~> 7.5"},
       {:decimal, "~> 3.1", override: true},
+      {:stb_image, "~> 1.0"},
       # Data / Machine Learning
       {:instructor, "~> 0.1"},
       {:hermes_mcp, "~> 0.14"},

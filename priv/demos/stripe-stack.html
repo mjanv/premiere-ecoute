@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stripe stack</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #000; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr; justify-items: center; min-height: 100dvh; }
+  form { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 16px 16px 0; }
+  button, input { padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: none; color: #ffffffc0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; }
+  button { cursor: pointer; }
+  input { width: 220px; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  canvas { align-self: center; width: min(calc(100% - 32px), 600px, calc((100dvh - 110px) * 0.75)); aspect-ratio: 0.75; margin: 16px 0 24px; display: block; }
+  .error { align-self: center; padding: 24px; text-align: center; color: #ffffffb0; }
+</style>
+</head>
+<body>
+  <form id="controls">
+    <input id="text" aria-label="Words" value="Wrapped Listen Loud 2026" maxlength="60">
+    <button type="button" id="next">Next</button>
+    <button type="button" id="pause" aria-pressed="false">Pause</button>
+  </form>
+  <canvas id="gl" role="img" aria-label="Heavy words on black, repeated in depth as a stack of thin coloured stripes that fan out in perspective. The view cuts between four angles and colour pairs."></canvas>
+
+<script>
+// Each scene is one camera angle and one colour pair, held for a few seconds
+// while the view drifts from the first set of values to the second.
+// rx, ry, rz are rotations in radians; depth is how far back the stack goes.
+const SCENES = [
+  { front: "#ff3fe8", back: "#e2102c", from: { rx: 0.42, ry: -0.5, rz: -0.55, x: 0.2, y: -0.1, dist: 3.0 }, to: { rx: 0.5, ry: -0.38, rz: -0.5, x: 0.0, y: 0.0, dist: 2.8 }, depth: 1.7 },
+  { front: "#b9c81e", back: "#4fd8d2", from: { rx: -0.62, ry: 0.55, rz: 0.24, x: 0.9, y: -0.9, dist: 2.7 }, to: { rx: -0.55, ry: 0.42, rz: 0.2, x: 0.75, y: -0.8, dist: 2.6 }, depth: 2.1 },
+  { front: "#ff8c5c", back: "#6a4cff", from: { rx: 1.02, ry: 0.12, rz: 0.03, x: -0.3, y: -1.3, dist: 3.1 }, to: { rx: 0.94, ry: -0.1, rz: -0.03, x: -0.1, y: -1.5, dist: 3.0 }, depth: 1.5 },
+  { front: "#a8dc3c", back: "#3fc8f0", from: { rx: -0.92, ry: 0.0, rz: 0.0, x: 0.4, y: 1.0, dist: 3.0 }, to: { rx: -0.78, ry: 0.08, rz: 0.02, x: 0.2, y: 1.2, dist: 2.9 }, depth: 1.3 },
+];
+const HOLD = 2.6;
+const LAYERS = 24;
+const PLANE = 9.0;
+const SIZE = 2048;
+
+// One instanced draw: every instance is a copy of the same flat sheet of text,
+// pushed back along the sheet's own depth. Copies alternate black and colour,
+// back to front, so each coloured copy is cut by the black one in front of it
+// and only a thin stripe of it shows. Perspective fans the stripes out.
+const VERT = `#version 300 es
+in vec2 position;
+uniform mat3 uTurn;
+uniform vec3 uShift;
+uniform float uDepth;
+uniform float uCount;
+uniform float uAspect;
+out vec2 vUv;
+out float vLevel;
+flat out float vBlack;
+void main() {
+  float level = float(gl_InstanceID) / (uCount - 1.0);
+  vec3 p = vec3(position * ${PLANE.toFixed(1)} + uShift.xy, -uDepth * (1.0 - level));
+  p = uTurn * p;
+  p.z -= uShift.z;
+  vUv = position * 1.25 + 0.5;
+  vLevel = level;
+  vBlack = float(gl_InstanceID % 2 == 0 ? 1 : 0);
+  gl_Position = vec4(p.x * 1.7 / uAspect, p.y * 1.7, 0.0, -p.z);
+}`;
+
+const FRAG = `#version 300 es
+precision highp float;
+in vec2 vUv;
+in float vLevel;
+flat in float vBlack;
+out vec4 outColor;
+uniform sampler2D uText;
+uniform vec3 uFront;
+uniform vec3 uBack;
+void main() {
+  float ink = smoothstep(0.35, 0.65, texture(uText, vUv).r);
+  vec3 col = mix(uBack, uFront, smoothstep(0.15, 1.0, vLevel));
+  col *= 0.82 + 0.18 * vLevel;
+  outColor = vec4(col * (1.0 - vBlack), ink);
+}`;
+
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias: true, alpha: false });
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const input = document.getElementById("text");
+if (query.get("text")) input.value = query.get("text");
+const state = {
+  paused: reduced,
+  scene: query.has("scene") ? Number(query.get("scene")) % SCENES.length : 0,
+  at: query.has("at") ? Number(query.get("at")) : reduced ? 0.5 : 0,
+  frozen: query.has("scene") || query.has("at"),
+  last: 0,
+};
+let uniforms = {};
+let texture = null;
+
+function fail(message) {
+  const p = document.createElement("p");
+  p.className = "error";
+  p.textContent = message;
+  canvas.replaceWith(p);
+}
+
+function compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+function rgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+// The sheet of text: rows of heavy words, each row stretched to fill the
+// width, white on black. The sheet repeats in every direction.
+function sheet() {
+  const words = input.value.trim().toUpperCase().split(/\s+/).filter(Boolean);
+  if (!words.length) words.push("WRAPPED");
+  const c = document.createElement("canvas");
+  c.width = c.height = SIZE;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, SIZE, SIZE);
+  ctx.fillStyle = "#fff";
+  const rows = 6;
+  const rowHeight = SIZE / rows;
+  const fontSize = rowHeight / 0.78;
+  ctx.font = `800 ${fontSize}px "Bricolage Demo", Impact, sans-serif`;
+  ctx.textBaseline = "alphabetic";
+  for (let r = 0; r < rows; r++) {
+    let line = words[r % words.length];
+    if (line.length < 9) line += " " + words[(r + 1) % words.length];
+    const width = ctx.measureText(line).width;
+    ctx.save();
+    ctx.translate(SIZE * 0.015, (r + 1) * rowHeight - rowHeight * 0.1);
+    ctx.scale((SIZE * 0.97) / width, 1);
+    ctx.fillText(line, 0, 0);
+    ctx.restore();
+  }
+  return c;
+}
+
+function upload() {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sheet());
+  gl.generateMipmap(gl.TEXTURE_2D);
+}
+
+function setup() {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const position = gl.getAttribLocation(program, "position");
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  for (const name of ["uTurn", "uShift", "uDepth", "uCount", "uAspect", "uText", "uFront", "uBack"]) uniforms[name] = gl.getUniformLocation(program, name);
+  texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  const sharper = gl.getExtension("EXT_texture_filter_anisotropic");
+  if (sharper) gl.texParameterf(gl.TEXTURE_2D, sharper.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  upload();
+}
+
+// Rotation about z, then x, then y, as a column-major 3x3 matrix.
+function turn(rx, ry, rz) {
+  const [cx, sx, cy, sy, cz, sz] = [Math.cos(rx), Math.sin(rx), Math.cos(ry), Math.sin(ry), Math.cos(rz), Math.sin(rz)];
+  const z = [[cz, -sz, 0], [sz, cz, 0], [0, 0, 1]];
+  const x = [[1, 0, 0], [0, cx, -sx], [0, sx, cx]];
+  const y = [[cy, 0, sy], [0, 1, 0], [-sy, 0, cy]];
+  const mul = (a, b) => a.map((row) => [0, 1, 2].map((j) => row[0] * b[0][j] + row[1] * b[1][j] + row[2] * b[2][j]));
+  const m = mul(y, mul(x, z));
+  return [m[0][0], m[1][0], m[2][0], m[0][1], m[1][1], m[2][1], m[0][2], m[1][2], m[2][2]];
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!gl.isContextLost()) {
+    if (!state.paused && !state.frozen) {
+      state.at += dt / HOLD;
+      if (state.at >= 1) { state.at = 0; state.scene = (state.scene + 1) % SCENES.length; }
+    }
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(2, Math.round(canvas.clientWidth * ratio));
+    const h = Math.max(2, Math.round(canvas.clientHeight * ratio));
+    if (w !== canvas.width || h !== canvas.height) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+    const scene = SCENES[state.scene];
+    const v = (key) => scene.from[key] + (scene.to[key] - scene.from[key]) * state.at;
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniformMatrix3fv(uniforms.uTurn, false, turn(v("rx"), v("ry"), v("rz")));
+    gl.uniform3f(uniforms.uShift, v("x"), v("y"), v("dist"));
+    gl.uniform1f(uniforms.uDepth, scene.depth);
+    gl.uniform1f(uniforms.uCount, LAYERS * 2);
+    gl.uniform1f(uniforms.uAspect, w / h);
+    gl.uniform1i(uniforms.uText, 0);
+    gl.uniform3fv(uniforms.uFront, rgb(scene.front));
+    gl.uniform3fv(uniforms.uBack, rgb(scene.back));
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, LAYERS * 2);
+  }
+  requestAnimationFrame(frame);
+}
+
+async function start() {
+  if (!gl) return fail("WebGL 2 is not available in this browser.");
+  try { await document.fonts.load('800 100px "Bricolage Demo"'); } catch (_) {}
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", () => setup());
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) return fail(String(error.message || error));
+  }
+  input.addEventListener("input", () => { if (!gl.isContextLost()) upload(); });
+  document.getElementById("next").addEventListener("click", () => {
+    state.scene = (state.scene + 1) % SCENES.length;
+    if (!state.frozen && !state.paused) state.at = 0;
+  });
+  const pause = document.getElementById("pause");
+  pause.setAttribute("aria-pressed", String(state.paused));
+  pause.addEventListener("click", () => {
+    state.paused = !state.paused;
+    pause.setAttribute("aria-pressed", String(state.paused));
+  });
+  document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

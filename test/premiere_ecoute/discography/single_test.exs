@@ -155,4 +155,21 @@ defmodule PremiereEcoute.Discography.SingleTest do
       assert Single.list_for_artist(artist.id) == []
     end
   end
+
+  describe "list_by_ids/1" do
+    test "returns the singles with the given ids, with their artists" do
+      {:ok, one} = Single.create_if_not_exists(single_fixture(%{provider_ids: %{spotify: "byids1"}, name: "One"}))
+      {:ok, two} = Single.create_if_not_exists(single_fixture(%{provider_ids: %{spotify: "byids2"}, name: "Two"}))
+      {:ok, _other} = Single.create_if_not_exists(single_fixture(%{provider_ids: %{spotify: "byids3"}, name: "Other"}))
+
+      singles = Single.list_by_ids([one.id, two.id, -1])
+
+      assert singles |> Enum.map(& &1.name) |> Enum.sort() == ["One", "Two"]
+      assert Enum.all?(singles, &match?(%Single{artists: [%{name: "Sample Artist"}]}, &1))
+    end
+
+    test "returns nothing for no id" do
+      assert Single.list_by_ids([]) == []
+    end
+  end
 end

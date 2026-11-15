@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "cuelume": "^0.1.2",
+    "howler": "^2.2.4",
     "motion": "^12.35.1",
+    "ogl": "^1.0.11",
     "vega": "^5.27.0",
     "vega-embed": "^6.24.0",
     "vega-lite": "^5.16.3"

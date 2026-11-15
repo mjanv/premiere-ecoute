@@ -494,4 +494,23 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
       assert Enum.find(report.track_summaries, &(&1.track_id == track2.id)).streamer_score == nil
     end
   end
+
+  describe "list_for_sessions/1" do
+    test "returns the reports of the given sessions" do
+      [one, two, other] = for _ <- 1..3, do: session_fixture(%{user_id: user_fixture().id})
+      for session <- [one, two, other], do: {:ok, _} = Report.generate(session)
+
+      reports = Report.list_for_sessions([one.id, two.id, -1])
+
+      assert reports |> Enum.map(& &1.session_id) |> Enum.sort() == Enum.sort([one.id, two.id])
+      assert Enum.all?(reports, &match?(%Report{session_summary: %{}, track_summaries: []}, &1))
+    end
+
+    test "returns nothing for no session or a session without report" do
+      session = session_fixture(%{user_id: user_fixture().id})
+
+      assert Report.list_for_sessions([]) == []
+      assert Report.list_for_sessions([session.id]) == []
+    end
+  end
 end

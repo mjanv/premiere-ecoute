@@ -11,6 +11,8 @@ config :premiere_ecoute, Oban, testing: :inline
 
 config :premiere_ecoute, :broadway_batch_timeout_ms, 50
 
+config :premiere_ecoute, PremiereEcoute.Wrapped.Appearance, req_options: [plug: {Req.Test, PremiereEcoute.Wrapped.Appearance}]
+
 config :premiere_ecoute,
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,

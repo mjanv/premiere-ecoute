@@ -16,6 +16,36 @@ defmodule PremiereEcouteWeb.Home.Components do
   alias PremiereEcoute.Sessions.ListeningSession
 
   @doc """
+  Highlights the Wrapped of the current user once it is ready. Renders nothing without a recap.
+  """
+  attr :recap, :any, default: nil, doc: "the available `Wrapped.Recap`, if any"
+
+  @spec wrapped_banner(map()) :: Phoenix.LiveView.Rendered.t()
+  def wrapped_banner(assigns) do
+    ~H"""
+    <.link
+      :if={@recap}
+      id="wrapped-banner"
+      navigate={~p"/wrapped/#{@recap.year}"}
+      class="group mb-8 flex items-center justify-between gap-4 rounded-xl px-5 py-3 text-white shadow-lg shadow-purple-900/20 ring-1 ring-white/20 transition-opacity hover:opacity-90"
+      style="background: var(--gradient-primary);"
+    >
+      <div class="flex items-center gap-3 min-w-0">
+        <PremiereEcouteWeb.CoreComponents.icon name="hero-sparkles" class="w-5 h-5 flex-shrink-0" />
+        <p class="truncate text-sm">
+          <span class="font-extrabold">{gettext("Wrapped %{year}", year: @recap.year)}</span>
+          <span class="text-white/80">· {gettext("Your year in music is ready")}</span>
+        </p>
+      </div>
+      <PremiereEcouteWeb.CoreComponents.icon
+        name="hero-arrow-right"
+        class="w-5 h-5 flex-shrink-0 transition-transform group-hover:translate-x-1"
+      />
+    </.link>
+    """
+  end
+
+  @doc """
   Renders a scrollable carousel with prev/next round buttons driven by the ScrollCarousel hook.
 
   ## Slots

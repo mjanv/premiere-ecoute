@@ -12,6 +12,7 @@
   {"lib/premiere_ecoute/gettext.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user/consent.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/wrapped/recap.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user/follow.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user/oauth_token.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user/token.ex", :call_without_opaque},

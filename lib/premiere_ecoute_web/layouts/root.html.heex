@@ -7,6 +7,8 @@
     <.live_title default="Premiere Ecoute" suffix="">
       {assigns[:page_title]}
     </.live_title>
+    <meta :if={assigns[:og_image]} property="og:title" content={assigns[:page_title]} />
+    <meta :if={assigns[:og_image]} property="og:image" content={assigns[:og_image]} />
     <link phx-track-static rel="stylesheet" href={~p"/fonts/BricolageGrotesque/bricolage-grotesque.css"} />
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>

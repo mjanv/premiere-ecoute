@@ -93,7 +93,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @doc """
   Returns the vote options of a vote scale.
   """
-  @spec vote_options(atom()) :: [String.t()] | nil
+  @spec vote_options(String.t()) :: [String.t()] | nil
   def vote_options(key), do: @vote_options[key]
 
   @doc """

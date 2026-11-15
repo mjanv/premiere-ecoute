@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Squash poster</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { --ink: #2a2a16; --blue: #0a5cff; --orange: #ff5a1f; --acid: #d8ff3c; --pale: #e4e4de; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #000; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr; justify-items: center; min-height: 100dvh; }
+  form { display: flex; gap: 8px; justify-content: center; padding: 16px 16px 0; }
+  button { padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: none; color: #ffffffc0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+  /* The card is 3:4. Everything inside is placed in percentages of the card,
+     and sized in cqw (1cqw = 1% of the card's width). */
+  .card { align-self: center; position: relative; width: min(calc(100% - 32px), 620px, calc((100dvh - 110px) * 0.75)); aspect-ratio: 0.75; margin: 16px 0 24px; container-type: inline-size; overflow: hidden; background: #b9bcb6; color: var(--ink); }
+  .card > * { position: absolute; }
+  canvas { inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* Three columns shared by every row. */
+  .row { left: 4%; right: 3.5%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.4cqw; }
+  .row > div { position: relative; min-width: 0; }
+  .row svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; fill: currentColor; }
+  .row.ghost { color: var(--pale); }
+  .row.breathe svg { transform-origin: 50% 0; animation: breathe 5s ease-in-out infinite; }
+  .row.breathe.late svg { animation-delay: -2.5s; }
+  @keyframes breathe { 50% { transform: scaleY(0.45); } }
+  .labels { color: #f4f4ee; font-size: 2.7cqw; font-weight: 800; letter-spacing: -0.03em; text-transform: uppercase; text-align: center; line-height: 1; }
+  .labels.onmark > div { display: grid; place-items: center; }
+  .band { left: 0; right: 0; background: var(--blue); }
+  .rule { left: 0; right: 0; background: #a8a66a; }
+
+  /* The information block, laid over the grid like a sticker. */
+  .sticker { left: 66.5%; right: 3.5%; top: 9.6%; height: 31%; display: flex; flex-direction: column; background: var(--ink); }
+  .ticker { background: var(--ink); color: #fff; font-size: 1.27cqw; font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap; overflow: hidden; padding: 0.4cqw 0.5cqw 0.3cqw; line-height: 1; display: flex; justify-content: space-between; }
+  .ticker b { color: #4d8dff; font-weight: 700; }
+  .sticker .body { flex: 1; background: var(--orange); border-radius: 2.6cqw; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; padding: 1cqw 0.6cqw; text-align: center; text-transform: uppercase; }
+  .date { font-size: 9.6cqw; font-weight: 700; line-height: 0.82; letter-spacing: -0.05em; }
+  .place { font-size: 2.35cqw; font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; }
+  .badge { width: 74%; }
+  .badge svg { width: 100%; height: auto; display: block; }
+
+  .credit { left: 1.2%; top: 53%; transform-origin: 0 0; transform: rotate(-90deg); font-size: 1.05cqw; font-weight: 700; letter-spacing: 0.01em; text-transform: uppercase; white-space: nowrap; }
+  .credit span { margin-right: 5cqw; }
+
+  .tags { left: 4%; bottom: 3%; display: flex; gap: 1.8cqw; align-items: flex-start; }
+  .tag small { display: block; background: var(--ink); color: #fff; font-size: 1.2cqw; font-weight: 600; text-transform: uppercase; padding: 0.3cqw 0.4cqw; line-height: 1; letter-spacing: -0.01em; }
+  .tag .box { height: 9.6cqw; display: grid; place-items: center; }
+  .tag.mark .box { width: 9.6cqw; background: var(--acid); }
+  .tag.mark svg { width: 62%; height: 62%; fill: var(--ink); }
+  .tag.text .box { width: 19cqw; background: #b9e4ec; font-size: 1.75cqw; font-weight: 600; line-height: 1.15; padding: 0 1.6cqw; justify-items: start; }
+  .more { right: 3.5%; bottom: 7%; font-size: 2.7cqw; font-weight: 600; letter-spacing: -0.04em; text-transform: uppercase; line-height: 1; }
+  .more b, .more span { display: inline-block; padding: 0.5cqw 0.6cqw 0.35cqw; }
+  .more b { background: var(--acid); font-weight: 600; }
+  .more span { background: var(--ink); color: #fff; }
+  @media (prefers-reduced-motion: reduce) { .row.breathe svg { animation: none; } }
+</style>
+</head>
+<body>
+  <form id="controls">
+    <button type="button" id="pause" aria-pressed="false">Pause</button>
+  </form>
+  <article class="card" id="card" aria-label="Poster: Premiere Ecoute Wrapped, 31 December 2026.">
+    <canvas id="field" aria-hidden="true"></canvas>
+
+    <div class="rule" style="top: 1.5%; height: 1.1%"></div>
+    <div class="row breathe" data-marks style="top: 3.1%; height: 2.5%"></div>
+    <div class="rule" style="top: 6.6%; height: 1.4%"></div>
+    <div class="row labels" style="top: 6.3%"><div>Premiere</div><div>Ecoute</div><div>Wrapped</div></div>
+
+    <div class="rule" style="top: 40.6%; height: 1.3%"></div>
+    <div class="row" data-marks style="top: 40.6%; height: 1.3%"></div>
+    <div class="row labels" style="top: 42.6%"><div>Premiere</div><div>Ecoute</div><div>Wrapped</div></div>
+
+    <div class="row breathe late" data-marks style="top: 54.3%; height: 2.6%"></div>
+    <div class="row ghost" data-marks style="top: 57.3%; height: 3.8%"></div>
+
+    <div class="band" style="top: 61.2%; height: 24.8%"></div>
+    <div class="row" data-marks style="top: 62.7%; height: 21.8%"></div>
+    <div class="row labels onmark" style="top: 62.7%; height: 21.8%"><div><span>Premiere</span></div><div><span>Ecoute</span></div><div><span>Wrapped</span></div></div>
+    <div class="rule" style="top: 86.8%; height: 1.1%"></div>
+
+    <div class="sticker">
+      <div class="ticker"><span><b>Votes on</b> Twitch chat</span><span><b>Votes on</b> Twitch chat</span></div>
+      <div class="body">
+        <div class="date">31 12<br>2026</div>
+        <div class="place">Your year<br>in albums</div>
+        <div class="badge">
+          <svg viewBox="0 0 200 72" fill="none" stroke="currentColor" stroke-width="2.4">
+            <ellipse cx="100" cy="36" rx="98" ry="34" fill="#2a2a16" stroke="none"/>
+            <g stroke="#ff5a1f">
+              <ellipse cx="100" cy="36" rx="88" ry="26"/>
+              <ellipse cx="100" cy="36" rx="58" ry="26"/>
+              <ellipse cx="100" cy="36" rx="28" ry="26"/>
+              <path d="M12 36h176M22 23h156M22 49h156"/>
+            </g>
+            <rect x="62" y="24" width="76" height="24" rx="12" fill="#2a2a16" stroke="#ff5a1f"/>
+            <text x="100" y="42" text-anchor="middle" font-family="Bricolage Demo, sans-serif" font-size="16" font-weight="800" fill="#ff5a1f" stroke="none">VOTES</text>
+          </svg>
+        </div>
+      </div>
+      <div class="ticker"><span><b>Votes on</b> Twitch chat</span><span><b>Votes on</b> Twitch chat</span></div>
+    </div>
+
+    <div class="credit"><span>This visual is a layout demo</span><span>Made for the demos page</span><span>Dev only, not a real event</span></div>
+
+    <div class="tags">
+      <div class="tag mark"><small>Organiser</small><div class="box" data-mark="2"></div></div>
+      <div class="tag text"><small>Counted from</small><div class="box">Your votes<br>in Twitch<br>chat</div></div>
+    </div>
+    <div class="more"><b>More on</b><span>premiere-ecoute.fr</span></div>
+  </article>
+
+<script>
+// The three marks of the poster, each drawn in a 100 x 100 box: a disc cut
+// into horizontal slices with a round hole, a K made of a bar and wedges, and
+// a disc filled with a checker of quarter-discs. They are stretched to
+// whatever box they are put in, so a short row squashes them flat.
+let ids = 0;
+function mark(kind) {
+  const id = "clip" + ids++;
+  const open = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">`;
+  const disc = `<clipPath id="${id}"><circle cx="50" cy="50" r="50"/></clipPath>`;
+  if (kind === 0) {
+    return `${open}${disc}<path clip-path="url(#${id})" fill-rule="evenodd" d="M0 0h100v14H0zM0 18h100v15H0zM0 36.5h100v27H0zM50 38a12 12 0 1 0 0 24a12 12 0 1 0 0-24zM0 67h100v15H0zM0 86h100v14H0z"/></svg>`;
+  }
+  if (kind === 1) {
+    return `${open}<path d="M0 0h13v100H0zM16 0h12L16 41zM16 100h12L16 59zM16 48L100 0v46zM16 52l84 2v46z"/></svg>`;
+  }
+  // A full square, minus the eight squares in the middle of each side, then a
+  // circle on each inner crossing except the centre. With the even-odd rule
+  // a circle empties a quarter of each filled square it touches and fills a
+  // quarter of each empty one, which leaves a rounded cross in the centre.
+  let d = "M0 0h100v100H0z";
+  for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) {
+    const inner = (v) => v === 1 || v === 2;
+    if (inner(x) !== inner(y)) d += `M${x * 25} ${y * 25}h25v25h-25z`;
+  }
+  for (let y = 1; y < 4; y++) for (let x = 1; x < 4; x++) {
+    if (x !== 2 || y !== 2) d += `M${x * 25} ${y * 25 - 12.5}a12.5 12.5 0 1 0 0 25a12.5 12.5 0 1 0 0-25z`;
+  }
+  return `${open}${disc}<path clip-path="url(#${id})" fill-rule="evenodd" d="${d}"/></svg>`;
+}
+for (const row of document.querySelectorAll("[data-marks]")) row.innerHTML = [0, 1, 2].map((k) => `<div>${mark(k)}</div>`).join("");
+for (const box of document.querySelectorAll("[data-mark]")) box.innerHTML = mark(Number(box.dataset.mark));
+
+// The background: a soft green and violet field pulled downwards in thin
+// columns with a jagged upper edge, then grain, then a frame of pixel steps
+// in the corners.
+const canvas = document.getElementById("field");
+const ctx = canvas.getContext("2d");
+const W = 1080, H = 1440, COLUMN = 10;
+canvas.width = W;
+canvas.height = H;
+const soft = document.createElement("canvas");
+soft.width = W;
+soft.height = H;
+const softCtx = soft.getContext("2d");
+const grain = document.createElement("canvas");
+grain.width = W;
+grain.height = H;
+{
+  const g = grain.getContext("2d");
+  const data = g.createImageData(W, H);
+  for (let i = 0; i < data.data.length; i += 4) {
+    const v = Math.random() < 0.5 ? 0 : 255;
+    data.data[i] = data.data[i + 1] = data.data[i + 2] = v;
+    data.data[i + 3] = Math.random() * 22;
+  }
+  g.putImageData(data, 0, 0);
+}
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const state = { paused: reduced, frozen: query.has("time") ? Number(query.get("time")) : null, clock: 0, last: 0 };
+
+function field(t) {
+  softCtx.fillStyle = "#c79ad6";
+  softCtx.fillRect(0, 0, W, H);
+  for (let x = 0; x < W; x += COLUMN) {
+    const u = x / W;
+    // An arch, higher in the middle, with sawteeth and a slow wobble.
+    const arch = 0.13 + 0.14 * Math.abs(u - 0.5) ** 1.6 * 4;
+    const teeth = 0.075 * Math.abs(((u * 17 + t * 0.12) % 1) - 0.5) * 2;
+    const wobble = 0.03 * Math.sin(u * 9 + t * 0.5) + 0.02 * Math.sin(u * 23 - t * 0.8);
+    const top = (arch + teeth + wobble) * H;
+    const g = softCtx.createLinearGradient(0, top - 0.1 * H, 0, H);
+    g.addColorStop(0, "#c79ad6");
+    g.addColorStop(0.07, "#6fcf8a");
+    g.addColorStop(0.34 + 0.06 * Math.sin(u * 15 + t * 0.4), "#19b7a4");
+    g.addColorStop(0.58, "#5ccf7c");
+    g.addColorStop(0.78 + 0.05 * Math.sin(u * 11 - t * 0.3), "#18b4a6");
+    g.addColorStop(1, "#7fd68c");
+    softCtx.fillStyle = g;
+    softCtx.fillRect(x, 0, COLUMN, H);
+  }
+  ctx.filter = "blur(2.5px)";
+  ctx.drawImage(soft, 0, 0);
+  ctx.filter = "none";
+  ctx.drawImage(grain, 0, 0);
+  steps();
+}
+
+// A staircase cuts each corner of the three panels: a grey fill, a paler
+// band one square wide, and a pink line that follows the steps without a
+// break. Everything snaps to one square size.
+const SQUARE = 30, LINE = 8;
+function stair(ox, oy, dx, dy, n) {
+  const rect = (x, y, w, h, color) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(dx > 0 ? ox + x : ox - x - w, dy > 0 ? oy + y : oy - y - h, w, h);
+  };
+  for (let k = 0; k < n; k++) {
+    const edge = (n - k) * SQUARE;
+    rect(0, k * SQUARE, edge - SQUARE, SQUARE, "#aab3af");
+    rect(Math.max(0, edge - SQUARE), k * SQUARE, SQUARE, SQUARE, "#c6d3cd");
+    rect(edge, k * SQUARE, LINE, SQUARE + LINE, "#ff93d2");
+    rect(edge - SQUARE, (k + 1) * SQUARE, SQUARE, LINE, "#ff93d2");
+  }
+}
+function steps() {
+  const top = Math.round(0.092 * H), middle = Math.round(0.535 * H);
+  stair(0, top, 1, 1, 8);
+  stair(0, middle, 1, -1, 5);
+  stair(W, middle, -1, -1, 5);
+  stair(W, H, -1, -1, 3);
+  ctx.fillStyle = "#ff93d2";
+  ctx.fillRect(0, 0, W * 0.32, 12);
+  ctx.fillRect(W * 0.68, 0, W * 0.32, 12);
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!state.paused) state.clock += dt;
+  field(state.frozen ?? state.clock);
+  requestAnimationFrame(frame);
+}
+
+const pause = document.getElementById("pause");
+pause.setAttribute("aria-pressed", String(state.paused));
+pause.addEventListener("click", () => {
+  state.paused = !state.paused;
+  pause.setAttribute("aria-pressed", String(state.paused));
+  for (const svg of document.querySelectorAll(".breathe svg")) svg.style.animationPlayState = state.paused ? "paused" : "running";
+});
+if (state.frozen !== null) for (const svg of document.querySelectorAll(".breathe svg")) svg.style.animation = "none";
+document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

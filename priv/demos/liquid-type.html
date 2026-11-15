@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Liquid type</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: 1fr auto; justify-items: center; }
+  .stage { position: relative; height: 100%; max-height: calc(100dvh - 76px); aspect-ratio: 9 / 16; max-width: 100vw; align-self: center; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; padding: 14px 16px 18px; width: 100%; }
+  input[type="text"] { width: min(260px, 60vw); padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: #ffffff10; color: #fff; font: 600 16px/1 inherit; letter-spacing: 0.06em; text-transform: uppercase; }
+  input[type="text"]:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .group { display: flex; gap: 6px; }
+  button { padding: 9px 13px; border-radius: 999px; border: 1px solid #ffffff40; background: none; color: #ffffffb0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button.swatch { width: 34px; height: 34px; padding: 0; border-width: 2px; }
+  button.swatch[aria-pressed="true"] { border-color: #fff; }
+  .error { align-self: center; padding: 24px; text-align: center; color: #ffffffb0; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas id="gl"></canvas>
+    <p class="sr" id="live" aria-live="polite"></p>
+  </div>
+  <form id="controls" autocomplete="off">
+    <input id="text" type="text" maxlength="40" aria-label="Text" value="NICE">
+    <div class="group" role="group" aria-label="Layout">
+      <button type="button" data-layout="stack" aria-pressed="true">Stack</button>
+      <button type="button" data-layout="lines" aria-pressed="false">Lines</button>
+    </div>
+    <div class="group" role="group" aria-label="Palette" id="palettes"></div>
+  </form>
+
+<script>
+const PALETTES = {
+  Neon: ["#4a2bff", "#ff3df2", "#ffb8ff", "#ff2d55"],
+  Acid: ["#0b3dff", "#00e5a0", "#eaff6b", "#ff7a1a"],
+  Ember: ["#7a0bff", "#ff2d2d", "#ffd08a", "#ff7b00"],
+  Ice: ["#1420ff", "#22c7ff", "#e8fbff", "#9a6bff"],
+};
+
+const VERT = `#version 300 es
+in vec2 position;
+out vec2 vUv;
+void main() { vUv = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }`;
+
+// The text is a mask texture with mipmaps. Sampling a higher mip level is a
+// cheap blur, so blur can vary per pixel: a focus band sweeps along the text.
+// A very blurred copy of the mask acts as a rough distance-to-edge field, which
+// bends the gradient so its bands follow the letter shapes.
+const FRAG = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uMask;
+uniform vec2 uRes;
+uniform float uTime;
+uniform float uIntro;
+uniform float uAxis;
+uniform vec3 uColors[4];
+
+float mask(vec2 uv, float lod) { return textureLod(uMask, uv, lod).r; }
+
+float soft(vec2 uv, float lod) {
+  vec2 r = exp2(lod) * 0.9 / uRes;
+  float s = mask(uv, lod) * 2.0;
+  for (int i = 0; i < 8; i++) {
+    float a = float(i) * 0.7853982;
+    vec2 d = vec2(cos(a), sin(a));
+    s += mask(uv + d * r, lod) + mask(uv + d.yx * vec2(-0.5, 0.5) * r, lod);
+  }
+  return s / 18.0;
+}
+
+vec3 palette(float p) {
+  float f = fract(p) * 4.0;
+  int i = int(floor(f));
+  float k = smoothstep(0.0, 1.0, fract(f));
+  return mix(uColors[i], uColors[(i + 1) % 4], k);
+}
+
+void main() {
+  vec2 uv = vUv;
+  float t = uTime;
+  float along = mix(uv.x, uv.y, uAxis);
+
+  // Blur radii are tuned for an 800 px wide canvas; k rescales them.
+  float k = log2(uRes.x / 800.0);
+  // A focus point swings back and forth along the text every 3 s; blur grows
+  // with the distance to it. A slower pulse softens everything now and then.
+  float focus = 0.5 + 0.6 * sin(6.2831853 * t / 3.0);
+  float pulse = smoothstep(0.55, 1.0, 0.5 + 0.5 * sin(6.2831853 * t / 6.0 + 1.6));
+  float lod = max(0.0, 4.2 + k) * smoothstep(0.2, 0.62, abs(along - focus)) + 0.9 * pulse + 6.0 * (1.0 - uIntro);
+  float a = lod < 0.05 ? mask(uv, 0.0) : soft(uv, lod);
+
+  // Blurred copies of the mask stand in for distance to the edge. They grow
+  // with the blur, so the fuzz eats into the letters, not only around them.
+  float inner = smoothstep(0.5 - 0.04 * lod, 0.97 - 0.05 * lod, soft(uv, 4.7 + k + 0.2 * lod));
+  float field = soft(uv, 5.7 + k + 0.1 * lod);
+  float halo = soft(uv, 5.5 + k);
+
+  vec2 p = uv * vec2(1.0, uRes.y / uRes.x) * 2.1;
+  for (int i = 1; i <= 4; i++) {
+    float n = float(i);
+    p += (0.36 / n) * sin(p.yx * n * 1.15 + t * (0.32 + 0.07 * n) + vec2(1.7, 4.1) * n);
+  }
+  float phase = 0.3 * (p.x + p.y) + field * 0.8 + t * 0.045;
+  vec3 rim = mix(uColors[0], uColors[1], 0.62);
+  vec3 col = mix(rim, palette(phase), inner);
+
+  vec3 outc = col * a + rim * halo * 0.75 * (1.0 - a);
+  outc *= uIntro;
+  float g = fract(sin(dot(gl_FragCoord.xy + t, vec2(12.9898, 78.233))) * 43758.5453);
+  outc += (g - 0.5) * 0.025;
+  outColor = vec4(outc, 1.0);
+}`;
+
+const canvas = document.getElementById("gl");
+const stage = canvas.parentElement;
+const input = document.getElementById("text");
+const live = document.getElementById("live");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const state = { text: "NICE", layout: "stack", palette: "Neon", introStart: 0, time: null };
+
+function fail(message) {
+  const p = document.createElement("p");
+  p.className = "error";
+  p.textContent = message;
+  stage.replaceChildren(p);
+}
+
+function compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+function rgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+// --- Text mask -------------------------------------------------------------
+
+const FONT = '800 400px "Bricolage Demo", "Arial Black", Impact, sans-serif';
+const scratch = document.createElement("canvas");
+const ctx = scratch.getContext("2d");
+
+function glyph(text) {
+  ctx.font = FONT;
+  const m = ctx.measureText(text);
+  return {
+    text,
+    left: m.actualBoundingBoxLeft,
+    width: Math.max(1, m.actualBoundingBoxLeft + m.actualBoundingBoxRight),
+    ascent: m.actualBoundingBoxAscent,
+    height: Math.max(1, m.actualBoundingBoxAscent + m.actualBoundingBoxDescent),
+  };
+}
+
+// Each letter fills the full width; its slot along the reading axis is
+// proportional to the letter's natural width, so an "I" stays a thin slab.
+function drawStack(text, w, h) {
+  const pad = w * 0.085;
+  const gap = w * 0.045;
+  const parts = [...text].map((ch) => (ch === " " ? null : glyph(ch)));
+  const glyphs = parts.filter(Boolean);
+  if (glyphs.length === 0) return;
+  const spaces = parts.length - glyphs.length;
+  const free = h - 2 * pad - gap * (parts.length - 1) - spaces * gap;
+  const total = glyphs.reduce((sum, g) => sum + Math.pow(g.width, 0.8), 0);
+  let y = h - pad;
+  for (const g of parts) {
+    if (!g) { y -= gap * 2; continue; }
+    const slot = (free * Math.pow(g.width, 0.8)) / total;
+    ctx.save();
+    ctx.translate(pad, y);
+    ctx.rotate(-Math.PI / 2);
+    ctx.scale(slot / g.width, (w - 2 * pad) / g.height);
+    ctx.fillText(g.text, g.left, g.ascent);
+    ctx.restore();
+    y -= slot + gap;
+  }
+}
+
+// One word per line, each stretched to the full width, equal heights.
+function drawLines(text, w, h) {
+  const pad = w * 0.085;
+  const gap = w * 0.045;
+  const lines = text.split(/\s+/).filter(Boolean).map(glyph);
+  if (lines.length === 0) return;
+  const rows = Math.max(lines.length, 3);
+  const slot = (h - 2 * pad - gap * (rows - 1)) / rows;
+  let y = (h - (lines.length * slot + (lines.length - 1) * gap)) / 2;
+  for (const g of lines) {
+    ctx.save();
+    ctx.translate(pad, y);
+    ctx.scale((w - 2 * pad) / g.width, slot / g.height);
+    ctx.fillText(g.text, g.left, g.ascent);
+    ctx.restore();
+    y += slot + gap;
+  }
+}
+
+function drawMask() {
+  const { width: w, height: h } = canvas;
+  scratch.width = w;
+  scratch.height = h;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#fff";
+  ctx.font = FONT;
+  ctx.textBaseline = "alphabetic";
+  const text = state.text.toUpperCase().trim();
+  (state.layout === "stack" ? drawStack : drawLines)(text, w, h);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scratch);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  live.textContent = text;
+}
+
+// --- GL --------------------------------------------------------------------
+
+let uniforms = {};
+
+function setup() {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+  gl.useProgram(program);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const position = gl.getAttribLocation(program, "position");
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+  gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  for (const name of ["uMask", "uRes", "uTime", "uIntro", "uAxis", "uColors"]) {
+    uniforms[name] = gl.getUniformLocation(program, name);
+  }
+  gl.uniform1i(uniforms.uMask, 0);
+}
+
+function resize() {
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(2, Math.round(stage.clientWidth * ratio));
+  const h = Math.max(2, Math.round(stage.clientHeight * ratio));
+  if (w === canvas.width && h === canvas.height) return;
+  canvas.width = w;
+  canvas.height = h;
+  gl.viewport(0, 0, w, h);
+  drawMask();
+}
+
+function frame(now) {
+  if (gl.isContextLost()) return requestAnimationFrame(frame);
+  // ?time=<seconds> freezes the animation clock, to inspect one moment.
+  const t = state.time ?? (reduced ? 3.0 : now / 1000);
+  const intro = reduced || state.time !== null ? 1 : Math.min(1, (now - state.introStart) / 900);
+  gl.uniform2f(uniforms.uRes, canvas.width, canvas.height);
+  gl.uniform1f(uniforms.uTime, t);
+  gl.uniform1f(uniforms.uIntro, 1 - Math.pow(1 - intro, 3));
+  gl.uniform1f(uniforms.uAxis, state.layout === "stack" ? 1 : 0);
+  gl.uniform3fv(uniforms.uColors, PALETTES[state.palette].flatMap(rgb));
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  if (!reduced) requestAnimationFrame(frame);
+}
+
+function refresh() {
+  state.introStart = performance.now();
+  drawMask();
+  if (reduced) requestAnimationFrame(frame);
+}
+
+// --- Controls --------------------------------------------------------------
+
+function press(group, active) {
+  for (const b of group.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b === active));
+}
+
+function controls() {
+  const palettes = document.getElementById("palettes");
+  for (const [name, colors] of Object.entries(PALETTES)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "swatch";
+    b.title = name;
+    b.setAttribute("aria-label", name);
+    b.setAttribute("aria-pressed", String(name === state.palette));
+    b.style.background = `conic-gradient(${colors.join(", ")}, ${colors[0]})`;
+    b.addEventListener("click", () => { state.palette = name; press(palettes, b); if (reduced) requestAnimationFrame(frame); });
+    palettes.append(b);
+  }
+  for (const b of document.querySelectorAll("[data-layout]")) {
+    b.addEventListener("click", () => { state.layout = b.dataset.layout; press(b.parentElement, b); refresh(); });
+  }
+  input.addEventListener("input", () => { state.text = input.value || " "; refresh(); });
+  document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+}
+
+async function start() {
+  if (!gl) return fail("WebGL 2 is not available in this browser.");
+  const query = new URLSearchParams(location.search);
+  if (query.get("text")) { state.text = query.get("text").slice(0, 40); input.value = state.text; }
+  if (query.get("layout") === "lines") {
+    state.layout = "lines";
+    press(document.querySelector("[data-layout]").parentElement, document.querySelector('[data-layout="lines"]'));
+  }
+  if (PALETTES[query.get("palette")]) state.palette = query.get("palette");
+  if (query.get("time") && Number.isFinite(Number(query.get("time")))) state.time = Number(query.get("time"));
+  try { await document.fonts.load(FONT, "A"); } catch (_) {}
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", () => { setup(); canvas.width = 0; resize(); });
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) return fail(String(error.message || error));
+  }
+  controls();
+  new ResizeObserver(resize).observe(stage);
+  resize();
+  state.introStart = performance.now();
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

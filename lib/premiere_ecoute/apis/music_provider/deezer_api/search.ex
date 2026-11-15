@@ -25,6 +25,34 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Search do
     end)
   end
 
+  @doc """
+  Finds the 30 s preview of a track.
+
+  Returns the preview URL of the first match, falling back to the first track found for the artist alone, or `nil` when nothing has a preview. Preview URLs are signed and expire: do not store them.
+  """
+  @spec get_track_preview(String.t(), String.t()) :: {:ok, String.t() | nil} | {:error, term()}
+  def get_track_preview(artist, title) when is_binary(artist) and is_binary(title) do
+    with {:ok, nil} <- search_preview("#{artist} #{title}") do
+      search_preview(artist)
+    end
+  end
+
+  defp search_preview(q) do
+    DeezerApi.api()
+    |> DeezerApi.get(url: "/search", params: [q: q, limit: 5])
+    |> DeezerApi.handle(200, fn
+      %{"data" => items} ->
+        Enum.find_value(items, fn
+          %{"preview" => "http" <> _ = preview} -> preview
+          _ -> nil
+        end)
+
+      # Deezer reports errors such as an exceeded quota in a 200 response without data
+      _ ->
+        nil
+    end)
+  end
+
   @spec build_query(Keyword.t()) :: String.t()
   defp build_query(query) do
     cond do

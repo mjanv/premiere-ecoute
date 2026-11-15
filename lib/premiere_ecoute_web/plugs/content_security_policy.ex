@@ -8,6 +8,8 @@ defmodule PremiereEcouteWeb.Plugs.ContentSecurityPolicy do
     * Frames    — YouTube and Spotify embeds
     * Connect   — self (incl. the LiveView websocket) and PostHog ingestion
     * Images    — self, data: URIs, and YouTube/Spotify thumbnail hosts
+    * Media     — self, blob: URIs, Deezer's preview CDN (Wrapped 30 s previews) and data: URIs
+      (Howler plays a silent data: clip to unlock audio on mobile)
     * Fonts/CSS — self-hosted, plus Google Fonts (Bricolage Grotesque is `@import`ed from
       fonts.googleapis.com, with the actual font files served from fonts.gstatic.com)
 
@@ -32,7 +34,7 @@ defmodule PremiereEcouteWeb.Plugs.ContentSecurityPolicy do
             "font-src 'self' https://fonts.gstatic.com",
             "connect-src 'self' https://eu.i.posthog.com",
             "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com",
-            "media-src 'self' blob:",
+            "media-src 'self' blob: data: https://*.dzcdn.net",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",

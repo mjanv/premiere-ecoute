@@ -1,0 +1,844 @@
+/*
+  Wrapped — full-screen 9:16 stories.
+
+  The stage is a size container: every dimension inside is in cqw/cqh so the
+  cards scale as one poster, on a phone as in the framed desktop view.
+  Numbers and covers carry the cards; words are short labels, except on the start screen.
+  The player only animates `transform` and `opacity`.
+*/
+
+.wrapped {
+  --c1: #6d28d9;
+  --c2: #db2777;
+  --c3: #1e1b4b;
+  --ink: #fff;
+  --ink-soft: rgb(255 255 255 / 0.72);
+  --ink-faint: rgb(255 255 255 / 0.16);
+  --stroke: 0.55cqw;
+
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--ink);
+  background:
+    radial-gradient(120% 80% at 10% 0%, var(--c1), transparent 60%),
+    radial-gradient(100% 70% at 100% 40%, var(--c2), transparent 65%),
+    radial-gradient(120% 90% at 30% 110%, var(--c3), transparent 70%),
+    #0b0a12;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
+}
+
+.wrapped [hidden] {
+  display: none !important;
+}
+
+.wrapped-bg,
+.wrapped-grain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.wrapped-bg {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.wrapped-bg.is-live {
+  opacity: 1;
+}
+
+/* Film grain + shade: keeps white text readable on any cover palette */
+.wrapped-grain {
+  background:
+    linear-gradient(to bottom, rgb(11 10 18 / 0.3), rgb(11 10 18 / 0.08) 35%, rgb(11 10 18 / 0.6)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.wrapped-stage {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  container-type: size;
+  overflow: hidden;
+}
+
+@media (min-aspect-ratio: 3/4) {
+  .wrapped-stage {
+    height: min(100dvh - 2rem, 920px);
+    width: auto;
+    aspect-ratio: 9 / 16;
+    border-radius: 28px;
+    box-shadow:
+      0 0 0 1px var(--ink-faint),
+      0 40px 120px rgb(0 0 0 / 0.55);
+    background: rgb(11 10 18 / 0.18);
+  }
+}
+
+/* Progress + top bar */
+
+.wrapped-progress {
+  position: absolute;
+  top: max(2.2cqh, env(safe-area-inset-top));
+  left: 4cqw;
+  right: 4cqw;
+  z-index: 3;
+  display: flex;
+  gap: 1cqw;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wrapped-progress li {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.28);
+  overflow: hidden;
+}
+
+.wrapped-progress span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.wrapped-bar {
+  position: absolute;
+  top: calc(max(2.2cqh, env(safe-area-inset-top)) + 2.2cqh);
+  left: 5cqw;
+  right: 3cqw;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+}
+
+.wrapped-brand,
+.wrapped-label,
+.wrapped-figure small,
+.wrapped-months span,
+.wrapped-rooms span,
+.wrapped-duel dt,
+.wrapped-stats dt {
+  font-size: 3.2cqw;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.wrapped-brand {
+  flex: 1;
+  color: var(--ink-soft);
+}
+
+.wrapped-bar button,
+.wrapped-bar a {
+  display: grid;
+  place-items: center;
+  width: 10cqw;
+  height: 10cqw;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.wrapped-bar button:hover,
+.wrapped-bar a:hover {
+  background: var(--ink-faint);
+}
+
+.wrapped :focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Cards. No z-index here: a card must not form a stacking context, or its buttons would sit under the tap zones */
+
+.wrapped-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3cqh;
+  padding: 15cqh 7cqw 8cqh;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.wrapped-card.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.wrapped-card p,
+.wrapped-card h1,
+.wrapped-card h2,
+.wrapped-card h3,
+.wrapped-card ol,
+.wrapped-card dl,
+.wrapped-card dd {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wrapped-card img {
+  display: block;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--ink-faint);
+  -webkit-user-drag: none;
+}
+
+.wrapped-lead {
+  max-width: 28ch;
+  font-size: 4.4cqw;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* The year, two lines, as wide as the stage */
+
+.wrapped-year {
+  display: flex;
+  flex-direction: column;
+  font-size: 74cqw;
+  font-weight: 700;
+  line-height: 0.74;
+  letter-spacing: -0.085em;
+  margin-left: -4cqw !important;
+}
+
+.wrapped-year span:last-child {
+  color: transparent;
+  -webkit-text-stroke: var(--stroke) var(--ink);
+}
+
+.wrapped-start {
+  justify-content: flex-end;
+  gap: 3cqh;
+  padding-bottom: 8cqh;
+}
+
+.wrapped-start .wrapped-year {
+  margin-bottom: 2cqh !important;
+}
+
+.wrapped-start .wrapped-cta {
+  margin-top: 2cqh;
+}
+
+/* Year in music — two figures, one solid, one outlined, pushed to opposite edges */
+
+.wrapped-year-in-music {
+  justify-content: space-between;
+  padding-top: 17cqh;
+  padding-bottom: 7cqh;
+}
+
+.wrapped-figure {
+  display: flex;
+  flex-direction: column;
+}
+
+.wrapped-figure b {
+  display: block;
+  font-size: calc(124cqw / var(--digits));
+  font-weight: 700;
+  line-height: 0.76;
+  letter-spacing: -0.08em;
+  font-variant-numeric: tabular-nums;
+  margin-left: -0.05em;
+  transform-origin: left bottom;
+}
+
+.wrapped-figure small {
+  margin-top: 2.4cqh;
+}
+
+.wrapped-figure-outline {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* Looser tracking: outlined digits must not overlap, or their strokes cross */
+.wrapped-figure-outline b {
+  letter-spacing: -0.035em;
+  color: transparent;
+  -webkit-text-stroke: var(--stroke) var(--ink);
+  margin-right: 0.02em;
+  transform-origin: right bottom;
+}
+
+/* Buttons */
+
+.wrapped-cta,
+.wrapped-ghost {
+  position: relative;
+  z-index: 4;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 9cqw;
+  border-radius: 999px;
+  font-size: 4.6cqw;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.15s ease;
+}
+
+.wrapped-cta {
+  background: var(--ink);
+  color: #0b0a12;
+}
+
+.wrapped-ghost {
+  box-shadow: inset 0 0 0 2px var(--ink);
+  color: var(--ink);
+}
+
+.wrapped-cta:active,
+.wrapped-ghost:active {
+  transform: scale(0.94);
+}
+
+/* Above the tap zones. The z-index is on the animated wrapper itself: its transform makes it a stacking context */
+.wrapped-actions {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3cqw;
+}
+
+/* Tap zones: previous on the left third, next on the rest */
+
+.wrapped-tap {
+  position: absolute;
+  top: 12cqh;
+  bottom: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.wrapped-tap-prev {
+  left: 0;
+  width: 32%;
+}
+
+.wrapped-tap-next {
+  right: 0;
+  width: 68%;
+}
+
+.wrapped-tap:focus-visible {
+  outline-offset: -6px;
+}
+
+/* The cover wall: full-bleed, tilted, drifting when taller than the stage */
+
+.wrapped-cover-wall {
+  padding: 0;
+  justify-content: flex-start;
+}
+
+.wrapped-cover-wall::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 22cqh;
+  background: linear-gradient(to bottom, rgb(11 10 18 / 0.75), transparent);
+}
+
+.wrapped-wall-tilt {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-7deg) scale(1.22);
+}
+
+.wrapped-wall {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 1.6cqw;
+  padding-top: 4cqh !important;
+}
+
+.wrapped-wall li {
+  aspect-ratio: 1;
+  border-radius: 1.6cqw;
+  overflow: hidden;
+  box-shadow: 0 2cqw 6cqw rgb(0 0 0 / 0.45);
+}
+
+.wrapped-wall-empty {
+  background: var(--ink-faint);
+  box-shadow: none !important;
+}
+
+.wrapped-wall img {
+  width: 100%;
+}
+
+/* Shared pieces: names and scores */
+
+.wrapped-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.wrapped-name b {
+  font-size: 4.8cqw;
+  font-weight: 700;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wrapped-name span {
+  font-size: 3.6cqw;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wrapped-score {
+  font-size: 7cqw;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrapped-rank {
+  font-size: 9cqw;
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 0.3cqw var(--ink);
+}
+
+/* Single-cover cards: one hero cover, its score bursting out of the corner */
+
+/* Sized on the stage height too, so the card also fits a 9:16 stage */
+.wrapped-first-vote,
+.wrapped-top-album,
+.wrapped-top-track,
+.wrapped-top-single {
+  gap: 4cqh;
+}
+
+.wrapped-hero {
+  position: relative;
+  width: min(74cqw, 40cqh);
+  margin: 4cqh 0 2cqh 3cqw;
+}
+
+.wrapped-hero img {
+  width: 100%;
+  border-radius: 2.4cqw;
+  box-shadow: 0 5cqw 14cqw rgb(0 0 0 / 0.55);
+}
+
+.wrapped-hero-rank {
+  position: absolute;
+  top: -11cqw;
+  left: -7cqw;
+  font-size: 34cqw;
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: var(--stroke) var(--ink);
+}
+
+.wrapped-hero-score {
+  position: absolute;
+  right: -13cqw;
+  bottom: -7cqw;
+  font-size: 30cqw;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  text-shadow: 0 2cqw 8cqw rgb(0 0 0 / 0.5);
+}
+
+.wrapped-name-hero {
+  max-width: 70cqw;
+}
+
+.wrapped-name-hero b {
+  font-size: 9cqw;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.wrapped-name-hero span {
+  margin-top: 0.6cqh;
+  font-size: 4.6cqw;
+}
+
+/* The day of the first vote */
+.wrapped-date {
+  font-size: 13cqw;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ink-soft);
+}
+
+/* Ranked lists: albums and tracks from the second place down */
+
+.wrapped-next-albums,
+.wrapped-next-tracks {
+  gap: 5cqh;
+}
+
+.wrapped-runners {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2cqh;
+}
+
+.wrapped-runners li {
+  display: grid;
+  grid-template-columns: 8cqw 22cqw 1fr auto;
+  align-items: center;
+  gap: 3cqw;
+}
+
+.wrapped-runners img {
+  width: 100%;
+  border-radius: 1.6cqw;
+  box-shadow: 0 2cqw 6cqw rgb(0 0 0 / 0.4);
+}
+
+/* Months: one word as wide as the stage, then twelve columns */
+
+.wrapped-your-months {
+  justify-content: flex-end;
+  gap: 2cqh;
+}
+
+.wrapped-shout {
+  font-size: 19cqw;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  margin-left: -0.6cqw !important;
+  transform-origin: left bottom;
+  overflow-wrap: anywhere;
+}
+
+.wrapped-months {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.4cqw;
+  height: 42cqh;
+  margin-top: 4cqh !important;
+}
+
+.wrapped-months li {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1cqh;
+  min-width: 0;
+}
+
+.wrapped-months i {
+  width: 100%;
+  border-radius: 1.2cqw 1.2cqw 0 0;
+  box-shadow: inset 0 0 0 0.4cqw var(--ink);
+  transform-origin: bottom;
+}
+
+.wrapped-months b {
+  font-size: 3.6cqw;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrapped-months span {
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+
+.wrapped-months .is-busiest i {
+  background: var(--ink);
+}
+
+.wrapped-months .is-busiest span {
+  color: var(--ink);
+}
+
+/* Rooms: streamer names, the first one loudest */
+
+.wrapped-your-rooms {
+  gap: 5cqh;
+}
+
+.wrapped-rooms {
+  display: flex;
+  flex-direction: column;
+  gap: 3.4cqh;
+}
+
+.wrapped-rooms li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8cqh;
+  min-width: 0;
+}
+
+.wrapped-rooms b {
+  font-size: 9cqw;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+  color: var(--ink-soft);
+}
+
+.wrapped-rooms li:first-child b {
+  font-size: 17cqw;
+  color: var(--ink);
+}
+
+.wrapped-rooms span {
+  color: var(--ink-soft);
+}
+
+/* You and the chat: ≠ on top, = below, scores face to face */
+
+.wrapped-you-and-chat {
+  justify-content: space-evenly;
+  gap: 0;
+  padding-top: 13cqh;
+}
+
+.wrapped-versus {
+  display: grid;
+  grid-template-columns: 34cqw 1fr;
+  align-items: center;
+  column-gap: 4cqw;
+  row-gap: 2.4cqh;
+}
+
+.wrapped-versus img {
+  grid-area: 1 / 1;
+  width: 100%;
+  border-radius: 2cqw;
+  box-shadow: 0 4cqw 10cqw rgb(0 0 0 / 0.5);
+}
+
+.wrapped-versus .wrapped-name {
+  grid-area: 1 / 2;
+}
+
+/* The second album mirrors the first */
+.wrapped-versus:nth-of-type(2) {
+  grid-template-columns: 1fr 34cqw;
+}
+
+.wrapped-versus:nth-of-type(2) img {
+  grid-area: 1 / 2;
+}
+
+.wrapped-versus:nth-of-type(2) .wrapped-name {
+  grid-area: 1 / 1;
+  text-align: right;
+}
+
+.wrapped-versus .wrapped-name b {
+  font-size: 6cqw;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.wrapped-duel {
+  grid-area: 2 / 1 / 3 / -1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* ≠ or =, standing between the two scores */
+.wrapped-glyph {
+  font-size: 17cqw;
+  font-weight: 700;
+  line-height: 20.5cqw;
+  color: var(--ink-soft);
+}
+
+.wrapped-duel dd {
+  font-size: 25cqw;
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrapped-duel dt {
+  margin-top: 1.4cqh;
+}
+
+.wrapped-duel-chat {
+  text-align: right;
+}
+
+.wrapped-duel-chat dd {
+  letter-spacing: -0.035em;
+  color: transparent;
+  -webkit-text-stroke: var(--stroke) var(--ink);
+}
+
+/* Recap: the three covers fanned over the year */
+
+.wrapped-recap {
+  gap: 2.2cqh;
+  padding-top: 13cqh;
+}
+
+.wrapped-recap {
+  justify-content: flex-end;
+  padding-bottom: 6cqh;
+}
+
+/* The year on one line, half hidden behind the covers */
+.wrapped-recap .wrapped-year {
+  position: absolute;
+  top: 10cqh;
+  left: 7cqw;
+  flex-direction: row;
+  font-size: 41cqw;
+}
+
+.wrapped-fan {
+  position: relative;
+  height: 62cqw;
+}
+
+.wrapped-fan img {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 52cqw;
+  margin-left: -26cqw;
+  border-radius: 2cqw;
+  box-shadow: 0 4cqw 12cqw rgb(0 0 0 / 0.55);
+}
+
+.wrapped-fan img:nth-child(1) { z-index: 3; }
+.wrapped-fan img:nth-child(2) { z-index: 2; left: 26%; top: 6cqw; width: 44cqw; margin-left: -22cqw; }
+.wrapped-fan img:nth-child(3) { z-index: 1; left: 74%; top: 6cqw; width: 44cqw; margin-left: -22cqw; }
+
+.wrapped-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6cqh;
+  counter-reset: top;
+}
+
+.wrapped-top li {
+  counter-increment: top;
+  font-size: 4.2cqw;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wrapped-top li::before {
+  content: counter(top);
+  display: inline-block;
+  width: 5cqw;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.wrapped-top span {
+  color: var(--ink-soft);
+}
+
+.wrapped-stats {
+  display: flex;
+  gap: 8cqw;
+  padding-top: 2cqh !important;
+  border-top: 2px solid var(--ink);
+}
+
+.wrapped-stats dd {
+  font-size: 15cqw;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.wrapped-stats dt {
+  margin-top: 0.8cqh;
+  color: var(--ink-soft);
+}
+
+/* Waiting screen */
+
+.wrapped-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqh;
+}
+
+.wrapped-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.6cqw;
+  height: 12cqw;
+}
+
+.wrapped-bars i {
+  width: 2.4cqw;
+  height: 100%;
+  border-radius: 2cqw;
+  background: var(--ink);
+  transform-origin: bottom;
+  animation: wrapped-bar 1s ease-in-out infinite alternate;
+}
+
+.wrapped-bars i:nth-child(2) { animation-delay: -0.8s; }
+.wrapped-bars i:nth-child(3) { animation-delay: -0.35s; }
+.wrapped-bars i:nth-child(4) { animation-delay: -0.6s; }
+.wrapped-bars i:nth-child(5) { animation-delay: -0.15s; }
+
+@keyframes wrapped-bar {
+  from { transform: scaleY(0.2); }
+  to { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapped-bars i { animation: none; transform: scaleY(0.6); }
+  .wrapped-bg { display: none; }
+  .wrapped-cta, .wrapped-ghost { transition: none; }
+}

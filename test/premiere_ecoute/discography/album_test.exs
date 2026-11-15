@@ -282,4 +282,26 @@ defmodule PremiereEcoute.Discography.AlbumTest do
       assert is_nil(Album.find_by_provider("nonexistent", :spotify))
     end
   end
+
+  describe "list_by_ids/1" do
+    test "returns the albums with the given ids, with their tracks and artists" do
+      [one, two, _other] =
+        for name <- ["One", "Two", "Other"] do
+          tracks = for n <- 1..2, do: %Track{provider_ids: %{spotify: "#{name}#{n}"}, name: "Track #{n}", track_number: n}
+          {:ok, album} = Album.create(album_fixture(%{provider_ids: %{spotify: name}, name: name, tracks: tracks}))
+          album
+        end
+
+      albums = Album.list_by_ids([one.id, two.id, -1])
+
+      assert albums |> Enum.map(& &1.name) |> Enum.sort() == ["One", "Two"]
+      assert Enum.all?(albums, &match?(%Album{tracks: [_, _], artists: [%{name: "Sample Artist"}]}, &1))
+    end
+
+    test "returns nothing for no id" do
+      {:ok, _album} = Album.create(album_fixture())
+
+      assert Album.list_by_ids([]) == []
+    end
+  end
 end

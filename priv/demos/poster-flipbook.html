@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Poster flipbook</title>
+<style>
+  @font-face {
+    font-family: "Bricolage Demo";
+    font-weight: 200 800;
+    src: url(/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2) format("woff2");
+  }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #0c0c0e; color: #fff; font-family: "Bricolage Demo", system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr; justify-items: center; min-height: 100dvh; }
+  form { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 16px 16px 0; }
+  button { padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: none; color: #ffffffc0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible, canvas:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  canvas { align-self: center; margin: 20px 16px 28px; height: min(calc(100dvh - 120px), calc((100vw - 32px) * 1.5)); aspect-ratio: 2 / 3; display: block; cursor: pointer; }
+</style>
+</head>
+<body>
+  <form id="controls">
+    <button type="button" id="pause" aria-pressed="false">Pause</button>
+    <button type="button" id="slow" aria-pressed="false">Slow</button>
+    <button type="button" id="next">Next</button>
+  </form>
+  <canvas id="poster" width="800" height="1200" tabindex="0" role="img" aria-label="A series of posters for Wrapped 2026 flipping quickly: your year in music, 128 albums, 5412 minutes."></canvas>
+
+<script>
+const W = 800, H = 1200;
+const INK = "#101014", BLUE = "#2f9bf0", DEEP = "#1c4fd6", SKY = "#7fb8f6", LILAC = "#d9c2f5", PALE = "#f0e8fb", WHITE = "#f5f3f8";
+const SANS = '"Bricolage Demo", "Helvetica Neue", Arial, sans-serif';
+const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace';
+
+const canvas = document.getElementById("poster");
+const ctx = canvas.getContext("2d");
+const layer = document.createElement("canvas");
+layer.width = W;
+layer.height = H;
+const lx = layer.getContext("2d");
+
+// Deterministic pseudo-random numbers, so a poster looks the same every time.
+function rand(a, b = 0, c = 0) {
+  const s = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+// --- Shared pieces -------------------------------------------------------------
+
+// Worn paper: speckles, scratches, creases and torn patches, drawn once.
+const paper = (() => {
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const p = c.getContext("2d");
+  for (let i = 0; i < 9000; i++) {
+    p.fillStyle = `rgba(255,255,255,${0.02 + rand(i, 1) * 0.09})`;
+    const s = 1 + rand(i, 2) * 2;
+    p.fillRect(rand(i, 3) * W, rand(i, 4) * H, s, s);
+  }
+  for (let i = 0; i < 60; i++) {
+    p.strokeStyle = `rgba(255,255,255,${0.03 + rand(i, 5) * 0.06})`;
+    p.lineWidth = 1;
+    const x = rand(i, 6) * W, y = rand(i, 7) * H, a = rand(i, 8) * Math.PI, l = 20 + rand(i, 9) * 120;
+    p.beginPath();
+    p.moveTo(x, y);
+    p.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l);
+    p.stroke();
+  }
+  // Torn, lighter patches near the top corners.
+  for (const [cx, cy, n] of [[70, 70, 260], [700, 60, 200], [120, 1130, 90]]) {
+    for (let i = 0; i < n; i++) {
+      const r = Math.pow(rand(i * 1.37, cx + 0.31, 5), 1.6) * 130;
+      const a = rand(i * 2.91, cy + 0.77, 9) * Math.PI * 2;
+      p.fillStyle = `rgba(255,255,255,${0.02 + rand(i * 3.3, 11, cx) * 0.07})`;
+      const s = 3 + rand(i * 4.7, 12, cy) * 16;
+      p.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.7, s, s * (0.4 + rand(i, 13)));
+    }
+  }
+  for (const y of [398, 801]) {
+    p.fillStyle = "rgba(255,255,255,0.035)";
+    p.fillRect(0, y, W, 1);
+  }
+  return c;
+})();
+
+function chrome(dark = true) {
+  ctx.fillStyle = dark ? "rgba(255,255,255,0.62)" : "rgba(16,16,20,0.7)";
+  ctx.font = `500 13px ${MONO}`;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
+  ctx.fillText("WRAPPED 2026", 34, 44);
+  ctx.fillText("YOUR YEAR IN MUSIC", 34, H - 44);
+  ctx.textAlign = "right";
+  ctx.fillText("DECEMBER 14, 2026", W - 34, 44);
+  ctx.fillText("RATED WITH THE CHAT", W - 34, H - 44);
+  ctx.textAlign = "center";
+  ctx.fillStyle = WHITE;
+  ctx.font = `700 17px ${SANS}`;
+  ctx.fillText("Premiere Ecoute", W / 2 + 12, 45);
+  ctx.beginPath();
+  ctx.arc(W / 2 - 66, 44, 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = INK;
+  ctx.beginPath();
+  ctx.arc(W / 2 - 66, 44, 2.6, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function background() {
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = INK;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function finish() {
+  ctx.globalCompositeOperation = "screen";
+  ctx.drawImage(paper, 0, 0);
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function panel(x, y, w, h) {
+  const g = ctx.createLinearGradient(0, y, 0, y + h);
+  g.addColorStop(0, INK);
+  g.addColorStop(0.22, DEEP);
+  g.addColorStop(0.42, SKY);
+  g.addColorStop(0.68, LILAC);
+  g.addColorStop(1, PALE);
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y, w, h);
+}
+
+// A pixelated six-armed burst: blue dithered cells on top, hatched lilac below.
+function burst(cx, cy, radius, cell, t) {
+  const n = Math.ceil(radius / cell);
+  const turn = Math.floor(t * 3) * 0.05;
+  for (let gy = -n; gy <= n; gy++) {
+    for (let gx = -n; gx <= n; gx++) {
+      const r = Math.hypot(gx, gy) / n;
+      if (r > 1 || r < 0.14) continue;
+      const a = Math.atan2(gy, gx) + turn;
+      const arm = Math.abs(Math.cos(a * 3));
+      const inArm = arm > 0.2 && r < 0.42 + 0.58 * arm;
+      const chip = r > 0.78 && Math.abs(Math.sin(a * 6 + 0.6)) > 0.86;
+      if (!inArm && !chip) continue;
+      const x = cx + gx * cell, y = cy + gy * cell;
+      const shade = gy / n * 0.5 + 0.5 + 0.22 * Math.sin(a * 3 + 1) + (rand(gx, gy) - 0.5) * 0.18;
+      const h = cell / 2;
+      if (shade < 0.5) {
+        ctx.fillStyle = DEEP;
+        ctx.fillRect(x, y, cell, cell);
+        ctx.fillStyle = (gx + gy) % 2 ? BLUE : SKY;
+        ctx.fillRect(x, y, h, h);
+        ctx.fillRect(x + h, y + h, h, h);
+      } else {
+        ctx.fillStyle = shade > 0.8 ? PALE : LILAC;
+        ctx.fillRect(x, y, cell, cell);
+        ctx.fillStyle = "#2a2540";
+        ctx.fillRect(x + h, y, h / 2, h / 2);
+        ctx.fillRect(x, y + h, h / 2, h / 2);
+      }
+    }
+  }
+}
+
+function checkerBand(x, y, w, h, cell, seed, t) {
+  const cols = Math.ceil(w / cell), rows = Math.ceil(h / cell);
+  const tick = Math.floor(t * 7);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      ctx.fillStyle = (i + j) % 2 ? LILAC : INK;
+      ctx.fillRect(x + i * cell, y + j * cell, cell, cell);
+    }
+  }
+  // Bigger blue squares scattered over the checker, reshuffled as time passes.
+  for (let j = 0; j < rows; j += 2) {
+    for (let i = 0; i < cols; i += 2) {
+      const k = rand(i + seed * 13, j, tick);
+      if (k > 0.3) continue;
+      ctx.fillStyle = k < 0.12 ? BLUE : SKY;
+      ctx.fillRect(x + i * cell, y + j * cell, cell * 2, cell * 2);
+      ctx.fillStyle = INK;
+      if (k < 0.2) ctx.fillRect(x + (i + 1) * cell, y + j * cell, cell, cell);
+    }
+  }
+  ctx.restore();
+}
+
+const GLYPHS = {
+  "2": ["#####", "....#", "#####", "#....", "#####"],
+  "0": ["#####", "#...#", "#...#", "#...#", "#####"],
+  "6": ["#####", "#....", "#####", "#...#", "#####"],
+  P: ["#####", "#...#", "#####", "#....", "#...."],
+  E: ["#####", "#....", "####.", "#....", "#####"],
+};
+
+// Chunky pixel letters with a 3D extrusion and a halftone grain on the faces.
+function blocks(target, text, x, y, px, depth, from, to) {
+  const cells = [];
+  [...text].forEach((ch, index) => {
+    GLYPHS[ch].forEach((row, j) => [...row].forEach((bit, i) => {
+      if (bit === "#") cells.push([x + (index * 6 + i) * px, y + j * px]);
+    }));
+  });
+  lx.clearRect(0, 0, W, H);
+  for (let k = depth; k >= 1; k--) {
+    lx.fillStyle = k % 2 ? "#16264a" : "#22386b";
+    for (const [cx, cy] of cells) lx.fillRect(cx + k * 3, cy + k * 3, px, px);
+  }
+  const g = lx.createLinearGradient(x, y, x + text.length * 6 * px, y + 5 * px);
+  g.addColorStop(0, from);
+  g.addColorStop(1, to);
+  lx.fillStyle = g;
+  for (const [cx, cy] of cells) lx.fillRect(cx, cy, px + 0.5, px + 0.5);
+  lx.globalCompositeOperation = "source-atop";
+  lx.fillStyle = "rgba(10,14,40,0.2)";
+  for (let j = y; j < y + 5 * px + depth * 3; j += 6) {
+    for (let i = x + ((j / 6) % 2) * 3; i < x + text.length * 6 * px + depth * 3; i += 6) lx.fillRect(i, j, 2.4, 2.4);
+  }
+  lx.fillStyle = "rgba(255,255,255,0.16)";
+  for (const [cx, cy] of cells) lx.fillRect(cx, cy, px, 3);
+  lx.globalCompositeOperation = "source-over";
+  target.drawImage(layer, 0, 0);
+}
+
+// --- The posters ---------------------------------------------------------------
+
+const POSTERS = [
+  function glow(t) {
+    background();
+    ctx.save();
+    ctx.translate(W / 2 - 10, H / 2);
+    ctx.rotate(-0.62 + Math.sin(t * 1.3) * 0.04);
+    ctx.scale(1, 0.44);
+    const r = 330 + Math.sin(t * 2) * 10;
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+    g.addColorStop(0, PALE);
+    g.addColorStop(0.28, LILAC);
+    g.addColorStop(0.55, BLUE);
+    g.addColorStop(0.8, "rgba(28,79,214,0.45)");
+    g.addColorStop(1, "rgba(28,79,214,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.font = `500 15px ${MONO}`;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.fillStyle = INK;
+    ctx.fillText("YOUR YEAR", W / 2, H / 2);
+    ctx.fillStyle = WHITE;
+    ctx.textAlign = "right";
+    ctx.fillText("IN MUSIC.", W - 54, H / 2);
+    ctx.textAlign = "left";
+    ctx.fillText("+", 56, H / 2);
+    chrome();
+    finish();
+  },
+
+  function headline(t) {
+    background();
+    panel(0, 400, W, H - 400);
+    burst(W / 2, 760, 250, 12, t);
+    ctx.fillStyle = WHITE;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.font = `500 92px ${SANS}`;
+    ctx.fillText("Your year", W / 2, 250);
+    ctx.fillText("in music.", W / 2, 350);
+    chrome();
+    finish();
+  },
+
+  function split(t) {
+    background();
+    panel(320, 660, W - 320, H - 660);
+    burst(570, 400, 215, 11, t);
+    burst(560, 960, 150, 9, t + 1);
+    ctx.fillStyle = WHITE;
+    ctx.save();
+    ctx.translate(290, H - 60);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.font = `500 96px ${MONO}`;
+    ctx.fillText("128 ALBUMS", 0, 0, 760);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(92, 250);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "left";
+    ctx.font = `500 38px ${SANS}`;
+    ctx.fillText("Your year", 0, 0);
+    ctx.fillText("in music", 0, 44);
+    ctx.restore();
+    chrome();
+    finish();
+  },
+
+  function checkers(t) {
+    background();
+    const row = 118, top = 140, split = 480;
+    for (let i = 0; i < 4; i++) checkerBand(0, top + (i * 2 + 1) * row - row * 0.35, split, row * 1.25, 19.5, i, t);
+    for (let i = 0; i < 5; i++) checkerBand(split, top + i * 2 * row - row * 0.2, W - split, i === 0 || i === 4 ? row * 0.7 : row * 1.2, 19.5, i + 7, t);
+    ctx.fillStyle = WHITE;
+    ctx.textBaseline = "middle";
+    ctx.font = `500 62px ${MONO}`;
+    ctx.textAlign = "left";
+    ctx.fillText("128", 34, top + 2.45 * row);
+    ctx.fillText("ALBUMS", 34, top + 6.45 * row);
+    ctx.fillText("5412", split + 26, top + 3.5 * row);
+    ctx.font = `500 62px ${MONO}`;
+    ctx.fillText("MINUTES", 34, top + 4.45 * row, split - 50);
+    chrome();
+    finish();
+  },
+
+  function chunky(t) {
+    background();
+    const wobble = Math.round(Math.sin(t * 3) * 4);
+    blocks(ctx, "20", 70 + wobble, 190, 56, 9, "#1e8fe8", "#8fc4f7");
+    blocks(ctx, "26", 150 - wobble, 590, 56, 9, "#c9b0ee", "#e9e4f2");
+    chrome();
+    finish();
+  },
+
+  function repeated(t) {
+    background();
+    ctx.font = `500 34px ${MONO}`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    const sweep = (t * 0.6) % 1;
+    for (let i = 0; i < 13; i++) {
+      const k = (i / 12 + sweep) % 1;
+      const g = ctx.createLinearGradient(70, 0, W - 70, 0);
+      g.addColorStop(0, BLUE);
+      g.addColorStop(Math.max(0.05, 1 - k), SKY);
+      g.addColorStop(1, "#b9b6c4");
+      ctx.fillStyle = g;
+      ctx.globalAlpha = 1 - i * 0.03;
+      ctx.fillText("YOUR YEAR IN MUSIC. 128 ALBUMS.", 70, 300 + i * 46, W - 140);
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = WHITE;
+    ctx.textAlign = "center";
+    ctx.font = `500 36px ${SANS}`;
+    ctx.fillText("WRAPPED 2026", W / 2, H - 120);
+    chrome();
+    finish();
+  },
+
+  function bold(t) {
+    background();
+    ctx.save();
+    ctx.translate(W / 2, 640);
+    ctx.rotate(-0.3);
+    ctx.transform(1, 0, -0.35, 1, 0, 0);
+    ctx.translate(-W / 2, -640);
+    const bob = Math.sin(t * 4) * 6;
+    for (let i = 3; i >= 0; i--) {
+      ctx.globalAlpha = 1 - i * 0.26;
+      blocks(ctx, "PE", 250 + i * 46, 470 + i * 62 + bob * i, 27, 7, i ? "#2a6fd8" : "#8fc4f7", i ? "#3aa0ee" : "#e4dcf4");
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+    ctx.fillStyle = WHITE;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.font = `700 96px ${SANS}`;
+    ctx.fillText("128 ALBUMS", W / 2, 290, W - 80);
+    ctx.fillText("5412 MINUTES", W / 2, 384, W - 80);
+    ctx.fillText("14.12.2026", W / 2, 930, W - 80);
+    ctx.fillText("WRAPPED", W / 2, 1024, W - 80);
+    chrome();
+    finish();
+  },
+];
+
+// --- Playback ------------------------------------------------------------------
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const state = {
+  paused: reduced || query.has("poster"),
+  hold: 0.42,
+  clock: 0,
+  index: query.has("poster") ? Math.abs(parseInt(query.get("poster"), 10) || 0) % POSTERS.length : 0,
+  since: 0,
+  last: 0,
+};
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!state.paused) {
+    state.clock += dt;
+    state.since += dt;
+    if (state.since >= state.hold) {
+      state.since = 0;
+      state.index = (state.index + 1) % POSTERS.length;
+    }
+  }
+  POSTERS[state.index](state.clock);
+  requestAnimationFrame(frame);
+}
+
+function step() {
+  state.index = (state.index + 1) % POSTERS.length;
+  state.since = 0;
+}
+
+function toggle(button, key, on, off) {
+  button.addEventListener("click", () => {
+    const pressed = button.getAttribute("aria-pressed") !== "true";
+    button.setAttribute("aria-pressed", String(pressed));
+    state[key] = pressed ? on : off;
+  });
+}
+
+const pause = document.getElementById("pause");
+pause.setAttribute("aria-pressed", String(state.paused));
+toggle(pause, "paused", true, false);
+toggle(document.getElementById("slow"), "hold", 1.6, 0.42);
+document.getElementById("next").addEventListener("click", step);
+canvas.addEventListener("click", step);
+canvas.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") { e.preventDefault(); step(); }
+});
+
+document.fonts.load(`700 40px ${SANS}`, "A").catch(() => {}).finally(() => requestAnimationFrame(frame));
+</script>
+</body>
+</html>

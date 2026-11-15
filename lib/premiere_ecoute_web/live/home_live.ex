@@ -13,12 +13,18 @@ defmodule PremiereEcouteWeb.HomeLive do
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Wantlists
+  alias PremiereEcoute.Wrapped
+  alias PremiereEcouteCore.FeatureFlag
 
   embed_templates "home/*"
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket), do: :timer.send_interval(30_000, self(), :refresh)
+    if connected?(socket) do
+      :timer.send_interval(30_000, self(), :refresh)
+      PremiereEcoute.PubSub.subscribe(Wrapped.topic(socket.assigns.current_scope.user))
+    end
+
     {:ok, socket}
   end
 
@@ -67,6 +73,7 @@ defmodule PremiereEcouteWeb.HomeLive do
 
     socket
     |> assign(:current_user, current_user)
+    |> assign(:wrapped_recap, wrapped_recap(socket, user))
     |> assign(:sessions_per_streamer, sessions_per_streamer)
     |> assign(:upcoming_sessions, upcoming_sessions)
     |> assign(:my_sessions, my_sessions)
@@ -82,6 +89,7 @@ defmodule PremiereEcouteWeb.HomeLive do
   def handle_params(_params, _url, %{assigns: %{current_scope: %{user: user}}} = socket) do
     socket
     |> assign(:current_user, User.preload(user))
+    |> assign(:wrapped_recap, wrapped_recap(socket, user))
     |> assign(
       current_session: Sessions.current_session(user),
       listening_sessions: Sessions.stopped_sessions(user),
@@ -94,7 +102,24 @@ defmodule PremiereEcouteWeb.HomeLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  # Ensures the Wrapped of the user is being computed, then returns it when it is ready and still promoted.
+  defp wrapped_recap(socket, user) do
+    if FeatureFlag.enabled?(:wrapped, for: user) and connected?(socket), do: Wrapped.ensure_recap(user)
+
+    promoted_recap(user)
+  end
+
+  defp promoted_recap(user) do
+    if FeatureFlag.enabled?(:wrapped, for: user) do
+      with %{} = recap <- Wrapped.available_recap(user), true <- Wrapped.promoted?(recap), do: recap
+    end
+  end
+
   @impl true
+  def handle_info({:wrapped_computed, _recap}, %{assigns: %{current_scope: %{user: user}}} = socket) do
+    {:noreply, assign(socket, :wrapped_recap, promoted_recap(user))}
+  end
+
   def handle_info(:refresh, %{assigns: %{current_scope: %{user: user}}} = socket) do
     {:noreply, assign(socket, next_radio: Radio.next_in?(user.id), last_radios: Radio.last_tracks(user.id))}
   end

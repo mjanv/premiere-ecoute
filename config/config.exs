@@ -157,7 +157,8 @@ config :premiere_ecoute, Oban,
     discography: 1,
     emails: 1,
     podcasts: 1,
-    uploads: 1
+    uploads: 1,
+    wrapped: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
@@ -169,9 +170,16 @@ config :premiere_ecoute, Oban,
        {"0 0,12 * * *", PremiereEcoute.Radio.Workers.CleanupOldTracks},
        # {"0 2 * * *", PremiereEcoute.Radio.Workers.SyncRadioDiscographyWorker},
        {"0 3 * * *", PremiereEcoute.Notifications.Workers.NotificationPruner},
-       {"0 3 * * *", PremiereEcoute.Playlists.Automations.Workers.HistoryPrunerWorker}
+       {"0 3 * * *", PremiereEcoute.Playlists.Automations.Workers.HistoryPrunerWorker},
+       {"0 4 * * *", PremiereEcoute.Wrapped.Workers.ScheduleRecaps}
      ]}
   ]
+
+# sound: play Deezer 30 s previews behind the cards (keep off until Deezer's terms are checked)
+# min_albums: albums a viewer must have voted on during the year to get a Wrapped
+config :premiere_ecoute, PremiereEcoute.Wrapped,
+  sound: false,
+  min_albums: 3
 
 config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   disabled: false,

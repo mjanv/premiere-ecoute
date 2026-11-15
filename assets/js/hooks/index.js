@@ -29,6 +29,7 @@ import { AudioPlayer } from "./audio_player";
 import { YoutubePlayer } from "./youtube_player";
 import { ClipProgressBar } from "./clip_progress_bar";
 import { ClipVolumeBar } from "./clip_volume_bar";
+import { WrappedRenders } from "../wrapped";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -61,5 +62,6 @@ export const Hooks = {
   AudioPlayer: AudioPlayer,
   YoutubePlayer: YoutubePlayer,
   ClipProgressBar: ClipProgressBar,
-  ClipVolumeBar: ClipVolumeBar
+  ClipVolumeBar: ClipVolumeBar,
+  ...WrappedRenders
 };

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Holo disc</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; font-family: system-ui, sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  form { position: fixed; top: 0; left: 0; right: 0; display: flex; gap: 8px; justify-content: center; padding: 16px; pointer-events: none; }
+  button { pointer-events: auto; padding: 10px 14px; border-radius: 999px; border: 1px solid #ffffff40; background: #00000060; color: #ffffffc0; font: 600 12px/1 inherit; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .error { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #ffffffb0; }
+</style>
+</head>
+<body>
+  <canvas id="gl" role="img" aria-label="A disc made of small dots, with slow iridescent bands of red, violet, blue and teal light. Moving the pointer tilts the light."></canvas>
+  <form id="controls">
+    <button type="button" id="pause" aria-pressed="false">Pause</button>
+  </form>
+
+<script>
+const VERT = `#version 300 es
+in vec2 position;
+void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+
+// A disc of small square dots. Underneath is a smooth picture of bent bands of
+// light, coloured like a hologram: the hue runs through the spectrum across
+// the bands, with thin bright streaks where they fold. Each dot takes its
+// colour from the picture and its size from the brightness, and the dimmest
+// ones drop out in a dither pattern, so the disc fades into scattered dots.
+const FRAG = `#version 300 es
+precision highp float;
+out vec4 outColor;
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec2 uTilt;
+
+const float DOTS = 150.0;
+const float RADIUS = 0.3;
+
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float soft(vec2 p) { return noise(p) * 0.65 + noise(p * 2.07 + 5.1) * 0.35; }
+
+float bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+float bayer4(vec2 a) { return bayer2(0.5 * a) * 0.25 + bayer2(a); }
+float bayer8(vec2 a) { return bayer4(0.5 * a) * 0.25 + bayer2(a); }
+
+vec3 spectrum(float h) {
+  vec3 c = 0.5 + 0.5 * cos(6.2831853 * (h + vec3(0.0, 0.36, 0.66)));
+  return c * vec3(0.95, 0.8, 1.15);
+}
+
+void main() {
+  float scale = min(uRes.x, uRes.y);
+  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / scale;
+  float unit = 1.0 / DOTS;
+  vec2 cell = floor(p / unit);
+  vec2 c = (cell + 0.5) * unit;
+  float r = length(c);
+  if (r > RADIUS) { outColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+
+  float t = uTime;
+  vec2 q = c / RADIUS;
+  float a = -0.28 + uTilt.x * 0.5;
+  q = mat2(cos(a), -sin(a), sin(a), cos(a)) * q;
+  q.y += 0.3 * sin(q.x * 1.5 + t * 0.25) + 0.42 * (soft(q * 0.9 + vec2(t * 0.06, 2.0)) - 0.5);
+  float bend = soft(q * vec2(0.7, 1.2) + vec2(-t * 0.05, 7.0));
+  float band = q.y * 1.25 + bend * 1.3 + uTilt.y * 0.6 + t * 0.03;
+
+  // Thin bright streaks sit where the band coordinate crosses whole numbers.
+  float fold = abs(fract(band * 0.8) - 0.5) * 2.0;
+  float streak = pow(1.0 - fold, 44.0);
+  float glow = pow(1.0 - fold, 3.2);
+
+  // Uneven lighting: parts of the disc fall into shadow.
+  float light = smoothstep(0.22, 0.72, soft(q * 0.8 + vec2(t * 0.045, 11.0) + uTilt * 0.6));
+  float rim = smoothstep(1.0, 0.72, r / RADIUS);
+  float lum = (0.13 + glow * 0.34 + streak * 1.25) * mix(0.2, 1.0, light) * mix(0.55, 1.0, rim);
+
+  // The hue only swings between teal, blue, violet and red, and stays muted.
+  float hue = 0.25 + 0.2 * sin(band * 2.2 + bend * 2.0) + 0.08 * sin(q.x * 1.7 - t * 0.05);
+  vec3 col = spectrum(hue);
+  col = mix(vec3(dot(col, vec3(0.3, 0.5, 0.2))), col, 0.62 + 0.38 * glow);
+  col = mix(col, vec3(1.0), clamp(streak * 0.9, 0.0, 1.0));
+  col *= 0.22 + lum * 1.25;
+
+  float on = step(bayer8(cell) * 0.2 + 0.02, lum);
+  float size = clamp(0.35 + sqrt(lum) * 0.75, 0.0, 0.96);
+  vec2 f = abs(fract(p / unit) - 0.5);
+  float dot = step(max(f.x, f.y), size * 0.5);
+  outColor = vec4(col * on * dot, 1.0);
+}`;
+
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const query = new URLSearchParams(location.search);
+const state = { paused: reduced, frozen: query.has("time") ? Number(query.get("time")) : null, clock: 4, last: 0, tilt: [0, 0], target: [0, 0] };
+let uniforms = {};
+
+function fail(message) {
+  const p = document.createElement("p");
+  p.className = "error";
+  p.textContent = message;
+  document.body.replaceChildren(p);
+}
+
+function compile(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+
+function setup() {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const position = gl.getAttribLocation(program, "position");
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  for (const name of ["uRes", "uTime", "uTilt"]) uniforms[name] = gl.getUniformLocation(program, name);
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - state.last) / 1000 || 0);
+  state.last = now;
+  if (!gl.isContextLost()) {
+    if (!state.paused) state.clock += dt;
+    for (const i of [0, 1]) state.tilt[i] += (state.target[i] - state.tilt[i]) * Math.min(1, dt * 3);
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(2, Math.round(canvas.clientWidth * ratio));
+    const h = Math.max(2, Math.round(canvas.clientHeight * ratio));
+    if (w !== canvas.width || h !== canvas.height) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+    gl.uniform2f(uniforms.uRes, w, h);
+    gl.uniform1f(uniforms.uTime, state.frozen ?? state.clock);
+    gl.uniform2f(uniforms.uTilt, state.tilt[0], state.tilt[1]);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  requestAnimationFrame(frame);
+}
+
+function start() {
+  if (!gl) return fail("WebGL 2 is not available in this browser.");
+  canvas.addEventListener("webglcontextlost", (e) => e.preventDefault());
+  canvas.addEventListener("webglcontextrestored", () => setup());
+  try {
+    setup();
+  } catch (error) {
+    if (!gl.isContextLost()) return fail(String(error.message || error));
+  }
+  // Moving the pointer tilts the light, like turning a hologram in the hand.
+  canvas.addEventListener("pointermove", (e) => {
+    state.target = [(e.clientX / window.innerWidth - 0.5) * 2, (0.5 - e.clientY / window.innerHeight) * 2];
+  });
+  canvas.addEventListener("pointerleave", () => { state.target = [0, 0]; });
+  const pause = document.getElementById("pause");
+  pause.setAttribute("aria-pressed", String(state.paused));
+  pause.addEventListener("click", () => {
+    state.paused = !state.paused;
+    pause.setAttribute("aria-pressed", String(state.paused));
+  });
+  document.getElementById("controls").addEventListener("submit", (e) => e.preventDefault());
+  requestAnimationFrame(frame);
+}
+
+start();
+</script>
+</body>
+</html>

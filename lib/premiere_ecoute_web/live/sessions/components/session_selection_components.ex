@@ -1127,7 +1127,11 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   @spec interlude_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def interlude_toggle(assigns) do
     ~H"""
-    <form phx-change="set_interlude" class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
+    <form
+      id="interlude-form"
+      phx-change="set_interlude"
+      class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700"
+    >
       <button
         type="button"
         phx-click={JS.dispatch("click", to: "#interlude-checkbox")}

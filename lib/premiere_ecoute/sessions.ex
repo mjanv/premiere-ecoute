@@ -78,6 +78,9 @@ defmodule PremiereEcoute.Sessions do
   defdelegate submit_post_album_vote(session, viewer, value), to: Scores.PostSessionVote, as: :submit_album
 
   # Retrospective
+  defdelegate get_viewer_votes_by_year(user, year, source), to: Retrospective.History
+  defdelegate list_voter_ids(year), to: Retrospective.History
+  defdelegate get_reports(session_ids), to: Retrospective.Report, as: :list_for_sessions
   defdelegate get_albums_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_singles_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_playlists_by_period(user, period, opts \\ %{}), to: Retrospective.History

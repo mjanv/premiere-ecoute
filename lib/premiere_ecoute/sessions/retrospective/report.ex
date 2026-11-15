@@ -73,6 +73,10 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
     |> foreign_key_constraint(:session_id)
   end
 
+  @doc "Returns the reports of the given sessions."
+  @spec list_for_sessions([integer()]) :: [t()]
+  def list_for_sessions(session_ids), do: Repo.all(from(r in __MODULE__, where: r.session_id in ^session_ids))
+
   @doc """
   Generates a comprehensive report for a listening session.
 
