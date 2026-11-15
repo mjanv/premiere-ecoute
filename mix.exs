@@ -159,7 +159,8 @@ defmodule PremiereEcoute.MixProject do
       # Tests
       {:hammox, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
-      {:lazy_html, "~> 0.1", only: :test},
+      # Pinned below 0.1.14: it needs fine ~> 0.2, which EXLA 1.0.0 does not compile against (no `try_decode`)
+      {:lazy_html, "0.1.13", only: :test},
       {:bypass, "~> 2.1", only: :test},
       {:mix_test_watch, "~> 1.4", only: :test, runtime: false},
       # Development
