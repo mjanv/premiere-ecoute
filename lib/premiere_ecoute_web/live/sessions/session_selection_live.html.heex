@@ -36,6 +36,8 @@
           selected_album={@selected_album}
           search_albums={@search_albums}
           search_form={@search_form}
+          interlude_skip={@interlude_skip}
+          interlude_threshold_s={@interlude_threshold_s}
         />
         <.random_album_modal
           :if={@show_random_modal}
@@ -73,7 +75,14 @@
             <div class="ml-16 space-y-2">
               <.autostart_toggle autostart={@autostart} />
               <%= if @source_type in ["album", "playlist"] do %>
-                <.interlude_toggle interlude_skip={@interlude_skip} interlude_threshold_s={@interlude_threshold_s} />
+                <.interlude_toggle
+                  interlude_skip={@interlude_skip}
+                  interlude_threshold_s={@interlude_threshold_s}
+                  tracks={
+                    if @source_type == "album" && @selected_album.ok? && @selected_album.result,
+                      do: @selected_album.result.tracks
+                  }
+                />
               <% end %>
               <.album_vote_toggle :if={@source_type == "album"} album_vote={@album_vote} />
               <%= if @source_type == "track" do %>

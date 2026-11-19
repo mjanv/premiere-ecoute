@@ -181,6 +181,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :selected_album, :any, required: true
   attr :search_albums, :any, required: true
   attr :search_form, :any, required: true
+  attr :interlude_skip, :boolean, default: false
+  attr :interlude_threshold_s, :integer, default: 45
 
   @spec album_step(map()) :: Phoenix.LiveView.Rendered.t()
   def album_step(assigns) do
@@ -354,14 +356,20 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
             <div class="relative z-10 p-6 border-t border-white/10">
               <div class="space-y-1 max-h-64 overflow-y-auto">
                 <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
+                  <% skipped = interlude?(track, @interlude_skip, @interlude_threshold_s) %>
                   <div class="rounded-lg p-3 hover:bg-white/5 transition-colors" style="background-color: rgba(0, 0, 0, 0.3);">
-                    <div class="flex items-center space-x-3">
+                    <div class={["flex items-center space-x-3", skipped && "opacity-50"]}>
                       <span class="text-sm text-gray-300 w-6 text-right">{index + 1}</span>
                       <div class="flex items-center gap-1.5 flex-1 min-w-0">
                         <h5 class="font-medium text-white truncate text-sm">{track.name}</h5>
                         <%= if Map.get(track, :explicit) do %>
                           <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-bold bg-gray-500 text-white shrink-0">
                             E
+                          </span>
+                        <% end %>
+                        <%= if skipped do %>
+                          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-600/30 text-purple-200 shrink-0">
+                            {gettext("no vote")}
                           </span>
                         <% end %>
                       </div>
@@ -1123,9 +1131,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   @doc "Renders the interlude skip toggle with optional duration input"
   attr :interlude_skip, :boolean, required: true
   attr :interlude_threshold_s, :integer, required: true
+  attr :tracks, :list, default: nil, doc: "Album tracks, used to preview how many tracks the threshold affects"
 
   @spec interlude_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def interlude_toggle(assigns) do
+    assigns = assign(assigns, :skipped_count, skipped_count(assigns))
+
     ~H"""
     <form
       id="interlude-form"
@@ -1149,6 +1160,9 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
       <div class="flex-1">
         <label class="text-sm font-medium text-gray-200">{gettext("Skip interludes")}</label>
         <p class="text-xs text-gray-400 mt-0.5">{gettext("Skip voting for tracks shorter than the specified duration")}</p>
+        <p :if={@skipped_count} class="text-xs text-purple-300 mt-1">
+          {ngettext("%{count} track will not be voted on", "%{count} tracks will not be voted on", @skipped_count)}
+        </p>
       </div>
       <div class={[
         "flex items-center space-x-2 transition-opacity",
@@ -1167,6 +1181,16 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     </form>
     """
   end
+
+  # Number of tracks shorter than the threshold (same rule as the session worker), nil when not applicable.
+  defp skipped_count(%{interlude_skip: true, tracks: tracks, interlude_threshold_s: s}) when is_list(tracks) do
+    Enum.count(tracks, &interlude?(&1, true, s))
+  end
+
+  defp skipped_count(_), do: nil
+
+  defp interlude?(track, true, threshold_s), do: (track.duration_ms || 0) < threshold_s * 1000
+  defp interlude?(_track, _skip, _threshold_s), do: false
 
   @doc "Renders the submitter name toggle with optional name input, for track sessions."
   attr :submitter_enabled, :boolean, required: true
