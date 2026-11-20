@@ -63,7 +63,7 @@ defmodule PremiereEcouteCore.Duration do
   @doc """
   Displays relative time from now to a past datetime.
 
-  Returns human-readable relative time like "Just now", "5 min ago", "3 hours ago", or "2 days ago". Falls back to "--" for invalid input.
+  Returns human-readable relative time like "Just now", "5 min ago", "3 hours ago", or "2 days ago". Falls back to "-" for invalid input.
   """
   @spec ago(DateTime.t() | any()) :: String.t()
   def ago(%DateTime{} = datetime) do
@@ -77,7 +77,7 @@ defmodule PremiereEcouteCore.Duration do
     end
   end
 
-  def ago(_), do: "--"
+  def ago(_), do: "-"
 
   defp pad(value), do: String.pad_leading(Integer.to_string(value), 2, "0")
 end

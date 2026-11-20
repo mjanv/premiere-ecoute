@@ -55,7 +55,7 @@ defmodule PremiereEcouteCore.DurationTest do
     end
 
     test "return an empty timer for undefined values" do
-      assert Duration.ago(nil) == "--"
+      assert Duration.ago(nil) == "-"
     end
 
     test "return a just timer when the datetime is less than one minute away", %{now: now} do

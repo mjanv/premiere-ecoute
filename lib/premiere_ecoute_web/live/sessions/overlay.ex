@@ -40,19 +40,62 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_label(_user, :votes), do: "Votes"
   defp score_label(_user, :player), do: "Playing"
 
-  # Longer labels get a smaller font so the vertical text fits the strip.
-  defp label_size(:viewer), do: "28vh"
-  defp label_size(:streamer), do: "14vh"
-  defp label_size(:votes), do: "24vh"
-  defp label_size(:player), do: "16vh"
+  # Big score value drawn in an SVG that scales to fill the score box.
+  attr :id, :string, required: true
+  attr :value, :string, required: true
+  attr :color, :string, required: true
+
+  defp big_value(assigns) do
+    assigns = assign(assigns, :length, assigns.value |> String.graphemes() |> Enum.map(&glyph_width/1) |> Enum.sum())
+
+    ~H"""
+    <svg
+      id={@id}
+      phx-hook="FitSvgText"
+      data-fill="0.62"
+      viewBox={"0 0 #{@length + 40} 112"}
+      preserveAspectRatio="xMidYMid meet"
+      style="width: 100%; height: 100%; display: block;"
+    >
+      <g>
+        <text
+          x={(@length + 40) / 2}
+          y="92"
+          text-anchor="middle"
+          textLength={@length}
+          lengthAdjust="spacingAndGlyphs"
+          font-size="100"
+          font-family="Overlay"
+          font-weight="700"
+          fill={@color}
+          stroke={@color}
+          stroke-width="5"
+          stroke-linejoin="round"
+        >
+          {@value}
+        </text>
+      </g>
+    </svg>
+    """
+  end
+
+  defp glyph_width("."), do: 30
+  defp glyph_width("-"), do: 42
+  defp glyph_width(_), do: 58
+
+  # Vertical label drawn in an SVG: the text is stretched to `label_length/1` units
+  # and the SVG scales to the strip, so the label fills it with any font.
+  defp label_text(user, score), do: user |> score_label(score) |> String.upcase()
+
+  defp label_length(user, score), do: String.length(score_label(user, score)) * 52
 
   # Height shared by the track counter and the progress bar, so they line up.
-  defp bar_height, do: "12vh"
+  defp bar_height, do: "18vh"
 
   defp track_counter(%AsyncResult{ok?: true, result: %{item: %{track_number: n, album: %{total_tracks: t}}}}),
     do: "#{n}/#{t}"
 
-  defp track_counter(_progress), do: "-/-"
+  defp track_counter(_progress), do: "14/34"
 
   @doc """
   Returns the widget background color for a vote state.

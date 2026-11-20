@@ -28,6 +28,7 @@ import { NoteHud } from "./note_hud";
 import { AudioPlayer } from "./audio_player";
 import { YoutubePlayer } from "./youtube_player";
 import { ClipProgressBar } from "./clip_progress_bar";
+import { FitSvgText } from "./fit_svg_text";
 import { ClipVolumeBar } from "./clip_volume_bar";
 import { WrappedRenders } from "../wrapped";
 
@@ -62,6 +63,7 @@ export const Hooks = {
   AudioPlayer: AudioPlayer,
   YoutubePlayer: YoutubePlayer,
   ClipProgressBar: ClipProgressBar,
+  FitSvgText: FitSvgText,
   ClipVolumeBar: ClipVolumeBar,
   ...WrappedRenders
 };

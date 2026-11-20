@@ -1,0 +1,11 @@
+/*
+  Font of the OBS overlay widgets. Served from our own static files so the
+  rendering never depends on the fonts installed where OBS runs.
+*/
+@font-face {
+  font-family: "Overlay";
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url("/fonts/BricolageGrotesque/BricolageGrotesque-700.woff2") format("woff2");
+}
