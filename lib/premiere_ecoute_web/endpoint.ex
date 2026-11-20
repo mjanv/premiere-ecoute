@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Endpoint do
     only: PremiereEcouteWeb.static_paths()
 
   if Code.ensure_loaded?(Tidewave) do
-    plug Tidewave
+    plug Tidewave, toolbar: false
   end
 
   if code_reloading? do
