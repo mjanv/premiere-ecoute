@@ -7400,7 +7400,7 @@ msgstr "Votare per l'intero album"
 msgid "Votes are open for the whole album! One vote each, your first vote counts."
 msgstr "Le votazioni sono aperte per tutto l'album! Un voto a testa, conta solo il tuo primo voto."
 
-#: lib/premiere_ecoute_web/live/wrapped/wrapped_live.ex:66
+#: lib/premiere_ecoute_web/live/wrapped/wrapped_live.ex:49
 #, elixir-autogen, elixir-format
 msgid "%{name}'s Wrapped %{year}"
 msgstr "Il Wrapped %{year} di %{name}"
@@ -7796,7 +7796,7 @@ msgstr "Un anno di album ascoltati in diretta con la chat su Premiere Ecoute"
 msgid "Here is what you listened to, what you loved, and what you bring home."
 msgstr "Ecco cosa hai ascoltato, cosa hai amato e cosa ti porti a casa."
 
-#: lib/premiere_ecoute_web/live/wrapped/wrapped_live.ex:102
+#: lib/premiere_ecoute_web/live/wrapped/wrapped_live.ex:85
 #, elixir-autogen, elixir-format
 msgid "Wrapped %{year} preview"
 msgstr "Anteprima del Wrapped %{year}"
