@@ -95,7 +95,7 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp track_counter(%AsyncResult{ok?: true, result: %{item: %{track_number: n, album: %{total_tracks: t}}}}),
     do: "#{n}/#{t}"
 
-  defp track_counter(_progress), do: "14/34"
+  defp track_counter(_progress), do: "-/-"
 
   @doc """
   Returns the widget background color for a vote state.

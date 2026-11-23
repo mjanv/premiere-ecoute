@@ -5,7 +5,7 @@ description: Production debugging session for Premiere Ecoute. Pull live signals
 
 # Production Debugging
 
-> SSH access and restart commands: see `docs/deployment.md`.
+> SSH access and restart commands: see `docs/guides/deployment.md`.
 
 ## Available tools
 
@@ -60,7 +60,7 @@ mcp__sentry__search_issues(organizationSlug="maxime-janvier", projectSlug="premi
 **Grafana** — 5xx error rate over last 30 min:
 ```
 mcp__grafana__query_prometheus(
-  datasourceUid="grafanacloud-mjanv-prom",
+  datasourceUid="grafanacloud-prom",
   expr="sum(rate(premiere_ecoute_prom_ex_phoenix_http_requests_total{status=~\"5..\"}[5m])) / sum(rate(premiere_ecoute_prom_ex_phoenix_http_requests_total[5m])) * 100",
   start="now-30m", end="now", step="1m"
 )
