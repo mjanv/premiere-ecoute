@@ -50,7 +50,7 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp swap_content(summary, _state, score), do: score_value(summary, score)
 
   # Scores at or above this switch the overlay to the "great score" liquid paint.
-  @great_score 9.5
+  @great_score 9.75
   # In great mode every overlay colour is painted white; the LiquidField layer then
   # multiplies the whole widget by a flowing gradient, so white turns into the gradient
   # and black stays black.

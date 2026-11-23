@@ -43,7 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
     test "paints the widget white under the liquid and film grain layers", %{conn: conn, user: user} do
       view = overlay(conn, user, "viewer")
       send(view.pid, :vote_open)
-      scores(view, 9.7)
+      scores(view, 9.8)
 
       assert has_element?(view, "#overlay-liquid[phx-hook='LiquidField'][style*='mix-blend-mode: multiply']")
       assert has_element?(view, "#overlay-film-grain[phx-hook='FilmGrain'][style*='mix-blend-mode: screen']")
@@ -54,7 +54,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
     test "hides the regular textures but keeps them mounted", %{conn: conn, user: user} do
       view = overlay(conn, user, "viewer")
       send(view.pid, :vote_open)
-      scores(view, 9.7)
+      scores(view, 9.8)
 
       assert has_element?(view, "div[style*='visibility: hidden'] #overlay-texture")
       assert has_element?(view, "div[style*='visibility: hidden'] #overlay-grain")
@@ -63,7 +63,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
     test "keeps the user's own colours for the textures", %{conn: conn, user: user} do
       view = overlay(conn, user, "viewer")
       send(view.pid, :vote_open)
-      scores(view, 9.7)
+      scores(view, 9.8)
 
       assert has_element?(view, "[data-overlay-root][data-primary='#76ce66'][data-secondary='#ff2d55']")
     end
@@ -71,7 +71,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
     test "goes back to the regular state when the score drops", %{conn: conn, user: user} do
       view = overlay(conn, user, "viewer")
       send(view.pid, :vote_open)
-      scores(view, 9.7)
+      scores(view, 9.8)
       scores(view, 9.1)
 
       refute has_element?(view, "#overlay-liquid")
@@ -82,7 +82,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
     test "ends when the vote closes", %{conn: conn, user: user} do
       view = overlay(conn, user, "viewer")
       send(view.pid, :vote_open)
-      scores(view, 9.7)
+      scores(view, 9.8)
       send(view.pid, :vote_close)
       render(view)
 
@@ -132,7 +132,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
     test "every hook used by the overlay is registered", %{conn: conn, user: user} do
       view = overlay(conn, user, "viewer")
       send(view.pid, :vote_open)
-      html = scores(view, 9.7)
+      html = scores(view, 9.8)
       registered = File.read!("assets/js/hooks/index.js")
 
       hooks =
