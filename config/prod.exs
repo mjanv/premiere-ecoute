@@ -9,11 +9,11 @@ config :premiere_ecoute, PremiereEcouteWeb.Images.ImageProxyController, cache_di
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   ssl: false,
-  pool_size: 2
+  pool_size: 10
 
 config :premiere_ecoute, PremiereEcoute.Events.Store,
   ssl: false,
-  pool_size: 2
+  pool_size: 5
 
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 

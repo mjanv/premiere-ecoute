@@ -34,8 +34,8 @@ SyslogIdentifier=premiere-ecoute
 
 # Resource limits to prevent OOM issues on 1GB droplet.
 # Allocate ~600MB for Phoenix app (remaining ~400MB for PostgreSQL, Traefik, OS)
-MemoryMax=600M
-MemoryHigh=500M
+MemoryMax=800M
+MemoryHigh=700M
 # Allow some swap usage for occasional spikes
 MemorySwapMax=200M
 
