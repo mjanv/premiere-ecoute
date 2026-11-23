@@ -28,6 +28,12 @@ import { NoteHud } from "./note_hud";
 import { AudioPlayer } from "./audio_player";
 import { YoutubePlayer } from "./youtube_player";
 import { ClipProgressBar } from "./clip_progress_bar";
+import { DitherSwap } from "./dither_swap";
+import { PaperTexture } from "./paper_texture";
+import { HalftoneGrain } from "./halftone_grain";
+import { PixelProgress } from "./pixel_progress";
+import { LiquidField } from "./liquid_field";
+import { FilmGrain } from "./film_grain";
 import { FitSvgText } from "./fit_svg_text";
 import { ClipVolumeBar } from "./clip_volume_bar";
 import { WrappedRenders } from "../wrapped";
@@ -63,6 +69,12 @@ export const Hooks = {
   AudioPlayer: AudioPlayer,
   YoutubePlayer: YoutubePlayer,
   ClipProgressBar: ClipProgressBar,
+  DitherSwap: DitherSwap,
+  PaperTexture: PaperTexture,
+  HalftoneGrain: HalftoneGrain,
+  PixelProgress: PixelProgress,
+  LiquidField: LiquidField,
+  FilmGrain: FilmGrain,
   FitSvgText: FitSvgText,
   ClipVolumeBar: ClipVolumeBar,
   ...WrappedRenders

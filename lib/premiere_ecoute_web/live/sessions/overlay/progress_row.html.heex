@@ -1,2 +1,16 @@
-<div style={"height: #{bar_height()}; flex-shrink: 0; box-sizing: border-box; border: 1.5vh solid #{@color}; border-left: 0; border-top: 0; background: linear-gradient(to right, #{bar_played_color(@widget_state, @color, @secondary)} 0%, #{bar_played_color(@widget_state, @color, @secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color, @secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color, @secondary)} 100%);"}>
+<%!-- Pixel-cell progress bar drawn by the PixelProgress hook; the background is the
+     remaining colour so the bar reads right before the hook draws. --%>
+<div
+  id="overlay-progress"
+  phx-hook="PixelProgress"
+  data-grain-exclude
+  data-percent={@percent}
+  data-shiny={@great}
+  data-played={bar_played_color(@widget_state, @color, @secondary)}
+  data-remaining={remaining_color(@great, @widget_state, @color, @secondary)}
+  style={"position: relative; height: #{bar_height()}; flex-shrink: 0; box-sizing: border-box; border: 1.5vh solid #{@color}; border-left: 0; border-top: 0; background: #{remaining_color(@great, @widget_state, @color, @secondary)};"}
+>
+  <div id="overlay-progress-cells" phx-update="ignore" style="position: absolute; inset: 0;">
+    <canvas style="width: 100%; height: 100%; display: block;"></canvas>
+  </div>
 </div>

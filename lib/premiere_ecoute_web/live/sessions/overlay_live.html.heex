@@ -1,51 +1,79 @@
-<div style={"background: #{widget_bg(@widget_state, @color_primary, @color_secondary)}; border-radius: 0px; #{overlay_size(@score)}display: flex; align-items: center; justify-content: center; color: #{widget_text_color(@widget_state, @color_primary, @color_secondary)}; line-height: 1; position: relative;"}>
-  <%= if @score in [:player] do %>
-    <.player
-      progress={@progress}
-      percent={@percent}
-      color={@color_primary}
-      secondary={@color_secondary}
-      summary={@summary}
-      widget_state={@widget_state}
-      score={@score}
-      user={@user}
-      text_color={widget_text_color(@widget_state, @color_primary, @color_secondary)}
-    />
-  <% end %>
-  <%= if @score in [:viewer, :streamer] do %>
-    <.single
-      progress={@progress}
-      percent={@percent}
-      color={@color_primary}
-      secondary={@color_secondary}
-      summary={@summary}
-      widget_state={@widget_state}
-      score={@score}
-      user={@user}
-      text_color={widget_text_color(@widget_state, @color_primary, @color_secondary)}
-    />
-  <% end %>
-  <%= if @score in [:both] do %>
-    <.double
-      progress={@progress}
-      percent={@percent}
-      color={@color_primary}
-      secondary={@color_secondary}
-      summary={@summary}
-      widget_state={@widget_state}
-      score={@score}
-      user={@user}
-      text_color={widget_text_color(@widget_state, @color_primary, @color_secondary)}
-    />
-  <% end %>
-  <%= if @score in [:votes] do %>
-    <.vote_bar
-      vote_distribution={@vote_distribution}
-      color={@color_primary}
-      user={@user}
-      widget_state={@widget_state}
-      score={@score}
-      text_color={widget_text_color(@widget_state, @color_primary, @color_secondary)}
-    />
-  <% end %>
-</div>
+<.paint
+  :let={paint}
+  primary={@color_primary}
+  secondary={@color_secondary}
+  summary={@summary}
+  score={@score}
+  widget_state={@widget_state}
+>
+  <%!-- data-primary/data-secondary keep the user's own colours for the textures, whatever is painted. --%>
+  <div
+    data-overlay-root
+    data-primary={@color_primary}
+    data-secondary={@color_secondary}
+    style={"background: #{widget_bg(@widget_state, paint.primary, paint.secondary)}; border-radius: 0px; #{overlay_size(@score)}display: flex; align-items: center; justify-content: center; color: #{paint.text}; line-height: 1; position: relative;"}
+  >
+    <%!-- Great mode: flowing gradient multiplied over the white-painted widget, plus film grain. --%>
+    <.layer :if={paint.great} id="overlay-liquid" hook="LiquidField" blend="multiply" />
+    <.layer :if={paint.great} id="overlay-film-grain" hook="FilmGrain" blend="screen" />
+    <%!-- Regular textures, kept mounted and hidden in great mode. The wrapper must not create a
+         stacking context (no z-index, no opacity), or the layers would only blend inside it. --%>
+    <div style={"position: absolute; inset: 0; pointer-events: none; visibility: #{if paint.great, do: "hidden", else: "visible"};"}>
+      <.layer id="overlay-texture" hook="PaperTexture" blend="lighten" />
+      <.layer id="overlay-grain" hook="HalftoneGrain" blend="multiply" />
+    </div>
+
+    <%= if @score in [:player] do %>
+      <.player
+        progress={@progress}
+        percent={@percent}
+        color={paint.primary}
+        secondary={paint.secondary}
+        great={paint.great}
+        summary={@summary}
+        widget_state={@widget_state}
+        score={@score}
+        user={@user}
+        text_color={paint.text}
+      />
+    <% end %>
+    <%= if @score in [:viewer, :streamer] do %>
+      <.single
+        progress={@progress}
+        percent={@percent}
+        color={paint.primary}
+        secondary={paint.secondary}
+        great={paint.great}
+        summary={@summary}
+        widget_state={@widget_state}
+        score={@score}
+        user={@user}
+        text_color={paint.text}
+      />
+    <% end %>
+    <%= if @score in [:both] do %>
+      <.double
+        progress={@progress}
+        percent={@percent}
+        color={paint.primary}
+        secondary={paint.secondary}
+        great={paint.great}
+        summary={@summary}
+        widget_state={@widget_state}
+        score={@score}
+        user={@user}
+        text_color={paint.text}
+      />
+    <% end %>
+    <%= if @score in [:votes] do %>
+      <.vote_bar
+        vote_distribution={@vote_distribution}
+        color={paint.primary}
+        user={@user}
+        widget_state={@widget_state}
+        score={@score}
+        text_color={paint.text}
+      />
+    <% end %>
+  </div>
+</.paint>

@@ -35,6 +35,99 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_nil?(summary, :viewer), do: is_nil(summary["viewer_score"] || Map.get(summary, :viewer_score))
   defp score_nil?(summary, :streamer), do: is_nil(summary["streamer_score"] || Map.get(summary, :streamer_score))
 
+  # Identifies what the score box shows, so the DitherSwap hook only animates real swaps.
+  defp swap_key(%AsyncResult{ok?: true, result: summary}, state, score),
+    do: "#{state}:#{swap_content(summary, state, score)}"
+
+  defp swap_key(_summary, state, _score), do: "#{state}:loading"
+
+  defp swap_content(_summary, :closed, _score), do: "lock"
+
+  defp swap_content(summary, :open, score) do
+    if score_nil?(summary, score), do: "unlock", else: score_value(summary, score)
+  end
+
+  defp swap_content(summary, _state, score), do: score_value(summary, score)
+
+  # Scores at or above this switch the overlay to the "great score" liquid paint.
+  @great_score 9.5
+  # In great mode every overlay colour is painted white; the LiquidField layer then
+  # multiplies the whole widget by a flowing gradient, so white turns into the gradient
+  # and black stays black.
+  @great_paint "#ffffff"
+  # Remaining part of the progress bar in great mode: a mid grey, so it reads as a
+  # darker tone of the gradient next to the played cells.
+  @great_remaining "#5c5c5c"
+
+  @doc """
+  Whether the shown score is a great one (at least #{@great_score}).
+  """
+  @spec great?(AsyncResult.t(), atom()) :: boolean()
+  def great?(%AsyncResult{ok?: true, result: summary}, score) when is_map(summary) and score in [:viewer, :streamer],
+    do: great_score?(summary, score)
+
+  def great?(%AsyncResult{ok?: true, result: summary}, :both) when is_map(summary),
+    do: great_score?(summary, :viewer) or great_score?(summary, :streamer)
+
+  def great?(_summary, _score), do: false
+
+  @doc """
+  Resolves the colours the overlay paints with and yields them to its block as
+  `%{great: boolean, primary: colour, secondary: colour, text: colour}`: the user's
+  colours, or white in great mode.
+  """
+  attr :primary, :string, required: true
+  attr :secondary, :string, required: true
+  attr :summary, AsyncResult, required: true
+  attr :score, :atom, required: true
+  attr :widget_state, :atom, required: true
+  slot :inner_block, required: true
+
+  def paint(assigns) do
+    great = great?(assigns.summary, assigns.score)
+    primary = if great, do: @great_paint, else: assigns.primary
+    secondary = if great, do: @great_paint, else: assigns.secondary
+
+    assigns =
+      assign(assigns, :paint, %{
+        great: great,
+        primary: primary,
+        secondary: secondary,
+        text: widget_text_color(assigns.widget_state, primary, secondary)
+      })
+
+    ~H"{render_slot(@inner_block, @paint)}"
+  end
+
+  @doc """
+  A full-widget canvas layer driven by a JS hook and blended over the widget.
+  """
+  attr :id, :string, required: true
+  attr :hook, :string, required: true
+  attr :blend, :string, required: true
+
+  def layer(assigns) do
+    ~H"""
+    <canvas
+      id={@id}
+      phx-hook={@hook}
+      phx-update="ignore"
+      aria-hidden="true"
+      style={"position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: #{@blend}; pointer-events: none; z-index: 2;"}
+    ></canvas>
+    """
+  end
+
+  defp remaining_color(true, _state, _c1, _c2), do: @great_remaining
+  defp remaining_color(false, state, c1, c2), do: bar_remaining_color(state, c1, c2)
+
+  defp great_score?(summary, score) do
+    case summary["#{score}_score"] || Map.get(summary, :"#{score}_score") do
+      value when is_number(value) -> value >= @great_score
+      _ -> false
+    end
+  end
+
   defp score_label(_user, :viewer), do: "Chat"
   defp score_label(_user, :streamer), do: "Streamer"
   defp score_label(_user, :votes), do: "Votes"
