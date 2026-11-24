@@ -133,7 +133,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     |> assign(:listening_session, session)
     |> assign(:widget_state, :closed)
     |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
-    |> push_event("stars_reset", %{})
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -225,6 +224,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     |> assign(:widget_state, widget_state)
     |> assign(:progress, AsyncResult.loading())
     |> assign(:percent, 0)
+    # The star field covers a whole session: a new session starts with an empty sky.
+    |> push_event("stars_reset", %{})
     |> then(fn socket -> {:noreply, socket} end)
   end
 

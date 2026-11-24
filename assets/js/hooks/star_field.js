@@ -1,9 +1,9 @@
 // Chat votes as a discreet night sky behind the session overlay. Every vote lights a
 // pixel star that flashes and fades (twinkle), then settles as a faint dot that stays
-// until the next track (constellation). Great votes cross the sky first as a shooting
+// for the whole session (constellation). Great votes cross the sky first as a shooting
 // star with a dithered trail along a slightly curved path, and settle where they land.
 // The server pushes "votes_cast" with values in 0..1 (vote position on the session's
-// scale) and "stars_reset" on a new track. Votes arrive in batches (up to 5, or after
+// scale) and "stars_reset" when a new session starts. Votes arrive in batches (up to 5, or after
 // 1 s), so each batch is spread over SPREAD ms.
 // Colours: low votes lean to the secondary colour, high votes to the primary (read
 // from the overlay root's data-primary/data-secondary). In great mode the liquid layer
@@ -25,7 +25,7 @@ const TRAVEL = [0.2, 0.4]; // distance crossed, as a share of the widget width
 const BEND = [0.1, 0.3]; // sideways bow of the path, as a share of its length (either side)
 const ENTRY = [0.25, 0.7]; // angle off straight inward at which a shooting star enters, in radians (either side)
 const BORDERS = ["top", "bottom", "left", "right"];
-const MAX_STARS = 1500; // oldest settled stars are dropped past this
+const MAX_STARS = 3000; // oldest settled stars are dropped past this
 
 const ease = (t) => 1 - Math.pow(1 - t, 2);
 
