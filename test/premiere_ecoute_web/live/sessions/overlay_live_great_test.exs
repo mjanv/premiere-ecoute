@@ -120,11 +120,20 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
       assert has_element?(view, "#score-box-viewer[phx-hook='DitherSwap'][data-key='open:unlock']")
 
       scores(view, 7.4)
-      assert has_element?(view, "#score-box-viewer[data-key='open:7.4']")
+      assert has_element?(view, "#score-box-viewer[data-key='open:score']")
 
       send(view.pid, :vote_close)
       render(view)
       assert has_element?(view, "#score-box-viewer[data-key='closed:lock']")
+    end
+
+    test "stays the same when the score value changes", %{conn: conn, user: user} do
+      view = overlay(conn, user, "viewer")
+      send(view.pid, :vote_open)
+      scores(view, 7.4)
+      scores(view, 8.1)
+
+      assert has_element?(view, "#score-box-viewer[data-key='open:score']")
     end
   end
 
@@ -143,6 +152,23 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveGreatTest do
 
       assert "LiquidField" in hooks
       for hook <- hooks, do: assert(registered =~ ~r/\b#{hook}: #{hook}\b/, "#{hook} is not registered")
+    end
+  end
+
+  describe "star field" do
+    test "renders the star layer behind the widget content", %{conn: conn, user: user} do
+      view = overlay(conn, user, "viewer")
+
+      assert has_element?(view, "#overlay-stars[phx-hook='StarField'][style*='z-index: -1']")
+      assert has_element?(view, "[data-overlay-root][style*='isolation: isolate']")
+    end
+
+    test "forwards cast votes to the star field", %{conn: conn, user: user} do
+      view = overlay(conn, user, "viewer")
+
+      send(view.pid, {:votes_cast, [0.2, 0.5, 1.0]})
+
+      assert_push_event(view, "votes_cast", %{values: [0.2, 0.5, 1.0]})
     end
   end
 end

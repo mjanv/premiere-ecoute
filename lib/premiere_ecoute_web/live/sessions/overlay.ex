@@ -35,7 +35,8 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_nil?(summary, :viewer), do: is_nil(summary["viewer_score"] || Map.get(summary, :viewer_score))
   defp score_nil?(summary, :streamer), do: is_nil(summary["streamer_score"] || Map.get(summary, :streamer_score))
 
-  # Identifies what the score box shows, so the DitherSwap hook only animates real swaps.
+  # Identifies what the score box shows, so the DitherSwap hook only animates real
+  # swaps: a change of vote state or of kind of content, never a new score value.
   defp swap_key(%AsyncResult{ok?: true, result: summary}, state, score),
     do: "#{state}:#{swap_content(summary, state, score)}"
 
@@ -44,13 +45,15 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp swap_content(_summary, :closed, _score), do: "lock"
 
   defp swap_content(summary, :open, score) do
-    if score_nil?(summary, score), do: "unlock", else: score_value(summary, score)
+    if score_nil?(summary, score), do: "unlock", else: score_kind(summary, score)
   end
 
-  defp swap_content(summary, _state, score), do: score_value(summary, score)
+  defp swap_content(summary, _state, score), do: score_kind(summary, score)
+
+  defp score_kind(summary, score), do: if(score_value(summary, score) == "-", do: "empty", else: "score")
 
   # Scores at or above this switch the overlay to the "great score" liquid paint.
-  @great_score 9.75
+  @great_score 9.5
   # In great mode every overlay colour is painted white; the LiquidField layer then
   # multiplies the whole widget by a flowing gradient, so white turns into the gradient
   # and black stays black.
@@ -100,11 +103,14 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   end
 
   @doc """
-  A full-widget canvas layer driven by a JS hook and blended over the widget.
+  A full-widget canvas layer driven by a JS hook and blended over the widget. With
+  `behind`, the layer sits under the widget content instead (over the root background,
+  under borders, text and progress bar).
   """
   attr :id, :string, required: true
   attr :hook, :string, required: true
   attr :blend, :string, required: true
+  attr :behind, :boolean, default: false
 
   def layer(assigns) do
     ~H"""
@@ -113,7 +119,7 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
       phx-hook={@hook}
       phx-update="ignore"
       aria-hidden="true"
-      style={"position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: #{@blend}; pointer-events: none; z-index: 2;"}
+      style={"position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: #{@blend}; pointer-events: none; z-index: #{if @behind, do: -1, else: 2};"}
     ></canvas>
     """
   end
@@ -176,11 +182,21 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp glyph_width("-"), do: 42
   defp glyph_width(_), do: 58
 
-  # Vertical label drawn in an SVG: the text is stretched to `label_length/1` units
+  # Vertical label drawn in an SVG: the text is stretched to `label_length/3` units
   # and the SVG scales to the strip, so the label fills it with any font.
-  defp label_text(user, score), do: user |> score_label(score) |> String.upcase()
+  defp label_text(user, score, summary), do: user |> strip_label(score, summary) |> String.upcase()
 
-  defp label_length(user, score), do: String.length(score_label(user, score)) * 52
+  defp label_length(user, score, summary), do: String.length(strip_label(user, score, summary)) * 52
+
+  # Easter egg: the label cheers when the shown score is exactly 6.7.
+  defp strip_label(user, score, summary) do
+    if six_seven?(summary, score), do: "Six seven!", else: score_label(user, score)
+  end
+
+  defp six_seven?(%AsyncResult{ok?: true, result: summary}, score) when score in [:viewer, :streamer],
+    do: score_value(summary, score) == "6.7"
+
+  defp six_seven?(_summary, _score), do: false
 
   # Height shared by the track counter and the progress bar, so they line up.
   defp bar_height, do: "18vh"

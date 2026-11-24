@@ -4,15 +4,15 @@
       id={"label-#{@score}"}
       phx-hook="FitSvgText"
       data-fill="0.94"
-      viewBox={"0 0 100 #{label_length(@user, @score) + 10}"}
+      viewBox={"0 0 100 #{label_length(@user, @score, @summary) + 10}"}
       preserveAspectRatio="xMidYMid meet"
       style="width: 100%; height: 100%; display: block;"
-      aria-label={score_label(@user, @score)}
+      aria-label={strip_label(@user, @score, @summary)}
     >
       <g>
         <text
-          transform={"translate(90 #{label_length(@user, @score) + 5}) rotate(-90)"}
-          textLength={label_length(@user, @score)}
+          transform={"translate(90 #{label_length(@user, @score, @summary) + 5}) rotate(-90)"}
+          textLength={label_length(@user, @score, @summary)}
           lengthAdjust="spacingAndGlyphs"
           font-size="100"
           font-family="Overlay"
@@ -22,7 +22,7 @@
           stroke-width="5"
           stroke-linejoin="round"
         >
-          {label_text(@user, @score)}
+          {label_text(@user, @score, @summary)}
         </text>
       </g>
     </svg>

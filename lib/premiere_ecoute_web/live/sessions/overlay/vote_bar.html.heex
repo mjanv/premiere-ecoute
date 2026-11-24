@@ -3,7 +3,7 @@ max_count = @vote_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end
 
 vote_options = Enum.map(@vote_distribution, &elem(&1, 0)) %>
 <div :if={@score in [:votes]} style="width: 100%; height: 100%; display: flex;">
-  <.label_strip score={@score} user={@user} color={@color} progress={nil} counter={false} width="28vh" />
+  <.label_strip summary={nil} score={@score} user={@user} color={@color} progress={nil} counter={false} width="28vh" />
   <div style={"flex: 1; min-width: 0; display: flex; overflow: hidden; gap: 2px; box-sizing: border-box; border: 1.5vh solid #{@color}; border-left: 0;"}>
     <%= for {option, count} <- @vote_distribution do %>
       <% color = SessionComponents.vote_option_color(option, vote_options)

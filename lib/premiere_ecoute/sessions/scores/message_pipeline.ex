@@ -87,13 +87,16 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   Processes batched votes for bulk insertion and broadcasts session summaries.
 
   Inserts all votes in the batch, generates an updated session report, extracts the relevant track summary (or the session summary for album votes), and broadcasts it via PubSub for real-time UI updates.
+
+  Also broadcasts `{:votes_cast, positions}`, one position on the vote scale (0..1) per vote of the batch, for the overlay's star field. Every vote of the batch counts, including repeat votes the insert skips.
   """
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
     Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
 
     # The report needs the session vote options to compute scores of text vote scales (smash/pass).
-    {:ok, report} = Report.generate(Repo.get(ListeningSession, session_id) || %ListeningSession{id: session_id})
+    session = Repo.get(ListeningSession, session_id) || %ListeningSession{id: session_id}
+    {:ok, report} = Report.generate(session)
 
     summary =
       case hd(messages).data do
@@ -105,8 +108,25 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, summary})
     end
 
+    positions = Enum.map(messages, fn message -> scale_position(message.data.value, session.vote_options) end)
+    PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:votes_cast, positions})
+
     messages
   end
+
+  # Position of a vote on the session's scale, from 0 (lowest option) to 1 (highest).
+  # Smash/pass lists smash first, but smash is the good vote.
+  defp scale_position("smash", _options), do: 1.0
+  defp scale_position("pass", _options), do: 0.0
+
+  defp scale_position(value, [_, _ | _] = options) do
+    case Enum.find_index(options, &(&1 == value)) do
+      nil -> 0.5
+      index -> index / (length(options) - 1)
+    end
+  end
+
+  defp scale_position(_value, _options), do: 0.5
 
   @doc """
   Handles failed message processing.

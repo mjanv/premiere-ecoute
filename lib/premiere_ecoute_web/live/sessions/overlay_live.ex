@@ -133,7 +133,14 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     |> assign(:listening_session, session)
     |> assign(:widget_state, :closed)
     |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
+    |> push_event("stars_reset", %{})
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  # Votes of a batch, as positions on the session's vote scale (0..1), for the StarField hook.
+  @impl true
+  def handle_info({:votes_cast, values}, socket) do
+    {:noreply, push_event(socket, "votes_cast", %{values: values})}
   end
 
   @impl true

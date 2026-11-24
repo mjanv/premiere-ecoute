@@ -118,4 +118,54 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
       assert %Vote{value: "0"} = vote
     end
   end
+
+  describe "publish/2 - votes cast" do
+    defp cast(votes) do
+      votes
+      |> Enum.with_index()
+      |> Enum.each(fn {message, i} ->
+        PremiereEcouteCore.publish(@pipeline, %MessageSent{
+          broadcaster_id: "1234",
+          user_id: "viewer#{i + 1}",
+          message: message,
+          is_streamer: false
+        })
+      end)
+    end
+
+    # Votes can be split over several batches; gathers their positions in order.
+    defp positions(acc \\ []) do
+      receive do
+        {:votes_cast, positions} -> positions(acc ++ positions)
+      after
+        300 -> acc
+      end
+    end
+
+    test "broadcasts the position of each vote on the scale", %{session: session} do
+      PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+
+      cast(["0", "5", "10"])
+
+      assert positions() == [0.0, 0.5, 1.0]
+    end
+
+    test "counts smash as the high vote of the smash/pass scale", %{session: session} do
+      session = session |> Ecto.Changeset.change(vote_options: ["smash", "pass"]) |> PremiereEcoute.Repo.update!()
+      Cache.put(:sessions, "1234", Map.take(session, [:id, :vote_options, :current_track_id]))
+      PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+
+      cast(["smash", "pass"])
+
+      assert positions() == [1.0, 0.0]
+    end
+
+    test "does not broadcast invalid messages", %{session: session} do
+      PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+
+      cast(["hello", "11"])
+
+      assert positions() == []
+    end
+  end
 end

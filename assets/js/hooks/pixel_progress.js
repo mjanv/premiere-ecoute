@@ -12,7 +12,7 @@
 import { clamp01, fitCanvas, rand, rgb } from "./overlay_canvas";
 
 // Tuning knobs
-const ROWS = 9; // cell rows across the bar height
+const ROWS = 5; // cell rows across the bar height (few, so cells stay visible on a small widget)
 const PATCH = 5; // size of the colour patches, in cells (smooth noise scale)
 const JITTER = 0.35; // per-cell randomness added on top of the patches (0..1)
 const FLAT = [0.05, 0.45]; // distance behind the front (share of the bar) where the texture fades out to flat colour

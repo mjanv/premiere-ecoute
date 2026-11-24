@@ -11,6 +11,9 @@ import { fitCanvas, onResize, rgb } from "./overlay_canvas";
 const PALETTE = ["#4a2bff", "#ff3df2", "#ffb8ff", "#ff2d55"]; // demo "Neon"
 const SCALE = 1.2; // flow scale, in widget heights (higher = smaller swirls)
 const SPEED = 1; // multiplies the flow speed
+const BANDS = 0.6; // colour bands per flow unit (demo: 0.3); higher packs more bands into each stroke
+const DETAIL = 0.35; // strength of a fine ripple over the flow, so even thin strokes hold several tints
+const RIPPLE = 3.5; // scale of that ripple, relative to the flow
 
 const VERT = `#version 300 es
 in vec2 position;
@@ -22,6 +25,9 @@ out vec4 outColor;
 uniform vec2 uRes;
 uniform float uTime;
 uniform float uScale;
+uniform float uBands;
+uniform float uDetail;
+uniform float uRipple;
 uniform vec3 uColors[4];
 
 vec3 palette(float p) {
@@ -38,7 +44,14 @@ void main() {
     float n = float(i);
     p += (0.36 / n) * sin(p.yx * n * 1.15 + t * (0.32 + 0.07 * n) + vec2(1.7, 4.1) * n);
   }
-  vec3 col = palette(0.3 * (p.x + p.y) + t * 0.045);
+  // A second, finer warp of the same kind ripples the bands.
+  vec2 q = p * uRipple;
+  for (int i = 1; i <= 2; i++) {
+    float n = float(i);
+    q += (0.5 / n) * sin(q.yx * n * 1.3 - t * (0.5 + 0.1 * n) + vec2(2.3, 0.7) * n);
+  }
+  float ripple = sin(q.x + q.y) * 0.5 + sin(q.x * 1.7 - q.y * 0.6) * 0.25;
+  vec3 col = palette(uBands * (p.x + p.y) + uDetail * ripple + t * 0.045);
   float g = fract(sin(dot(gl_FragCoord.xy + t, vec2(12.9898, 78.233))) * 43758.5453);
   outColor = vec4(col + (g - 0.5) * 0.025, 1.0);
 }`;
@@ -64,7 +77,7 @@ function program(gl) {
   gl.enableVertexAttribArray(position);
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
   const u = {};
-  for (const name of ["uRes", "uTime", "uScale", "uColors"]) u[name] = gl.getUniformLocation(prog, name);
+  for (const name of ["uRes", "uTime", "uScale", "uBands", "uDetail", "uRipple", "uColors"]) u[name] = gl.getUniformLocation(prog, name);
   gl.uniform3fv(u.uColors, PALETTE.flatMap((c) => rgb(c).map((v) => v / 255)));
   return u;
 }
@@ -101,6 +114,9 @@ export const LiquidField = {
         gl.uniform2f(u.uRes, canvas.width, canvas.height);
         gl.uniform1f(u.uTime, reduced ? 3 : (now / 1000) * SPEED);
         gl.uniform1f(u.uScale, SCALE);
+        gl.uniform1f(u.uBands, BANDS);
+        gl.uniform1f(u.uDetail, DETAIL);
+        gl.uniform1f(u.uRipple, RIPPLE);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
       this.raf = reduced ? null : requestAnimationFrame(frame);

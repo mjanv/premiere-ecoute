@@ -1,5 +1,5 @@
 <div :if={@score in [:player]} style="display: flex; flex-direction: row; width: 1200px; height: 240px; box-sizing: border-box;">
-  <.label_strip score={@score} user={@user} color={@color} progress={@progress} counter={true} width="28vh" />
+  <.label_strip summary={nil} score={@score} user={@user} color={@color} progress={@progress} counter={true} width="28vh" />
 
   <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
     <div style={"flex: 1; min-height: 0; display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 0 12px; box-sizing: border-box; border: 1.5vh solid #{@color}; border-left: 0; border-bottom: 0;"}>

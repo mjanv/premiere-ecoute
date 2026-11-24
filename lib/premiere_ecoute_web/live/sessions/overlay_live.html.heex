@@ -11,7 +11,7 @@
     data-overlay-root
     data-primary={@color_primary}
     data-secondary={@color_secondary}
-    style={"background: #{widget_bg(@widget_state, paint.primary, paint.secondary)}; border-radius: 0px; #{overlay_size(@score)}display: flex; align-items: center; justify-content: center; color: #{paint.text}; line-height: 1; position: relative;"}
+    style={"background: #{widget_bg(@widget_state, paint.primary, paint.secondary)}; border-radius: 0px; #{overlay_size(@score)}display: flex; align-items: center; justify-content: center; color: #{paint.text}; line-height: 1; position: relative; isolation: isolate;"}
   >
     <%!-- Great mode: flowing gradient multiplied over the white-painted widget, plus film grain. --%>
     <.layer :if={paint.great} id="overlay-liquid" hook="LiquidField" blend="multiply" />
@@ -22,6 +22,9 @@
       <.layer id="overlay-texture" hook="PaperTexture" blend="lighten" />
       <.layer id="overlay-grain" hook="HalftoneGrain" blend="multiply" />
     </div>
+    <%!-- Chat votes as stars behind the widget content, in every mode. The root is isolated so
+         this layer stays above its background. --%>
+    <.layer id="overlay-stars" hook="StarField" blend="normal" behind />
 
     <%= if @score in [:player] do %>
       <.player

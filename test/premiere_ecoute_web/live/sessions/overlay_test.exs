@@ -10,10 +10,10 @@ defmodule PremiereEcouteWeb.Sessions.OverlayTest do
   defp summary(scores), do: AsyncResult.ok(scores)
 
   describe "great?/2" do
-    test "is true for a viewer score at or above 9.75" do
-      assert Overlay.great?(summary(%{viewer_score: 9.75}), :viewer)
+    test "is true for a viewer score at or above 9.5" do
+      assert Overlay.great?(summary(%{viewer_score: 9.5}), :viewer)
       assert Overlay.great?(summary(%{viewer_score: 10.0}), :viewer)
-      refute Overlay.great?(summary(%{viewer_score: 9.7}), :viewer)
+      refute Overlay.great?(summary(%{viewer_score: 9.4}), :viewer)
     end
 
     test "reads string keys, as in stored report summaries" do
@@ -31,7 +31,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayTest do
     test "is true in both mode when either score is great" do
       assert Overlay.great?(summary(%{viewer_score: 9.8, streamer_score: 6.0}), :both)
       assert Overlay.great?(summary(%{viewer_score: 6.0, streamer_score: 10.0}), :both)
-      refute Overlay.great?(summary(%{viewer_score: 9.7, streamer_score: 9.0}), :both)
+      refute Overlay.great?(summary(%{viewer_score: 9.4, streamer_score: 9.0}), :both)
     end
 
     test "is false without a score, while loading, and for the player and votes overlays" do

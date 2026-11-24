@@ -1,6 +1,6 @@
 <div style="display: grid; grid-template-columns: 28vh 1fr 28vh 1fr; grid-template-rows: 1fr 12vh; width: 100%; height: 100%; box-sizing: border-box;">
   <div style="grid-column: 1; grid-row: 1 / 3; display: flex;">
-    <.label_strip score={:viewer} user={@user} color={@color} progress={@progress} counter={true} width="100%" />
+    <.label_strip summary={@summary} score={:viewer} user={@user} color={@color} progress={@progress} counter={true} width="100%" />
   </div>
   <div style="grid-column: 2; grid-row: 1; display: flex; min-width: 0;">
     <.score_box
@@ -15,7 +15,15 @@
     />
   </div>
   <div style="grid-column: 3; grid-row: 1; display: flex;">
-    <.label_strip score={:streamer} user={@user} color={@color} progress={@progress} counter={false} width="100%" />
+    <.label_strip
+      summary={@summary}
+      score={:streamer}
+      user={@user}
+      color={@color}
+      progress={@progress}
+      counter={false}
+      width="100%"
+    />
   </div>
   <div style="grid-column: 4; grid-row: 1; display: flex; min-width: 0;">
     <.score_box

@@ -34,6 +34,7 @@ import { HalftoneGrain } from "./halftone_grain";
 import { PixelProgress } from "./pixel_progress";
 import { LiquidField } from "./liquid_field";
 import { FilmGrain } from "./film_grain";
+import { StarField } from "./star_field";
 import { FitSvgText } from "./fit_svg_text";
 import { ClipVolumeBar } from "./clip_volume_bar";
 import { WrappedRenders } from "../wrapped";
@@ -75,6 +76,7 @@ export const Hooks = {
   PixelProgress: PixelProgress,
   LiquidField: LiquidField,
   FilmGrain: FilmGrain,
+  StarField: StarField,
   FitSvgText: FitSvgText,
   ClipVolumeBar: ClipVolumeBar,
   ...WrappedRenders
