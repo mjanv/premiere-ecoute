@@ -13,14 +13,14 @@
 import { fitCanvas, rgb } from "./overlay_canvas";
 
 // Tuning knobs
-const UNIT = 80; // pixel unit = widget height / UNIT (star pixels stay chunky on a small widget)
+const UNIT = 56; // pixel unit = widget height / UNIT (about 1.5 screen pixels on an 80 px tall widget)
 const SPREAD = 1000; // ms over which a batch of votes is spread
 const TWINKLE = 2200; // ms from flash to settled dot
-const PEAK = 0.9; // brightness of a star at its flash (0..1)
-const REST = 0.22; // brightness of a settled star, as a share of its peak
+const PEAK = 1; // brightness of a star at its flash (0..1)
+const REST = 0.45; // brightness of a settled star, as a share of its peak
 const SHOOTING = 0.9; // votes at or above this value shoot first
 const FLIGHT = 1500; // ms for a shooting star to cross
-const TRAIL = 14; // trail length, in pixel units
+const TRAIL = 13; // trail length, in pixel units
 const TRAVEL = [0.2, 0.4]; // distance crossed, as a share of the widget width
 const BEND = [0.1, 0.3]; // sideways bow of the path, as a share of its length (either side)
 const ENTRY = [0.25, 0.7]; // angle off straight inward at which a shooting star enters, in radians (either side)

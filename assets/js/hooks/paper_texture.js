@@ -9,7 +9,8 @@
 import { onResize, rand, rgb } from "./overlay_canvas";
 
 // Tuning knobs
-const SPECKS = 700; // specks for a 1280x400 widget; scaled with the area
+const SPECKS = 700; // specks for a 1280x400 widget; scaled with the area. None with the
+// constellation background (the root's data-background), where they would read as stars.
 const SCRATCHES = 6; // scratches for a 1280x400 widget; scaled with the area
 const PATCHES = 1; // torn lighter patches
 const CREASES = 1; // faint horizontal fold lines
@@ -26,6 +27,7 @@ function draw(canvas, seed) {
   const r = (a, b = 0, c = 0) => rand(a, b, c, seed);
 
   const root = canvas.closest("[data-overlay-root]");
+  const specks = root?.dataset.background === "texture" ? SPECKS : 0;
   const tints = [rgb(root?.dataset.primary, "#ffffff"), rgb(root?.dataset.secondary, "#ffffff")];
   // Opaque colour: lighten blending needs the level, not a translucent white.
   const shade = (c, level) => `rgb(${c.map((v) => Math.round(Math.min(255, v * level * STRENGTH))).join(",")})`;
@@ -35,7 +37,7 @@ function draw(canvas, seed) {
 
   p.clearRect(0, 0, w, h);
 
-  for (let i = 0; i < SPECKS * area; i++) {
+  for (let i = 0; i < specks * area; i++) {
     p.fillStyle = speck(0.02 + r(i, 1) * 0.09, r(i, 14));
     const s = Math.max(1, (1 + r(i, 2) * 2) * unit);
     p.fillRect(r(i, 3) * w, r(i, 4) * h, s, s);

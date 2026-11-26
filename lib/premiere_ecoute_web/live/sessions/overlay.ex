@@ -102,6 +102,17 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
     ~H"{render_slot(@inner_block, @paint)}"
   end
 
+  # Background of the black areas, hard-coded for now:
+  # - :constellation, chat votes drawn as stars, over a paper texture without specks;
+  # - :texture, the paper texture with its specks (which read as stars), and no stars.
+  @background :constellation
+
+  @doc """
+  Background of the overlay's black areas: `:constellation` or `:texture`.
+  """
+  @spec background() :: :constellation | :texture
+  def background, do: @background
+
   @doc """
   A full-widget canvas layer driven by a JS hook and blended over the widget. With
   `behind`, the layer sits under the widget content instead (over the root background,
